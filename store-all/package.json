@@ -1,0 +1,30 @@
+{
+  "name": "default",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve --open",
+    "dev": "npm run serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@better-scroll/core": "^2.0.0-alpha.4",
+    "@chenfengyuan/vue-barcode": "^1.0.1",
+    "axios": "^0.19.2",
+    "better-scroll": "^1.15.2",
+    "core-js": "^2.6.5",
+    "element-ui": "^2.13.0",
+    "qrcodejs2": "0.0.2",
+    "vant": "^2.5.7",
+    "view-design": "^4.3.2",
+    "vue": "^2.6.10",
+    "vue-router": "^3.1.6"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.8.0",
+    "@vue/cli-service": "^3.8.0",
+    "stylus": "^0.54.7",
+    "stylus-loader": "^3.0.2",
+    "vue-template-compiler": "^2.6.10"
+  }
+}

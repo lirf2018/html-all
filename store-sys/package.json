@@ -1,0 +1,24 @@
+{
+  "name": "default",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve --open",
+    "dev": "npm run serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "async-validate": "^1.0.1",
+    "axios": "^0.20.0",
+    "core-js": "^2.6.5",
+    "echarts": "^5.0.0",
+    "view-design": "^4.3.2",
+    "vue": "^2.6.10",
+    "vue-router": "^3.4.3"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.8.0",
+    "@vue/cli-service": "^3.8.0",
+    "vue-template-compiler": "^2.6.10"
+  }
+}
