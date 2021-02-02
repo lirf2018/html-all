@@ -3,19 +3,25 @@
 		<div><Head :title="title" /></div>
 		<div class="banner-list">
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-				<van-swipe-item v-for="(img, index) in bannerImg" :key="index"><img :src="img" /></van-swipe-item>
+				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" /></van-swipe-item>
 			</van-swipe>
 		</div>
-		<div class="goods-info">
-			<div class="goods-name"><span>商品名称商品名称商品名称商品名称</span></div>
+		<div class="goods-info" v-if="goodsInfo != null">
+			<div class="goods-name"><span>{{goodsInfo.goodsName}}</span></div>
 			<div class="goods-prop">
 				<div>
 					<span>￥</span>
-					<span>1.11</span>
-					<span>起</span>
+					<span>
+						{{goodsInfo.skuLowMoney}}
+						<span v-if="goodsInfo.skuLowMoney<=goodsInfo.skuLowMoneyTrue" style="font-size: 10px;color: gray;font-weight: 100;">
+							<span>价格 ￥</span>
+							<span style="text-decoration: line-through;">{{goodsInfo.skuLowMoneyTrue}}</span>
+						</span>
+					</span>
+					<span></span>
 				</div>
-				<div><span>销量 4</span></div>
-				<div><span>库存 100000</span></div>
+				<div><span>销量 {{goodsInfo.sellCount}}</span></div>
+				<div>库存 {{goodsInfo.goodsNum}}</div>
 			</div>
 			<div style="clear: both;"></div>
 		</div>
@@ -43,17 +49,18 @@
 		</div>
 
 		<div class="goods-detail">
-			<van-tabs v-model="active" color="#008000">
+			<van-tabs v-model="active" color="#ffffff">
 				<van-tab title="商品详情">
-					<div class="text-img"></div>
+					<div v-if="goodsInfo!=null">
+						<div class="text-img" v-html="goodsInfo.intro">{{goodsInfo.intro}}</div>
+					</div>
 					<div class="both-img">
-						<img src="https://img.yzcdn.cn/vant/apple-5.jpg" />
-						<img src="https://img.yzcdn.cn/vant/apple-6.jpg" />
-						<img src="https://img.yzcdn.cn/vant/apple-7.jpg" />
+						<img :src="item.imgUrl" v-for="(item,index) in goodsInfoList" :key="index" />
 					</div>
 					<div style="height: 10px; width: 100%;clear: both;"></div>
+					<!-- <van-divider dashed color="red">价格说明</van-divider> -->
 				</van-tab>
-				<van-tab title="成交记录">
+				<!-- <van-tab title="成交记录">
 					<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
 						<div class="order-record">
 							<div class="title">
@@ -72,15 +79,15 @@
 							<div style="width: 100%;clear: both;"></div>
 						</div>
 					</van-list>
-				</van-tab>
+				</van-tab> -->
 			</van-tabs>
 		</div>
 		<div class="footer">
 			<div style="height: 51px; width: 100%;clear: both;"></div>
 			<van-goods-action>
-				<van-goods-action-icon icon="chat-o" text="客服" color="#008000" />
+				<!-- <van-goods-action-icon icon="chat-o" text="客服" color="#008000" />
 				<van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
-				<van-goods-action-icon icon="star" text="已收藏" color="#008000" />
+				<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
 				<van-goods-action-button v-if="goodsItem.goodsStatus == 1 && goodsItem.goodsStore > 0" color="#53FF53" text="加入购物车" @click="showNext(0)" />
 				<van-goods-action-button v-if="goodsItem.goodsStatus == 1 && goodsItem.goodsStore > 0" color="#008000" text="立即购买" @click="showNext(1)" />
 				<div v-if="goodsItem.goodsStatus != 1" class="goods-down"><span>商品已下架</span></div>
@@ -92,7 +99,7 @@
 		<div class="sku-div">
 			<van-popup v-model="showGoods" closeable close-icon="close" position="bottom" :style="{ height: '80%' }">
 				<div class="goods-show-info">
-					<div class="goods-show-img"><img src="https://img.yzcdn.cn/vant/apple-1.jpg" @click="showImg" /></div>
+					<div class="goods-show-img"><img :src="skuImg" @click="showImg" /></div>
 					<div class="goods-show-goods">
 						<div class="goods-show-price">
 							<span>￥</span>
@@ -121,8 +128,8 @@
 						<div class="prop-value">
 							<div
 								@click="clickValueSpan(propItem.propId, valueItem.valueId)"
-								:class="valueItem.valueItemsCss"
-								v-for="valueItem in propItem.propValues"
+								:class="valueItem.valueItemsCss == null?'value-items':valueItem.valueItemsCss"
+								v-for="valueItem in propItem.valueList"
 								:key="valueItem.valueId"
 							>
 								<span>{{ valueItem.valueName }}</span>
@@ -146,6 +153,7 @@
 
 <script>
 import Head from '@/components/Head.vue';
+import axios from '@/network/request.js';
 export default {
 	components: { Head: Head },
 	data() {
@@ -159,21 +167,92 @@ export default {
 			loading: false,
 			finished: false,
 			refreshing: false,
-			showGoods: false,
+			showGoods: false,//
 			showImgDetail: false,
-			skuImagesShow: ['https://img.yzcdn.cn/vant/apple-1.jpg'],
-			skuPrice: '1.11',
-			skuStore: '10',
+			skuImg:null,
+			skuPrice: '0',
+			skuStore: '0',
 			skuPropName: '',
 			skuPropNameCode: '',
+			showImgDetail:false,
+			skuImagesShow:[],
 			goodsItem: [], //商品数据
-			bannerImg: ['https://img.yzcdn.cn/vant/apple-1.jpg', 'https://img.yzcdn.cn/vant/apple-2.jpg'],
 			clickType: 0, //0加入购物车  1购买
 			clickTypeText: '加入购物车',
-			testIndex: 0
+			testIndex: 0,
+			goodsInfo:null,
+			goodsBannelList:[],
+			goodsInfoList:[],
+			goodsSkuList:[]
 		};
 	},
+	filters: {
+		numFilter(value) {
+			let realVal = '';
+			if (!isNaN(value) && value !== '') {
+				// 截取当前数据到小数点后两位
+				realVal = parseFloat(value).toFixed(2);
+			} else {
+				realVal = '--';
+			}
+			return realVal;
+		},
+		dateFormat(originVal) {
+			let dt = new Date(originVal);
+			//年的时间
+			let y = dt.getFullYear();
+			//月的时间  .padStart 不足两位自动补0  2位长度
+			let m = (dt.getMonth() + 1 + '').padStart(2, '0');
+			//日的时间
+			let d = (dt.getDate() + '').padStart(2, '0');
+	
+			//小时
+			let hh = (dt.getHours() + '').padStart(2, '0');
+			//分钟
+			let mm = (dt.getMinutes() + '').padStart(2, '0');
+			//秒数
+			let ss = (dt.getSeconds() + '').padStart(2, '0');
+	
+			//将它们拼接成完整的字符串
+			//return 'yyyy-mm-dd hh:mm:ss'  可以改成下面的方法
+			return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+		}
+	},
 	methods: {
+		findGoodsInfo() {
+			let {goodsId} = this.$route.query;
+			if (!goodsId) {
+				return;
+			}
+			let vm = this;
+			let params = {
+				req_type: 'query_goods_detail',
+				data: { goods_id: goodsId, user_id: 0 }
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					vm.goodsInfo = res.data;
+					vm.goodsBannelList = vm.goodsInfo.bannerImgList;
+					vm.goodsInfoList = vm.goodsInfo.goodsImgList;
+					vm.skuImg = vm.goodsInfo.goodsImg;
+					vm.skuImagesShow =  [vm.goodsInfo.goodsImg];
+					vm.goodsSkuList = vm.goodsInfo.goodsSkuList;
+					vm.skuStore = vm.goodsInfo.goodsNum;
+					vm.initSku(vm.goodsInfo);
+				} else {
+				}
+			});
+		},
+		initSku(goods){
+			var goodsItem = {
+				goodsId: 110,
+				goodsName: 'iphone手机',
+				goodsStore: 100,
+				goodsStatus: 1,
+				goodsSkuPropList: goods.salePropList
+			};
+			this.goodsItem = goodsItem;
+		},
 		showNext(clickType) {
 			this.showGoods = true;
 			this.clickTypeText = clickType == 0 ? '加入购物车' : '下一步';
@@ -218,13 +297,14 @@ export default {
 			this.onLoad();
 		},
 		clickValueSpan(propId, valueId) {
+			let vm = this;
 			//选中属性值
 			let propList = this.goodsItem.goodsSkuPropList;
 			let chosePropValueIds = ''; //选中的属性值id
 			let chosePropValueIdsNames = ''; //选中的属性值id名称
 			propList.forEach(function(e) {
 				let propId_ = e.propId;
-				e.propValues.forEach(function(e) {
+				e.valueList.forEach(function(e) {
 					if (propId_ == propId) {
 						e.valueItemsCss = valueId == e.valueId ? 'value-items-chose' : 'value-items';
 					}
@@ -235,71 +315,24 @@ export default {
 				});
 			});
 			//根据已选择的属性值查找对应的sku价格和库存
-			this.skuPropName = chosePropValueIdsNames;
 			this.skuPropNameCode = chosePropValueIds;
+			this.skuPropName = chosePropValueIdsNames;
+			this.goodsSkuList.forEach(function(e){
+				if(e.propCode == chosePropValueIds){
+					vm.skuPrice = e.skuNowMoney;
+					vm.skuStore = e.skuNum;
+					vm.skuImg = e.skuImg;
+					vm.skuImagesShow =  [e.skuImg];
+				}
+			})
+			
+			
 		}
 	},
 	mounted() {
-		var goodsSkuPropList = [
-			{
-				propId: 1,
-				propName: '颜色',
-				propValues: [
-					{
-						valueId: 1,
-						valueName: '炫耀金',
-						valueItemsCss: 'value-items'
-					},
-					{
-						valueId: 2,
-						valueName: '玫瑰红',
-						valueItemsCss: 'value-items'
-					}
-				]
-			},
-			{
-				propId: 2,
-				propName: '尺寸',
-				propValues: [
-					{
-						valueId: 3,
-						valueName: '5寸',
-						valueItemsCss: 'value-items'
-					},
-					{
-						valueId: 4,
-						valueName: '5.9寸',
-						valueItemsCss: 'value-items'
-					}
-				]
-			},
-			{
-				propId: 3,
-				propName: '内存',
-				propValues: [
-					{
-						valueId: 5,
-						valueName: '64G',
-						valueItemsCss: 'value-items'
-					}
-				]
-			}
-		];
-
-		// let goodsSkuList = [{
-		// 	skuId:1,
-		// 	skuName:'商品sku名称',
-		// 	skuPropCode:
-		// }];
-
-		var goodsItem = {
-			goodsId: 110,
-			goodsName: 'iphone手机',
-			goodsStore: 100,
-			goodsStatus: 1,
-			goodsSkuPropList: goodsSkuPropList
-		};
-		this.goodsItem = goodsItem;
+		this.$nextTick(function() {
+			this.findGoodsInfo();
+		});
 	}
 };
 </script>
@@ -371,21 +404,27 @@ export default {
 
 .goods-prop {
 	color: #008000;
+	border-bottom: 1px solid #f0f0f0;
 }
 
 .goods-prop > div {
 	padding-top: 10px;
-	border-top: 1px solid #f0f0f0;
 }
 
-.goods-prop > div:not(:last-child) {
+.goods-prop > div:first-child{
 	float: left;
-	width: 34%;
+	width: 50%;
 }
 
-.goods-prop > div:last-child {
+.goods-prop > div:nth-child(2){
+	float: left;
+	width: 25%;
+	text-align: left;
+}
+
+.goods-prop > div:last-child{
 	float: right;
-	width: 32%;
+	width: 25%;
 	text-align: right;
 }
 
@@ -395,11 +434,11 @@ export default {
 
 .goods-prop > div:first-child > span:first-child {
 	font-weight: bold;
-	font-size: 12px;
+	font-size: 10px;
 }
 
 .goods-prop > div:first-child > span:nth-child(2) {
-	font-size: 16px;
+	font-size: 18px;
 }
 .goods-prop > div:first-child > span:last-child {
 	color: #657180;

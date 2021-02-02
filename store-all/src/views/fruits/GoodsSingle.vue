@@ -12,6 +12,12 @@
 				<div>
 					<span>￥</span>
 					<span>{{goodsInfo.nowMoney}}</span>
+					<span>
+						<span v-if="goodsInfo.nowMoney<=goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
+							<span> 价格 ￥</span>
+							<span style="text-decoration: line-through;">{{goodsInfo.trueMoney}}</span>
+						</span>
+					</span>
 				</div>
 				<div><span>销量 {{goodsInfo.sellCount}}</span></div>
 				<div>库存 {{goodsInfo.goodsNum}}</div>
@@ -42,9 +48,12 @@
 		</div>
 
 		<div class="goods-detail">
-			<van-tabs v-model="active" color="#008000">
+			<!-- color="#008000" -->
+			<van-tabs v-model="active" color="#ffffff">
 				<van-tab title="商品详情">
-					<div class="text-img"></div>
+					<div v-if="goodsInfo!=null">
+						<div class="text-img" v-html="goodsInfo.intro">{{goodsInfo.intro}}</div>
+					</div>
 					<div class="both-img">
 						<img :src="item.imgUrl" v-for="(item,index) in goodsInfoList" :key="index" />
 					</div>
@@ -86,7 +95,7 @@
 			</van-goods-action>
 		</div>
 		<!-- 弹出选择商品数量 -->
-		<div>
+		<div v-if="goodsInfo != null">
 			<van-popup v-model="showGoods" closeable close-icon="close" position="bottom">
 				<div class="goods-show-info">
 					<div class="goods-show-img"><img :src="goodsInfo.goodsImg" @click="showImg" /></div>
@@ -95,6 +104,12 @@
 						<div class="goods-show-price">
 							<span>￥</span>
 							<span>{{goodsInfo.nowMoney}}</span>
+							<span>
+								<span v-if="goodsInfo.nowMoney<=goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
+									<span> 价格 ￥</span>
+									<span style="text-decoration: line-through;">{{goodsInfo.trueMoney}}</span>
+								</span>
+							</span>
 						</div>
 					</div>
 				</div>
@@ -288,18 +303,26 @@ export default {
 
 .goods-prop > div {
 	padding-top: 10px;
-	border-top: 1px solid #f0f0f0;
 }
 
-.goods-prop > div:not(:last-child) {
+.goods-prop > div:first-child{
 	float: left;
-	width: 34%;
+	width: 50%;
+	font-size: 18px;
 }
 
-.goods-prop > div:last-child {
+.goods-prop > div:nth-child(2){
+	float: left;
+	width: 25%;
+	text-align: left;
+	font-size: 10px;
+}
+
+.goods-prop > div:last-child{
 	float: right;
-	width: 32%;
+	width: 25%;
 	text-align: right;
+	font-size: 10px;
 }
 
 .goods-prop {
@@ -308,11 +331,11 @@ export default {
 
 .goods-prop > div:first-child > span:first-child {
 	font-weight: bold;
-	font-size: 12px;
+	font-size: 10px;
 }
 
 .goods-prop > div:first-child > span:last-child {
-	font-size: 16px;
+	font-size: 10px;
 }
 
 .goods-prop > div:not(:first-child) {
@@ -379,10 +402,10 @@ export default {
 	padding-top: 5px;
 }
 .goods-show-price > span:first-child {
-	font-size: 12px;
+	font-size: 10px;
 }
-.goods-show-price > span:last-child {
-	font-size: 16px;
+.goods-show-price > span:nth-child(2) {
+	font-size: 18px;
 }
 .goods-show-buy {
 	padding: 10px 0;

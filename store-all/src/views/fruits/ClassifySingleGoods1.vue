@@ -1,13 +1,14 @@
 <template>
 	<div class="body-bg">
 		<div><Head :title="title" /></div>
+		<!-- <div style="height: 46px;"></div> -->
 		<div class="classfy-contents">
 			<van-row>
 				<van-col span="6">
 					<div class="left-main" ref="ratingsmain" :style="myStyle" id="scrollDiv">
 						<van-sidebar v-model="activeKey" @change="onchange">
 							<div ref="lItem" v-for="(item, index) in menuList" :key="index">
-								<van-sidebar-item :style="{ color: item.menuId == onclickMenu ? '#008000' : '' }" :title="item.menuId + item.menuName" />
+								<van-sidebar-item :style="{ color: item.menuId == onclickMenu ? '#008000' : '' }" :title="item.menuName" />
 							</div>
 						</van-sidebar>
 					</div>
@@ -18,17 +19,19 @@
 							<div v-for="(item, index) in menuList" :key="index" class="goods-list" ref="vansticky">
 								<div ref="rItem">
 									<div class="second-tab-name">
-										<span>{{ item.menuId + item.menuName }}</span>
+										<span style="font-size: 12px;">{{item.menuName }}</span>
 									</div>
 									<div class="goods-items" v-for="g in item.goodsList" :key="g.goodsId">
 										<div class="goods-img"><img :src="g.goodsImg" /></div>
 										<div class="goods-contents">
-											<span class="goods-name">{{ g.goodsname }}</span>
-											<span class="goods-desc">{{ g.goodsDesc }}</span>
+											<div class="goods-name-div">
+												<span class="goods-name">{{ g.goodsName }}</span>
+											</div>
+											<!-- <span class="goods-desc">{{ g.goodsDesc }}</span> -->
 											<div class="price-div">
 												<div class="price">
 													<span class="goods-currency">￥</span>
-													<span class="goods-price">{{ g.goodsPrice }}</span>
+													<span class="goods-price">{{ g.nowMoney }}</span>
 												</div>
 												<div class="add-cart">
 													<div v-if="g.userGoodsCount == 0" class="shop-cart" @click="onclickShopCart(item.menuId, g.goodsId)">
@@ -54,7 +57,7 @@
 				</van-col>
 			</van-row>
 		</div>
-		<div><Tbar :tbActive="tbActive" /></div>
+		<!-- <div><Tbar :tbActive="tbActive" /></div> -->
 	</div>
 </template>
 
@@ -62,6 +65,7 @@
 import BScroll from 'better-scroll';
 import Head from '@/components/Head.vue';
 import Tbar from '@/components/Bottom-bar.vue';
+import axios from '@/network/request.js';
 export default {
 	components: { Head: Head, Tbar: Tbar },
 	data() {
@@ -80,12 +84,13 @@ export default {
 	},
 	created() {
 		var h = document.documentElement.clientHeight || document.body.clientHeight;
-		this.showheight = h - 50 - 51;
+		// this.showheight = h - 50 - 51;
+		this.showheight = h-50;// 设置底部高度
 		this.myStyle = 'height:' + this.showheight + 'px';
 		this._Bscroll();
 
 		//测试
-		this.testPost();
+		this.searchGoodsList();
 	},
 	mounted() {
 		//增加滚动监听
@@ -192,17 +197,30 @@ export default {
 				}
 			});
 		},
+		searchGoodsList(){
+			let vm = this;
+			let params = {
+				req_type: 'query_goods_list1',
+				data: { user_id: 0 }
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					vm.menuList = res.data.menusList;
+				} else {
+				}
+			});
+		},
 		testPost() {
 			let goodsList = [];
 			for (let i = 0; i < 10; i++) {
 				this.testId = this.testId + 1;
 				var data = {
 					goodsId: this.testId + '-' + this.testId,
-					goodsname: '苹果水果新鲜当季水果丑苹果整箱10斤现季山西冰糖心红富士带一十',
+					goodsName: '苹果水果新鲜当季水果丑苹果整箱10斤现季山西冰糖心红富士带一十',
 					goodsDesc:
 						'皮薄，口感特别好。果肉细腻，看的出是新鲜采摘下来的，个子很大个，包装严实，没有坏果，皮薄肉厚，水分充足，好吃还不贵，苹果红红的，看着就很新鲜，苹果闻起来也是香气十足，颜色鲜艳好看，脆爽可口，汁多皮薄，味道极好。果子都很新鲜香味扑鼻个个都是熟透的香甜可口的大苹果。',
 					userGoodsCount: 0,
-					goodsPrice: '30.23',
+					nowMoney: '30.23',
 					goodsImg: 'https://img.yzcdn.cn/vant/apple-2.jpg'
 				};
 				goodsList.push(data);
@@ -323,7 +341,7 @@ export default {
 	line-height: 20px;
 	margin: 0;
 	padding: 0;
-	font-size: 14px;
+	font-size: 12px;
 	color: #323233;
 	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
 }
@@ -336,6 +354,11 @@ export default {
 }
 .van-sidebar-item--select {
 	border-color: #008000 !important;
+}
+
+>>>.van-sidebar-item{
+	font-size: 12px;
+	padding: 10px 12px 15px 8px;
 }
 
 /**
@@ -362,25 +385,25 @@ export default {
 	overflow: hidden;
 	font-size: 14px;
 	color: #657180;
-	height: 5.5rem;
+	height: 4.5rem;
 	position: relative;
 	padding: 7px 0;
 }
 
 .goods-img {
 	float: left;
-	width: 33%;
-}
-
-.goods-img > img {
-	width: 5.5rem;
-	height: 5.5rem;
+	width: 20%;
 }
 
 .goods-contents {
 	float: right;
-	width: 67%;
+	width: 80%;
 	overflow: hidden;
+}
+
+.goods-img > img {
+	width: 4rem;
+	height: 4rem;
 }
 
 .goods-contents > span {
@@ -389,17 +412,35 @@ export default {
 
 .goods-name,
 .goods-desc {
-	display: inline-block;
+	/* display: inline-block;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	font-size: 12px;
 	padding-bottom: 5px;
-	padding-left: 1.5rem;
+	padding-left: 1.5rem; */
+	/* overflow:hidden; 
+	text-overflow:ellipsis;
+	display:-webkit-box; 
+	-webkit-box-orient:vertical;
+	-webkit-line-clamp:2; 
+	display: inline-block; */
 }
+
+.goods-name-div{
+	overflow:hidden;
+	text-overflow:ellipsis;
+	display:-webkit-box; 
+	-webkit-box-orient:vertical;
+	-webkit-line-clamp:3;
+	height: 40px;
+	margin-left: 20px;
+	overflow-wrap: break-word;
+}
+
 .goods-name {
 	color: #464c5b;
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .price-div {
