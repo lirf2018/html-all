@@ -318,7 +318,7 @@
 					>
 						<div>{{ item.orderNum }}</div>
 						<div>{{ item.tableName }}</div>
-						<div>{{ item.userPhone }}13418915218&nbsp;</div>
+						<div>{{ item.userPhone }}</div>
 						<div>{{ item.orderStatusName }}</div>
 						<div>{{ item.lastUpdateTime }}</div>
 						<div><span>选择</span></div>
