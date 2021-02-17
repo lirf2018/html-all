@@ -3,22 +3,29 @@
 		<div><Head :title="title" /></div>
 		<div class="addrs-list">
 			<div v-for="(item, index) in list" :key="index">
-				<div class="first-name"><span>李</span></div>
+				<div class="first-name">
+					<span>{{ item.first_name }}</span>
+				</div>
 				<div class="user-info">
 					<div>
-						<span user-name>{{ item.name }}</span>
-						<span class="phone">{{ item.tel }}</span>
-						<span class="is-default" v-if="item.isDefault">默认</span>
+						<span user-name>{{ item.user_name }}</span>
+						<span class="phone">{{ item.user_phone }}</span>
+						<span class="is-default" v-if="item.is_default == 1">默认</span>
 					</div>
 					<div>
-						<span class="user-addr">{{ item.address }}</span>
+						<span class="user-addr">{{ item.area_name }}</span>
 					</div>
 				</div>
-				<div class="editer-text"><span>编辑</span></div>
+				<div class="editer-text">
+					<span @click="delAddr(item.id)">删除</span>
+					&nbsp;&nbsp;
+					<span @click="toPageDetail(item.id)">编辑</span>
+					&nbsp;
+				</div>
 			</div>
 		</div>
 		<div style="height: 45px;"></div>
-		<div class="add-btn">
+		<div class="add-btn" @click="toPage('addUserAddr')">
 			<div><span>新增加地址</span></div>
 		</div>
 	</div>
@@ -26,35 +33,75 @@
 
 <script>
 import Head from '@/components/Head.vue';
+import axios from '@/network/request.js';
+import { Dialog, Toast } from 'vant';
 export default {
 	components: { Head: Head },
 	data() {
 		return {
 			title: '收货地址',
 			chosenAddressId: '1',
-			list: [
-				{
-					id: '1',
-					name: '张三',
-					tel: '13000000000',
-					address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室',
-					isDefault: true
-				},
-				{
-					id: '2',
-					name: '李四',
-					tel: '1310000000',
-					address: '浙江省杭州市拱墅区莫干山路 50 号'
-				}
-			]
+			list: []
 		};
 	},
+	mounted: function() {
+		this.$nextTick(function() {
+			this.findAddrList();
+		});
+	},
 	methods: {
+		findAddrList() {
+			let vm = this;
+			let params = {
+				req_type: 'query_user_addr',
+				data: {
+					user_id: 0
+				}
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					vm.list = res.data.user_addr_list;
+				}
+			});
+		},
+		delAddr(id) {
+			let vm = this;
+			Dialog.confirm({
+				title: '提示',
+				message: '确认删除？'
+			})
+				.then(() => {
+					let params = {
+						req_type: 'delete_user_addr',
+						data: {
+							user_id: 0,
+							id: id
+						}
+					}; // 参数
+					axios.post('', params).then(function(res) {
+						if (res.resp_code == 1) {
+							Toast('操作成功');
+							vm.$nextTick(function() {
+								vm.findAddrList();
+							});
+						}
+					});
+				})
+				.catch(() => {
+					// on cancel
+				});
+		},
 		onAdd() {
 			Toast('新增地址');
 		},
 		onEdit(item, index) {
 			Toast('编辑地址:' + index);
+		},
+		toPage(path) {
+			this.$router.push(path);
+		},
+		toPageDetail(id) {
+			this.$router.push('addUserAddr?id=' + id);
 		}
 	}
 };
@@ -110,12 +157,12 @@ export default {
 }
 
 .editer-text {
-	width: 15%;
+	width: 20%;
 	text-align: center;
 	position: absolute;
 	top: 38%;
 	right: 0px;
-	width: 50px;
+	/* width: 50px; */
 	line-height: 30px;
 	height: 30px;
 	border-left: 1px solid #f8f8f8f8;

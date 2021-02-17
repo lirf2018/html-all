@@ -14,7 +14,7 @@
 			</van-cell-group>
 		</div>
 		<div class="forget-passwd">
-			<div><span>账号密码登录</span></div>
+			<div @click="accountLogin"><span>账号密码登录</span></div>
 		</div>
 		<div style="clear: both;"></div>
 		<div class="login-btn">
@@ -35,7 +35,12 @@ export default {
 			sms: ''
 		};
 	},
-	methods: {}
+	methods: {
+		accountLogin(){
+			let url = "accountLogin";
+			this.$router.push(url);
+		}
+	}
 };
 </script>
 

@@ -8,10 +8,18 @@
 				<div class="addr" @click="showAddrDiv">
 					<div class="addr-left">
 						<div v-if="province != ''">
-							<div class="province"><span>{{province}}</span></div>
-							<div class="city"><span>{{city}}</span></div>
-							<div class="county"><span>{{county}}</span></div>
-							<div class="town"><span>{{town}}</span></div>
+							<div class="province">
+								<span>{{ province }}</span>
+							</div>
+							<div class="city">
+								<span>{{ city }}</span>
+							</div>
+							<div class="county">
+								<span>{{ county }}</span>
+							</div>
+							<div class="town">
+								<span>{{ town }}</span>
+							</div>
 						</div>
 						<div v-if="province == ''">
 							<div class="area"><span>所在地区</span></div>
@@ -33,7 +41,7 @@
 			</div>
 		</div>
 		<div style="height: 45px;"></div>
-		<div class="add-btn">
+		<div class="add-btn" @click="saveData">
 			<div><span>保存地址</span></div>
 		</div>
 		<div class="addrs"><AddrPanel :showp="show" @closeAddrDivS="closeAddrDiv" @setAddrDataS="setAddrData"></AddrPanel></div>
@@ -43,10 +51,13 @@
 <script>
 import Head from '@/components/Head.vue';
 import AddrPanel from '@/components/AddrPanel.vue';
+import axios from '@/network/request.js';
+import { Toast } from 'vant';
 export default {
 	components: { Head: Head, AddrPanel: AddrPanel },
 	data() {
 		return {
+			id: null,
 			title: '添加收货地址',
 			checked: false,
 			username: '',
@@ -60,7 +71,84 @@ export default {
 			show: false
 		};
 	},
+	mounted() {
+		this.$nextTick(function() {
+			this.findDetail();
+		});
+	},
 	methods: {
+		findDetail() {
+			let vm = this;
+			let { id } = this.$route.query;
+			if (null == id) {
+				return;
+			}
+			vm.id = id;
+			let params = {
+				req_type: 'query_globle_addr_detail',
+				data: {
+					id: id,
+					user_id: 0
+				}
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					vm.checked = res.data.is_default;
+					vm.username = res.data.user_name;
+					vm.phone = res.data.phone;
+					vm.province = res.data.province;
+					vm.city = res.data.city;
+					vm.county = res.data.county;
+					vm.town = res.data.town;
+					vm.addrDetail = res.data.addr_detail;
+					vm.addrCodes = res.data.area_ids;
+				}
+			});
+		},
+		saveData() {
+			let vm = this;
+			if (vm.checked) {
+				vm.isDefault = 1;
+			}
+			if (vm.username == '' || vm.username == null) {
+				Toast('用户名不能为空');
+				return;
+			}
+			if (vm.phone == '' || vm.phone == null) {
+				Toast('手机号码不能为空');
+				return;
+			}
+			if (vm.addrDetail == '' || vm.addrDetail == null) {
+				Toast('详细地址不能为空');
+				return;
+			}
+			if (vm.addrCodes == '' || vm.addrCodes == null) {
+				Toast('选择地址有误,请重新选择');
+				return;
+			}
+			let params = {
+				req_type: 'add_user_addr',
+				data: {
+					id: vm.id,
+					user_id: 0,
+					area_Ids: vm.addrCodes,
+					area_names: vm.province + vm.city + vm.county + vm.town,
+					addr_detail: vm.addrDetail,
+					addr_type: 1,
+					user_phone: vm.phone,
+					user_name: vm.username,
+					is_default: vm.isDefault
+				}
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					Toast('操作成功');
+					vm.$nextTick(function() {
+						vm.$router.push('userAddr');
+					});
+				}
+			});
+		},
 		showAddrDiv() {
 			this.show = true;
 		},
@@ -74,9 +162,6 @@ export default {
 			this.county = data.county;
 			this.town = data.town;
 		}
-	},
-	mounted() {
-		this.show = false;
 	}
 };
 </script>

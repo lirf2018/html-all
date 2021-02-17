@@ -2,49 +2,10 @@
 	<div class="body-bg">
 		<div><Head :title="title" /></div>
 		<div class="classify-items">
-			<div class="items">
-				<div class="level1">一级分类</div>
+			<div class="items" v-for="(items, index) in levelList" :key="index" v-if="items.category_list.length > 0">
+				<div class="level1">{{ items.level_name }}</div>
 				<div class="level2">
-					<span>热血虫潮</span>
-					<span>热血</span>
-					<span>水果套餐</span>
-					<span>套餐</span>
-				</div>
-			</div>
-			<div class="items">
-				<div class="level1">一级分类</div>
-				<div class="level2">
-					<span>热血虫潮</span>
-					<span>热血</span>
-					<span>水果套餐</span>
-					<span>套餐</span>
-				</div>
-			</div>
-			<div class="items">
-				<div class="level1">一级分类</div>
-				<div class="level2">
-					<span>热血虫潮</span>
-					<span>热血</span>
-					<span>水果套餐</span>
-					<span>套餐</span>
-				</div>
-			</div>
-			<div class="items">
-				<div class="level1">一级分类</div>
-				<div class="level2">
-					<span>热血虫潮</span>
-					<span>热血</span>
-					<span>水果套餐</span>
-					<span>套餐</span>
-				</div>
-			</div>
-			<div class="items">
-				<div class="level1">一级分类</div>
-				<div class="level2">
-					<span>热血虫潮</span>
-					<span>热血</span>
-					<span>水果套餐</span>
-					<span>套餐</span>
+					<span v-for="(item, index) in items.category_list" :key="item.category_id" @click="toPage(item.category_id)">{{ item.category_name }}</span>
 				</div>
 			</div>
 		</div>
@@ -53,17 +14,43 @@
 
 <script>
 import Head from '@/components/Head.vue';
+import axios from '@/network/request.js';
+
 export default {
 	components: { Head: Head },
 	data() {
 		return {
-			title: '商品分类'
+			title: '商品分类',
+			levelList: []
 		};
+	},
+	mounted: function(e) {
+		this.$nextTick(function() {
+			this.findAllClassify();
+		});
+	},
+	methods: {
+		findAllClassify() {
+			let vm = this;
+			let params = {
+				req_type: 'query_classify_all',
+				data: {}
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					vm.levelList = res.data.level_list;
+				}
+			});
+		},
+		toPage(id) {
+			let url = 'classifyGoods2?catogeryId=' + id;
+			this.$router.push(url);
+		}
 	}
 };
 </script>
 
-<style scoped> 
+<style scoped>
 .body-bg {
 	border: none;
 	line-height: 20px;
@@ -77,7 +64,7 @@ export default {
 	padding: 10px 10px;
 	overflow: auto;
 	font-size: 14px;
-	background-color: #FFFFFF;
+	background-color: #ffffff;
 }
 .level1 {
 	padding-bottom: 5px;

@@ -15,12 +15,12 @@
 			</van-cell-group>
 		</div>
 		<div class="forget-passwd">
-			<div><span>忘记密码</span></div>
-			<div><span>手机验证码登录</span></div>
+			<div @click="resetPasswd"><span>忘记密码</span></div>
+			<div @click="phoneLogin"><span>手机验证码登录</span></div>
 		</div>
 		<div style="clear: both;"></div>
 		<div class="login-btn">
-			<div><span>登录</span></div>
+			<div @click="loginSuccess"><span>登录</span></div>
 		</div>
 		<EG />
 	</div>
@@ -42,6 +42,19 @@ export default {
 		showPasswd() {
 			this.inputType = this.inputType == 'password' ? 'text' : 'password';
 			this.eye = this.eye == 'closed-eye' ? 'eye-o' : 'closed-eye';
+		},
+		loginSuccess(){
+			let url = "center";
+			this.$router.push(url);
+		},
+		phoneLogin(){
+			let url = "phoneLogin";
+			this.$router.push(url);
+		},
+		resetPasswd(){
+			// 重置密码
+			let url = "resetPasswd";
+			this.$router.push(url);
 		}
 	}
 };

@@ -4,11 +4,13 @@
 			<div><Head :title="title" /></div>
 		</div>
 		<div style="height: 46px;"></div>
-		<!-- <div><van-empty class="custom-image" image="https://img.yzcdn.cn/vant/custom-empty-image.png" description="描述文字" /></div> -->
-		<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId" v-if="shopCart.isValid">
+		<div @click="toGoodsList" v-if="showCartEmptyFlag">
+			<van-empty class="custom-image" image="http://127.0.0.1/2021/01/10/202101101610290789993.jpg" description="去逛逛" />
+		</div>
+		<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId" v-if="shopCart.isValid && shopCart.cartList.length > 0">
 			<div class="shop">
 				<div class="shop-div">
-					<div><van-checkbox v-model="shopCart.isChecked" checked-color="#008000" @click="checkedShopGoodsAll(shopCart.shopId)"></van-checkbox></div>
+					<div><van-checkbox v-model="shopCart.isChecked" checked-color="#008000" @click="checkedShopGoodsAll(shopCart.shopId, shopCart.isChecked)"></van-checkbox></div>
 					<div class="shop-o"><van-icon name="shop-o" /></div>
 					<div>
 						<span>{{ shopCart.shopName }}</span>
@@ -20,14 +22,14 @@
 			</div>
 			<div style="clear: both;"></div>
 			<div class="items" v-for="(goodsInfo, index) in shopCart.cartList" :key="goodsInfo.cartId" v-if="goodsInfo.isValid">
-				<div class="goods-list">
+				<div class="goods-list" @click="toGoodsDetailPage(goodsInfo)">
 					<div class="select-btn">
 						<div class="checkbox-goods">
 							<van-checkbox
 								checked-color="#008000"
 								ref="checkboxes"
 								v-model="goodsInfo.isChecked"
-								@click="checkedShopGoods(shopCart.shopId, goodsInfo.cartId)"
+								@click="checkedShopGoods(shopCart.shopId, goodsInfo.cartId, goodsInfo.isChecked)"
 							></van-checkbox>
 						</div>
 					</div>
@@ -44,13 +46,13 @@
 									disable-input
 									integer
 									:key="goodsInfo.cartId"
-									@change="updateCartGoodsCount(shopCart.shopId, goodsInfo.cartId)"
+									@change="updateCartGoodsCount(shopCart.shopId, goodsInfo.cartId, goodsInfo.goodsCount)"
 								/>
 							</div>
 							<div v-show="!shopCart.isEditer" class="goods-name">{{ goodsInfo.goodsName }}</div>
 						</div>
 						<div class="goods-sku">
-							<span>{{ goodsInfo.goodsSkuPropName }}</span>
+							<span>{{ goodsInfo.goodsSpecName }}</span>
 						</div>
 						<div class="goods-price">
 							<div>
@@ -71,9 +73,6 @@
 		<div>
 			<div style="height: 52px; width: 100%;clear: both;"></div>
 			<div class="van-submit-bar">
-				<div class="checked-all">
-					<div><van-checkbox checked-color="#008000" v-model="checkedAll" @click="choiceAll">全选</van-checkbox></div>
-				</div>
 				<div class="all-price-div">
 					<div class="all-price">
 						<span>合计：</span>
@@ -89,12 +88,14 @@
 				</div>
 			</div>
 		</div>
-		<div><Tbar :tbActive="tbActive" /></div>
+		<div><Tbar tbActiveParent="2" /></div>
 	</div>
 </template>
 <script>
 import Head from '@/components/Head.vue';
 import Tbar from '@/components/Bottom-bar.vue';
+import axios from '@/network/request.js';
+import { Toast } from 'vant';
 export default {
 	components: { Head: Head, Tbar: Tbar },
 	data() {
@@ -106,86 +107,15 @@ export default {
 			tbActive: 2,
 			cartItems: [],
 			priceAll: 0.0,
-			goodsCount: 1
+			goodsCount: 1,
+			showCartEmptyFlag: false
 		};
 	},
 	mounted: function() {
-		const cartItems = [
-			{
-				shopName: '水果2号店',
-				shopId: 2,
-				cartList: [
-					{
-						cartId: 10,
-						goodsName: '测试店铺22商品10',
-						goodsCount: 1,
-						goodsImg: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-						goodsPrice: 1.0,
-						goodsSkuPropName: ''
-					},
-					{
-						cartId: 11,
-						goodsName: '测试店铺22商品11',
-						goodsCount: 1,
-						goodsImg: 'https://img.yzcdn.cn/vant/apple-8.jpg',
-						goodsPrice: 1.01,
-						goodsSkuPropName: ''
-					}
-				]
-			}
-			/* ,{
-				shopName: '水果1号店',
-				shopId: 1,
-				cartList: [
-					{
-						cartId: 1,
-						goodsName: '测试店铺商品1',
-						goodsCount: 1,
-						goodsImg: 'https://img.yzcdn.cn/vant/apple-2.jpg',
-						goodsPrice: 1.0,
-						goodsSkuPropName: ''
-					},
-					{
-						cartId: 2,
-						goodsName: '测试店铺商品2',
-						goodsCount: 1,
-						goodsImg: 'https://img.yzcdn.cn/vant/apple-5.jpg',
-						goodsPrice: 1.01,
-						goodsSkuPropName: ''
-					}
-				]
-			} */
-		];
-
-		var myData = [];
-		cartItems.forEach(function(e) {
-			var dateSun = [];
-			e.cartList.forEach(function(e) {
-				var shopCartData = {
-					cartId: e.cartId,
-					goodsName: e.goodsName,
-					goodsCount: e.goodsCount,
-					goodsImg: e.goodsImg,
-					goodsPrice: e.goodsPrice,
-					goodsSkuPropName: e.goodsSkuPropName,
-					isChecked: false,
-					isValid: true
-				};
-				dateSun.push(shopCartData);
-			});
-			var shopCart = {
-				shopName: e.shopName,
-				shopId: e.shopId,
-				cartList: dateSun,
-				isChecked: false,
-				editerText: '编辑',
-				isEditer: false,
-				isValid: true
-			};
-			myData.push(shopCart);
-			// console.info(shopCart)
+		this.$nextTick(() => {
+			this.findOrderCart();
+			// this.testData();
 		});
-		this.cartItems = myData;
 	},
 	computed: {
 		computeResultPrice() {
@@ -207,6 +137,66 @@ export default {
 		}
 	},
 	methods: {
+		toGoodsDetailPage(goods) {
+			let goodsId = goods.goodsId;
+			let isSingle = goods.isSingle;
+			//.goodsId, goodsInfo.isSingle
+			
+			let url = '/goodsSku';
+			if (isSingle == 1) {
+				url = '/goodsSingle';
+			}
+			url = url + '?goodsId=' + goodsId;
+			this.$router.push(url);
+			//打开新页签
+			//const page  = this.$router.resolve({path: url})
+			//window.open(page.href,'_blank')
+		},
+		findOrderCart() {
+			let vm = this;
+			let params = {
+				req_type: 'query_order_cart',
+				data: { user_id: 0 }
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					let datas = res.data.cartList;
+					vm.showCartEmptyFlag = res.data.showCartEmptyFlag;
+					var myData = [];
+					datas.forEach(function(e) {
+						var dateSun = [];
+						e.cartDetailList.forEach(function(e) {
+							var shopCartData = {
+								cartId: e.cartId,
+								goodsId: e.goodsId,
+								goodsName: e.goodsName,
+								goodsCount: e.goodsCount,
+								goodsImg: e.goodsImg,
+								goodsPrice: e.goodsPrice,
+								goodsSpecName: e.goodsSpecName,
+								isSingle: e.isSingle,
+								isChecked: false,
+								isValid: true
+							};
+							dateSun.push(shopCartData);
+						});
+						var shopCart = {
+							shopName: e.shopName,
+							shopId: e.shopId,
+							cartList: dateSun,
+							isChecked: false,
+							editerText: '编辑',
+							isEditer: false,
+							isValid: true
+						};
+						myData.push(shopCart);
+						// console.info(shopCart)
+					});
+					vm.cartItems = myData;
+				} else {
+				}
+			});
+		},
 		onClickLeft() {
 			this.$toast('返回');
 		},
@@ -241,59 +231,62 @@ export default {
 				});
 			});
 		},
-		checkedShopGoodsAll(shopId) {
+		checkedShopGoodsAll(shopId, shopIsChecked) {
+			// console.log('--checkedShopGoodsAll----' + shopId + '  shopIsChecked=' + shopIsChecked);
 			//店铺全选
 			this.cartItems.forEach(function(e) {
 				let _shopId = e.shopId;
 				if (shopId == _shopId) {
-					let shopIsChecked = e.isChecked; //店铺是否全选
-					var cartList = e.cartList;
-					cartList.forEach(function(e) {
-						e.isChecked = shopIsChecked ? false : true;
-					});
+					if (shopIsChecked) {
+						var cartList = e.cartList;
+						cartList.forEach(function(e) {
+							e.isChecked = true;
+						});
+					} else {
+						var cartList = e.cartList;
+						cartList.forEach(function(e) {
+							e.isChecked = false;
+						});
+					}
 				}
 			});
 		},
-		checkedShopGoods(shopId, cartId) {
-			let cartgoodskAll = 0; //购物车商品数量
-			let cartIsCheckAll = 0; //购物车选中的数据
+		checkedShopGoods(shopId, cartId, isChecked) {
+			let checkShopcartGoodsCount = 0;
 			//选择店铺单个商品
 			this.cartItems.forEach(function(e) {
-				let _shopId = e.shopId;
-				var cartList = e.cartList;
-				cartgoodskAll = cartgoodskAll + cartList.length;
-				var checkedSize = 0; //店铺全选
-				cartList.forEach(function(e) {
-					//被点击的商品选择
-					if (cartId == e.cartId) {
-						e.isChecked = !e.isChecked;
-					}
-					if (e.isChecked) {
-						cartIsCheckAll++;
-						checkedSize++;
-					}
-				});
-				e.isChecked = checkedSize == cartList.length ? true : false;
-			});
-			this.checkedAll = cartgoodskAll == cartIsCheckAll ? true : false;
-		},
-		updateCartGoodsCount(shopId, cartId) {
-			//更新购物车数量
-			var goodsCount = 0;
-			var index = 0;
-			this.cartItems.forEach(function(e) {
-				if (shopId == e.shopId) {
+				if (e.shopId == shopId) {
 					e.cartList.forEach(function(e) {
+						//被点击的商品选择
 						if (cartId == e.cartId) {
-							goodsCount = e.goodsCount;
-							return;
+							e.isChecked = isChecked;
+						}
+						if (e.isChecked) {
+							checkShopcartGoodsCount = checkShopcartGoodsCount + 1;
 						}
 					});
+					e.isChecked = false;
+					if (checkShopcartGoodsCount == e.cartList.length) {
+						e.isChecked = true;
+					}
 				}
 			});
-			console.info('----------------------goodsCount=' + goodsCount + '          index=' + index);
+		},
+		updateCartGoodsCount(shopId, cartId, goodsCount) {
+			let vm = this;
+			let params = {
+				req_type: 'add_order_cart',
+				data: { cart_id: cartId, user_id: 0, goods_spec: null, goods_count: goodsCount, add_model: 1 }
+			};
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					Toast('添加成功');
+				} else {
+				}
+			});
 		},
 		deleteCartGoods(cartId) {
+			let vm = this;
 			if (cartId > 0) {
 				this.$dialog
 					.confirm({
@@ -303,7 +296,7 @@ export default {
 					.then(() => {
 						// on confirm
 						//删除商品
-						console.info('------------删除商品----------' + cartId);
+						// console.info('------------删除商品----------' + cartId);
 						this.cartItems.forEach(function(e) {
 							var shopCartGoodsCount = e.cartList.length; //店铺下购物车商品数量
 							e.cartList.forEach(function(e) {
@@ -318,10 +311,12 @@ export default {
 								e.isValid = false;
 							}
 						});
+						vm.updateGoodsCartStatus(cartId);
+						vm.checkCartGoods();
 					})
 					.catch(() => {
 						// on cancel
-						console.info('---------on cancel----------');
+						// console.info('---------on cancel----------');
 					});
 			} else {
 				if (!this.isEditer) {
@@ -329,7 +324,7 @@ export default {
 					console.info('------------提交购物车-----------');
 				} else {
 					//批量删除商品
-					console.info('------------批量删除商品-----------');
+					// console.info('------------批量删除商品-----------');
 					this.$dialog
 						.confirm({
 							title: '提示',
@@ -358,6 +353,21 @@ export default {
 									}
 								}
 							});
+
+							let cartIds = '';
+							for (var i = 0; i < deleteCartGoods.length; i++) {
+								if (deleteCartGoods.length - 1 == i) {
+									cartIds = cartIds + deleteCartGoods[i];
+								} else {
+									cartIds = cartIds + deleteCartGoods[i] + ',';
+								}
+							}
+							if(cartIds == ''){
+								Toast('选择要删除的商品');
+								return 
+							}
+							vm.updateGoodsCartStatus(cartIds);
+							vm.checkCartGoods();
 						})
 						.catch(() => {
 							// on cancel
@@ -365,6 +375,114 @@ export default {
 						});
 				}
 			}
+		},
+		checkCartGoods(){
+			let vm = this;
+			// console.info('---------checkCartGoods----------');
+			let count = 0;
+			vm.cartItems.forEach(function(e) {
+				// console.info('---------checkCartGoods----------'+e.shopId+"  e.isValid="+e.isValid);
+				if(!e.isValid){
+					count++;
+				}
+			});
+			if(count == vm.cartItems.length){
+				vm.showCartEmptyFlag = true;
+			}
+		},
+		updateGoodsCartStatus(cartIds) {
+			//
+			let params = {
+				req_type: 'delete_order_cart',
+				data: { cart_ids: cartIds, user_id: 0 }
+			};
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					Toast('删除成功');
+				} else {
+				}
+			});
+		},
+		toGoodsList() {
+			this.$router.push('allGoodsList');
+		},
+		testData() {
+			const cartItems = [
+				{
+					shopName: '水果2号店',
+					shopId: 2,
+					cartList: [
+						{
+							cartId: 10,
+							goodsName: '测试店铺22商品10',
+							goodsCount: 1,
+							goodsImg: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+							goodsPrice: 1.0,
+							goodsSpecName: ''
+						},
+						{
+							cartId: 11,
+							goodsName: '测试店铺22商品11',
+							goodsCount: 1,
+							goodsImg: 'https://img.yzcdn.cn/vant/apple-8.jpg',
+							goodsPrice: 1.01,
+							goodsSpecName: ''
+						}
+					]
+				},
+				{
+					shopName: '水果1号店',
+					shopId: 1,
+					cartList: [
+						// {
+						// 	cartId: 1,
+						// 	goodsName: '测试店铺商品1',
+						// 	goodsCount: 1,
+						// 	goodsImg: 'https://img.yzcdn.cn/vant/apple-2.jpg',
+						// 	goodsPrice: 1.0,
+						// 	goodsSpecName: ''
+						// },
+						// {
+						// 	cartId: 2,
+						// 	goodsName: '测试店铺商品2',
+						// 	goodsCount: 1,
+						// 	goodsImg: 'https://img.yzcdn.cn/vant/apple-5.jpg',
+						// 	goodsPrice: 1.01,
+						// 	goodsSpecName: ''
+						// }
+					]
+				}
+			];
+
+			var myData = [];
+			cartItems.forEach(function(e) {
+				var dateSun = [];
+				e.cartList.forEach(function(e) {
+					var shopCartData = {
+						cartId: e.cartId,
+						goodsName: e.goodsName,
+						goodsCount: e.goodsCount,
+						goodsImg: e.goodsImg,
+						goodsPrice: e.goodsPrice,
+						goodsSpecName: e.goodsSpecName,
+						isChecked: false,
+						isValid: true
+					};
+					dateSun.push(shopCartData);
+				});
+				var shopCart = {
+					shopName: e.shopName,
+					shopId: e.shopId,
+					cartList: dateSun,
+					isChecked: false,
+					editerText: '编辑',
+					isEditer: false,
+					isValid: true
+				};
+				myData.push(shopCart);
+				// console.info(shopCart)
+			});
+			this.cartItems = myData;
 		}
 	}
 };

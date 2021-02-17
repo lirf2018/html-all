@@ -7,20 +7,24 @@
 			</van-swipe>
 		</div>
 		<div class="goods-info" v-if="goodsInfo != null">
-			<div class="goods-name"><span>{{goodsInfo.goodsName}}</span></div>
+			<div class="goods-name">
+				<span>{{ goodsInfo.goodsName }}</span>
+			</div>
 			<div class="goods-prop">
 				<div>
 					<span>￥</span>
-					<span>{{goodsInfo.nowMoney}}</span>
+					<span>{{ goodsInfo.nowMoney }}</span>
 					<span>
-						<span v-if="goodsInfo.nowMoney<=goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
-							<span> 价格 ￥</span>
-							<span style="text-decoration: line-through;">{{goodsInfo.trueMoney}}</span>
+						<span v-if="goodsInfo.nowMoney <= goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
+							<span>价格 ￥</span>
+							<span style="text-decoration: line-through;">{{ goodsInfo.trueMoney }}</span>
 						</span>
 					</span>
 				</div>
-				<div><span>销量 {{goodsInfo.sellCount}}</span></div>
-				<div>库存 {{goodsInfo.goodsNum}}</div>
+				<div>
+					<span>销量 {{ goodsInfo.sellCount }}</span>
+				</div>
+				<div>库存 {{ goodsInfo.goodsNum }}</div>
 			</div>
 			<div style="clear: both;"></div>
 		</div>
@@ -51,12 +55,10 @@
 			<!-- color="#008000" -->
 			<van-tabs v-model="active" color="#ffffff">
 				<van-tab title="商品详情">
-					<div v-if="goodsInfo!=null">
-						<div class="text-img" v-html="goodsInfo.intro">{{goodsInfo.intro}}</div>
+					<div v-if="goodsInfo != null">
+						<div class="text-img" v-html="goodsInfo.intro">{{ goodsInfo.intro }}</div>
 					</div>
-					<div class="both-img">
-						<img :src="item.imgUrl" v-for="(item,index) in goodsInfoList" :key="index" />
-					</div>
+					<div class="both-img"><img :src="item.imgUrl" v-for="(item, index) in goodsInfoList" :key="index" /></div>
 					<div style="height: 10px; width: 100%;clear: both;"></div>
 					<!-- <van-divider dashed color="red">价格说明</van-divider> -->
 				</van-tab>
@@ -100,14 +102,14 @@
 				<div class="goods-show-info">
 					<div class="goods-show-img"><img :src="goodsInfo.goodsImg" @click="showImg" /></div>
 					<div class="goods-show-goods">
-						<div class="goods-show-goods-name">{{goodsInfo.goodsName}}</div>
+						<div class="goods-show-goods-name">{{ goodsInfo.goodsName }}</div>
 						<div class="goods-show-price">
 							<span>￥</span>
-							<span>{{goodsInfo.nowMoney}}</span>
+							<span>{{ goodsInfo.nowMoney }}</span>
 							<span>
-								<span v-if="goodsInfo.nowMoney<=goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
-									<span> 价格 ￥</span>
-									<span style="text-decoration: line-through;">{{goodsInfo.trueMoney}}</span>
+								<span v-if="goodsInfo.nowMoney <= goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
+									<span>价格 ￥</span>
+									<span style="text-decoration: line-through;">{{ goodsInfo.trueMoney }}</span>
 								</span>
 							</span>
 						</div>
@@ -138,6 +140,7 @@
 <script>
 import Head from '@/components/Head.vue';
 import axios from '@/network/request.js';
+import { Toast } from 'vant';
 export default {
 	components: { Head: Head },
 	data() {
@@ -159,9 +162,10 @@ export default {
 			clickType: 0, //0加入购物车  1购买
 			clickTypeText: '加入购物车',
 			testIndex: 0,
-			goodsInfo:null,
-			goodsBannelList:[],
-			goodsInfoList:[]
+			goodsInfo: null,
+			goodsBannelList: [],
+			goodsInfoList: [],
+			goodsId: null
 		};
 	},
 	mounted: function() {
@@ -171,11 +175,12 @@ export default {
 	},
 	methods: {
 		findGoodsInfo() {
-			let {goodsId} = this.$route.query;
+			let vm = this;
+			let { goodsId } = this.$route.query;
+			vm.goodsId = goodsId;
 			if (!goodsId) {
 				return;
 			}
-			let vm = this;
 			let params = {
 				req_type: 'query_goods_detail',
 				data: { goods_id: goodsId, user_id: 0 }
@@ -185,7 +190,7 @@ export default {
 					vm.goodsInfo = res.data;
 					vm.goodsBannelList = vm.goodsInfo.bannerImgList;
 					vm.goodsInfoList = vm.goodsInfo.goodsImgList;
-					vm.imagesShow.push(vm.goodsInfo.goodsImg)
+					vm.imagesShow.push(vm.goodsInfo.goodsImg);
 				} else {
 				}
 			});
@@ -200,6 +205,7 @@ export default {
 				//下一步
 			} else {
 				//加入购物车
+				this.addCartGoods();
 			}
 		},
 		showImg() {
@@ -232,6 +238,19 @@ export default {
 			// 将 loading 设置为 true，表示处于加载状态
 			this.loading = true;
 			this.onLoad();
+		},
+		addCartGoods() {
+			let vm = this;
+			let params = {
+				req_type: 'add_order_cart',
+				data: { goods_id: vm.goodsId, user_id: 0, goods_spec: null, goods_count: vm.buyCount }
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					Toast('添加成功');
+				} else {
+				}
+			});
 		}
 	}
 };
@@ -305,20 +324,20 @@ export default {
 	padding-top: 10px;
 }
 
-.goods-prop > div:first-child{
+.goods-prop > div:first-child {
 	float: left;
 	width: 50%;
 	font-size: 18px;
 }
 
-.goods-prop > div:nth-child(2){
+.goods-prop > div:nth-child(2) {
 	float: left;
 	width: 25%;
 	text-align: left;
 	font-size: 10px;
 }
 
-.goods-prop > div:last-child{
+.goods-prop > div:last-child {
 	float: right;
 	width: 25%;
 	text-align: right;

@@ -61,14 +61,14 @@
 		<div>
 			<van-cell-group><van-cell title="绑定列表" is-link /></van-cell-group>
 		</div>
-		<div>
+		<div @click="toPage('userAddr')">
 			<van-cell-group><van-cell title="收货地址管理" is-link /></van-cell-group>
 		</div>
-		<div>
+		<div @click="toPage('mySuggest')">
 			<van-cell-group><van-cell title="建议和反馈" is-link /></van-cell-group>
 		</div>
-		<div class="exit-out"><van-button color="#008000">退出</van-button></div>
-		<div><Tbar :tbActive="tbActive" /></div>
+		<div class="exit-out" @click="toPage('accountLogin')"><van-button color="#008000" >退出</van-button></div>
+		<div><Tbar tbActiveParent="3" /></div>
 		<EG />
 	</div>
 </template>
@@ -82,6 +82,15 @@ export default {
 		return {
 			tbActive: 3
 		};
+	},
+	mounted:function(){
+		
+	},
+	methods:{
+		toPage(path){
+			// 登出系统
+			this.$router.push(path);
+		}
 	}
 };
 </script>

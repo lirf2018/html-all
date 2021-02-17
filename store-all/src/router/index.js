@@ -8,8 +8,8 @@ import AllGoodsList from '@/views/fruits/AllGoodsList.vue';
 import SearchGoods from '@/views/fruits/SearchGoods.vue';
 import AddSuggest from '@/views/fruits/AddSuggest.vue';
 import SuggestDetail from '@/views/fruits/SuggestDetail.vue';
-import ActivityList from '@/views/fruits/ActivityList.vue'
-import ActivityDetail from '@/views/fruits/ActivityDetail.vue'
+import InfoList from '@/views/fruits/InfoList.vue'
+import InfoDetail from '@/views/fruits/InfoDetail.vue'
 import Center from '@/views/fruits/Center.vue';
 import ClassifySingleGoods1 from '@/views/fruits/ClassifySingleGoods1.vue'; //左边为菜单，右边商品列表（滚动）
 import ClassifyGoods2 from '@/views/fruits/ClassifyGoods2.vue';
@@ -27,7 +27,7 @@ import MySuggest from '@/views/fruits/MySuggest.vue';
 import OrderList from '@/views/fruits/OrderList.vue';
 import OrderDetail from '@/views/fruits/OrderDetail.vue';
 import Search from '@/views/fruits/Search.vue';
-import ShopCart from '@/views/fruits/ShopCart.vue';;
+import ShopCart from '@/views/fruits/ShopCart.vue';
 import Classify from '@/views/fruits/Classify.vue';
 import AccountLogin from '@/views/fruits/AccountLogin.vue';
 import PhoneLogin from '@/views/fruits/PhoneLogin.vue';
@@ -65,12 +65,12 @@ export const pageLink = [
 		component: AddSuggest
 	},
 	{
-		path: "/activityList",
-		component: ActivityList
+		path: "/infoList",
+		component: InfoList
 	},
 	{
-		path: "/activityDetail",
-		component: ActivityDetail
+		path: "/infoDetail",
+		component: InfoDetail
 	},
 	{
 		path: "/center",
@@ -87,6 +87,10 @@ export const pageLink = [
 	{
 		path: "/classifySingleGoods",
 		component: ClassifySingleGoods
+	},
+	{
+		path: "/classify",
+		component: Classify
 	},
 	{
 		path: "/goodsSingle",
@@ -143,10 +147,6 @@ export const pageLink = [
 	{
 		path: "/shopCart",
 		component: ShopCart
-	},
-	{
-		path: "/classify",
-		component: Classify
 	},
 	{
 		path: "/accountLogin",

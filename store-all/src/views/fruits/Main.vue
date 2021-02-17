@@ -1,13 +1,11 @@
 <template>
 	<div class="body-bg">
 		<!-- <div class="search"><van-search shape="round" background="#008000" placeholder="请输入搜索关键词" /></div> -->
-		<div class="search">
-			<van-search v-model="value" disabled placeholder="请输入搜索关键词" shape="round" background="#008000"/>
-		</div>
+		<div class="search"><van-search v-model="value" disabled placeholder="请输入搜索关键词" shape="round" background="#008000" /></div>
 		<div style="height: 44px;"></div>
 		<div class="banner-list">
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-				<van-swipe-item v-for="(bannel, index) in bannelList" :key="index"><img :src="bannel.banner_img" @click = "toPageUrl(bannel.banner_link)" /></van-swipe-item>
+				<van-swipe-item v-for="(bannel, index) in bannelList" :key="index"><img :src="bannel.banner_img" @click="toPageUrl(bannel.banner_link)" /></van-swipe-item>
 			</van-swipe>
 		</div>
 		<!-- <div class="ticket">
@@ -35,11 +33,11 @@
 			<div>
 				<van-grid>
 					<!-- <van-grid-item icon="home-o" text="所有水果" /> -->
-					<van-grid-item :icon="item.menuImg" :text="item.menuName" v-for = "(item,index) in mainMenu" :to="item.menuUrl"  />
+					<van-grid-item :icon="item.menuImg" :text="item.menuName" v-for="(item, index) in mainMenu" :to="item.menuUrl" :key="index" />
 				</van-grid>
 			</div>
 		</div>
-		<div class="activity" v-if="activity1 != null"><img :src="activity1.activity_img" @click = "toPageUrl(activity1.activity_link)" /></div>
+		<div class="activity" v-if="activity1 != null"><img :src="activity1.activity_img" @click="toPageUrl(activity1.activity_link)" /></div>
 		<div class="goods-list">
 			<div class="goods-item" v-for="(item, index) in newGoodsList" :key="index">
 				<div class="goods-item-detail">
@@ -58,15 +56,15 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id,item.is_single)"><span>去看看</span></div>
+						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single)"><span>去看看</span></div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div style="clear: both;height: 10px;" ></div>
+		<div style="clear: both;height: 10px;"></div>
 		<div class="activity2" v-if="activity2 != null || activity3 != null">
-			<img v-if="activity2 != null" :src="activity2.activity_img" @click = "toPageUrl(activity2.activity_link)"/>
-			<img v-if="activity3 != null" :src="activity3.activity_img" @click = "toPageUrl(activity3.activity_link)"/>
+			<img v-if="activity2 != null" :src="activity2.activity_img" @click="toPageUrl(activity2.activity_link)" />
+			<img v-if="activity3 != null" :src="activity3.activity_img" @click="toPageUrl(activity3.activity_link)" />
 		</div>
 		<div class="goods-item2" v-for="(item, index) in weightGoodsList" :key="index">
 			<div style="clear: both;"></div>
@@ -80,11 +78,11 @@
 						<span>￥</span>
 						<span>{{ item.now_money }}</span>
 					</div>
-					<div class="goods-item2-buy" @click="toGoodsDetailPage(item.goods_id,item.is_single)"><span>去购买</span></div>
+					<div class="goods-item2-buy" @click="toGoodsDetailPage(item.goods_id, item.is_single)"><span>去购买</span></div>
 				</div>
 			</div>
 		</div>
-		<div class="activity" v-if="activity4 != null"><img :src="activity4.activity_img" @click = "toPageUrl(activity4.activity_link)"/></div>
+		<div class="activity" v-if="activity4 != null"><img :src="activity4.activity_img" @click="toPageUrl(activity4.activity_link)" /></div>
 		<div class="goods-list">
 			<div class="goods-item" v-for="(item, index) in hotGoodsList" :key="index">
 				<div class="goods-item-detail">
@@ -103,19 +101,19 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id,item.is_single)"><span>去看看</span></div>
+						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single)"><span>去看看</span></div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div style="clear: both;height: 10px;" ></div>
+		<div style="clear: both;height: 10px;"></div>
 		<div class="activity2">
-			<img v-if="activity5 != null" :src="activity5.activity_img" @click = "toPageUrl(activity5.activity_link)"/>
-			<img v-if="activity6 != null" :src="activity6.activity_img" @click = "toPageUrl(activity6.activity_link)"/>
+			<img v-if="activity5 != null" :src="activity5.activity_img" @click="toPageUrl(activity5.activity_link)" />
+			<img v-if="activity6 != null" :src="activity6.activity_img" @click="toPageUrl(activity6.activity_link)" />
 		</div>
 		<div style="clear: both;"></div>
 		<van-divider :style="{ color: '#ADADAD', borderColor: '#ADADAD', padding: '0 16px' }">我是有底线的</van-divider>
-		<div><Tbar :tbActive="tbActive" /></div>
+		<div><Tbar tbActiveParent="0" /></div>
 		<EG />
 	</div>
 </template>
@@ -127,9 +125,9 @@ export default {
 	components: { Tbar: Tbar, EG: EG },
 	data() {
 		return {
-			value:'',
-			tbActive: 0,
-			mainMenu:[],
+			value: '',
+			cartCount:0,
+			mainMenu: [],
 			bannelList: [],
 			newGoodsList: [],
 			hotGoodsList: [],
@@ -150,13 +148,10 @@ export default {
 		});
 		this.$nextTick(function() {
 			this.findMenus();
-		})
-		// this.$nextTick(function() {
-		// 	this.findGoods();
-		// })
+		});
 	},
 	methods: {
-		findMenus(){
+		findMenus() {
 			let vm = this;
 			let params = {
 				req_type: 'main_menu',
@@ -165,15 +160,15 @@ export default {
 			axios.post('', params).then(function(res) {
 				if (res.resp_code == 1) {
 					vm.mainMenu = res.data.list;
-				} 
+				}
 			});
 		},
-		toGoodsDetailPage(goodsId,isSingle) {
-			let url = "/goodsSku";
-			if(isSingle == 1){
-				url = "/goodsSingle";
+		toGoodsDetailPage(goodsId, isSingle) {
+			let url = '/goodsSku';
+			if (isSingle == 1) {
+				url = '/goodsSingle';
 			}
-			url = url + "?goodsId="+goodsId;
+			url = url + '?goodsId=' + goodsId;
 			this.$router.push(url);
 			//打开新页签
 			//const page  = this.$router.resolve({path: url})
@@ -227,9 +222,9 @@ export default {
 				vm.activity6 = activitys[5];
 			}
 		},
-		toPageUrl(url){
-			if(url == null || url == ''){
-				return
+		toPageUrl(url) {
+			if (url == null || url == '') {
+				return;
 			}
 			this.$router.push(url);
 		}
@@ -238,7 +233,6 @@ export default {
 </script>
 
 <style scoped>
-	
 .body-bg {
 	border: none;
 	line-height: 20px;
@@ -256,7 +250,7 @@ export default {
 	font-size: 3.5rem !important;
 }
 
-.search{
+.search {
 	z-index: 99999999999;
 	position: fixed;
 	top: 0;
@@ -456,7 +450,7 @@ export default {
 	color: #008000;
 }
 
->>>.van-search .van-cell{
-	padding: 0px 8px 0px 0
+>>> .van-search .van-cell {
+	padding: 0px 8px 0px 0;
 }
 </style>

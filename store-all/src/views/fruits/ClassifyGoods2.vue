@@ -3,15 +3,16 @@
 		<div><Head :title="title" /></div>
 		<div class="chose-classify">
 			<div class="classify">
-				<span>已选分类：</span>
-				<span>套餐</span>
+				<span>已选条件 ：</span>
+				<span>{{ categoryName }}</span>
 			</div>
-			<div class="classify-cancel"><span>取消</span></div>
+			<div class="classify-cancel" @click="toAllGoods()"><span>取消</span></div>
 		</div>
+		<div style="height: 35px;"></div>
 		<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-			<div class="items">
+			<div class="l-items">
 				<div class="goods-item" v-for="(items, index) in goodsList" :key="index">
-					<div>
+					<div @click="toGoodsDetailPage(items.goodsId, items.isSingle)">
 						<div class="goods-img">
 							<div>
 								<div><img :src="items.goodsImg" /></div>
@@ -23,10 +24,10 @@
 						<div class="price-div">
 							<div class="price">
 								<span>￥</span>
-								<span>{{ items.goodsPrice }}</span>
+								<span>{{ items.isSingle == 1 ? items.nowMoney : items.lowPrice }}</span>
 							</div>
 							<div class="kc">
-								<span>库存 {{ items.goodsCount }}</span>
+								<span>已售 {{ items.sellCount }}</span>
 							</div>
 						</div>
 						<div style="clear: both;"></div>
@@ -40,8 +41,11 @@
 
 <script>
 import Head from '@/components/Head.vue';
+import axios from '@/network/request.js';
 export default {
-	components: { Head: Head },
+	components: {
+		Head: Head
+	},
 	data() {
 		return {
 			title: '全部水果',
@@ -49,47 +53,44 @@ export default {
 			loading: false,
 			finished: false,
 			refreshing: false,
-			testGoodsId: 0
+			testGoodsId: 0,
+			currePage: 1,
+			categoryName: null,
+			hasNext: false
 		};
 	},
-	mounted: function() {
-		let c = 10;
-		var data = [];
-		for (var i = 1; i < c; i++) {
-			this.testGoodsId = this.testGoodsId + 1;
-			var goods = {
-				goodsId: this.testGoodsId,
-				goodsName: '测试商品' + this.testGoodsId,
-				goodsImg: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-				goodsCount: i,
-				goodsPrice: i + 0.01
-			};
-			data.push(goods);
-		}
-		// this.goodsList = data;
-	},
+	mounted: function() {},
 	methods: {
 		onLoad() {
+			let vm = this;
+			let { catogeryId } = vm.$route.query;
+			let params = {
+				req_type: 'query_goods_list',
+				data: {
+					currePage: vm.currePage,
+					catogeryId: catogeryId,
+					userId: 0
+				}
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					let goodsList = res.data.goodsList;
+					let hasNext = res.data.hasNext;
+					vm.categoryName = res.data.categoryName;
+					vm.initGoodsList(goodsList, hasNext);
+					vm.currePage = vm.currePage + 1;
+				} else {
+				}
+			});
+		},
+		initGoodsList(newGoodsList, hasNext) {
+			let vm = this;
 			setTimeout(() => {
-				if (this.refreshing) {
-					this.goodsList = [];
-					this.refreshing = false;
+				for (let i = 0; i < newGoodsList.length; i++) {
+					vm.goodsList.push(newGoodsList[i]);
 				}
-
-				for (let i = 0; i < 10; i++) {
-					var goods = {
-						goodsId: i,
-						goodsName: '测试商品' + i,
-						goodsImg: 'https://img.yzcdn.cn/vant/apple-1.jpg',
-						goodsCount: i,
-						goodsPrice: i + 0.01
-					};
-					this.goodsList.push(goods);
-				}
-
 				this.loading = false;
-
-				if (this.goodsList.length >= 20) {
+				if (hasNext == false) {
 					this.finished = true;
 				}
 			}, 1000);
@@ -102,6 +103,21 @@ export default {
 			// 将 loading 设置为 true，表示处于加载状态
 			this.loading = true;
 			this.onLoad();
+		},
+		toGoodsDetailPage(goodsId, isSingle) {
+			let url = '/goodsSku';
+			if (isSingle == 1) {
+				url = '/goodsSingle';
+			}
+			url = url + '?goodsId=' + goodsId;
+			this.$router.push(url);
+			//打开新页签
+			//const page  = this.$router.resolve({path: url})
+			//window.open(page.href,'_blank')
+		},
+		toAllGoods() {
+			//查询全部商品
+			this.$router.push('allGoodsList');
 		}
 	}
 };

@@ -5,9 +5,9 @@
 		<div class="classfy-contents">
 			<van-row>
 				<van-col span="6">
-					<div class="left-main" ref="ratingsmain" :style="myStyle" id="scrollDiv">
-						<van-sidebar v-model="activeKey" @change="onchange">
-							<div ref="lItem" v-for="(item, index) in menuList" :key="index">
+					<div class="left-main" ref="ratingsmain" :style="myStyle" id="scrollDiv" >
+						<van-sidebar v-model="activeKey" @change="onchange" >
+							<div ref="lItem" v-for="(item, index) in menuList" :key="index" v-if="item.goodsList.length>0">
 								<van-sidebar-item :style="{ color: item.menuId == onclickMenu ? '#008000' : '' }" :title="item.menuName" />
 							</div>
 						</van-sidebar>
@@ -16,10 +16,10 @@
 				<van-col span="18" class="ratings-main-col">
 					<div class="ratings-main" ref="ratingsmain" :style="myStyle">
 						<div>
-							<div v-for="(item, index) in menuList" :key="index" class="goods-list" ref="vansticky">
+							<div v-for="(item, index) in menuList" :key="index" class="goods-list" ref="vansticky" v-if="item.goodsList.length>0">
 								<div ref="rItem">
 									<div class="second-tab-name">
-										<span style="font-size: 12px;">{{item.menuName }}</span>
+										<span style="font-size: 12px;">{{ item.menuName }}</span>
 									</div>
 									<div class="goods-items" v-for="g in item.goodsList" :key="g.goodsId">
 										<div class="goods-img"><img :src="g.goodsImg" /></div>
@@ -43,7 +43,7 @@
 															button-size="12px"
 															v-model="g.userGoodsCount"
 															disable-input
-															@change="onChangeGoods(item.menuId, g.goodsId)"
+															@change="onChangeGoods(item.menuId, g.goodsId, g.userGoodsCount)"
 														/>
 													</div>
 												</div>
@@ -57,7 +57,7 @@
 				</van-col>
 			</van-row>
 		</div>
-		<!-- <div><Tbar :tbActive="tbActive" /></div> -->
+		<!-- <div style="display: none;"><Tbar :tbActive="tbActive" /></div> -->
 	</div>
 </template>
 
@@ -66,6 +66,7 @@ import BScroll from 'better-scroll';
 import Head from '@/components/Head.vue';
 import Tbar from '@/components/Bottom-bar.vue';
 import axios from '@/network/request.js';
+import { Toast } from 'vant';
 export default {
 	components: { Head: Head, Tbar: Tbar },
 	data() {
@@ -85,7 +86,7 @@ export default {
 	created() {
 		var h = document.documentElement.clientHeight || document.body.clientHeight;
 		// this.showheight = h - 50 - 51;
-		this.showheight = h-50;// 设置底部高度
+		this.showheight = h - 50; // 设置底部高度
 		this.myStyle = 'height:' + this.showheight + 'px';
 		this._Bscroll();
 
@@ -154,7 +155,7 @@ export default {
 					// console.log(this.activeKey + '======' + this.menuHeightList[this.activeKey] + '===可见：' + this.showheight);
 					// div.scrollTop = this.showheight;
 					// console.log("===6==="+this.showheight)
-					if (this.menuHeightList[this.activeKey] > (this.showheight - this.menuHeightList[1])) {
+					if (this.menuHeightList[this.activeKey] > this.showheight - this.menuHeightList[1]) {
 						div.scrollTop = this.menuHeightList[this.activeKey] - this.menuHeightList[2];
 					} else {
 						div.scrollTop = 0;
@@ -175,29 +176,34 @@ export default {
 				// console.log(i)
 			}
 		},
-		onChangeGoods(menuId, goodsId) {
-			this.menuList.forEach(function(e) {
-				if (menuId == e.menuId) {
-					e.goodsList.forEach(function(e) {
-						if (e.goodsId == goodsId) {
-							console.log('--当前商品' + goodsId + '数量--' + e.userGoodsCount);
-						}
-					});
+		onChangeGoods(menuId, goodsId, userGoodsCount) {
+			let vm = this;
+			let params = {
+				req_type: 'add_order_cart',
+				data: { goods_id: goodsId, user_id: 0, goods_spec: null, goods_count: userGoodsCount, add_model: 1 }
+			}; // 参数
+			axios.post('', params).then(function(res) {
+				if (res.resp_code == 1) {
+					Toast('添加成功');
+				} else {
 				}
 			});
 		},
 		onclickShopCart(menuId, goodsId) {
+			let vm = this
+			let flag = 1;
 			this.menuList.forEach(function(e) {
 				if (menuId == e.menuId) {
 					e.goodsList.forEach(function(e) {
 						if (e.goodsId == goodsId) {
 							e.userGoodsCount = 1;
+							vm.onChangeGoods(null,goodsId,1);
 						}
 					});
 				}
 			});
 		},
-		searchGoodsList(){
+		searchGoodsList() {
 			let vm = this;
 			let params = {
 				req_type: 'query_goods_list1',
@@ -209,127 +215,6 @@ export default {
 				} else {
 				}
 			});
-		},
-		testPost() {
-			let goodsList = [];
-			for (let i = 0; i < 10; i++) {
-				this.testId = this.testId + 1;
-				var data = {
-					goodsId: this.testId + '-' + this.testId,
-					goodsName: '苹果水果新鲜当季水果丑苹果整箱10斤现季山西冰糖心红富士带一十',
-					goodsDesc:
-						'皮薄，口感特别好。果肉细腻，看的出是新鲜采摘下来的，个子很大个，包装严实，没有坏果，皮薄肉厚，水分充足，好吃还不贵，苹果红红的，看着就很新鲜，苹果闻起来也是香气十足，颜色鲜艳好看，脆爽可口，汁多皮薄，味道极好。果子都很新鲜香味扑鼻个个都是熟透的香甜可口的大苹果。',
-					userGoodsCount: 0,
-					nowMoney: '30.23',
-					goodsImg: 'https://img.yzcdn.cn/vant/apple-2.jpg'
-				};
-				goodsList.push(data);
-			}
-
-			this.menuList = [
-				{
-					menuId: 1,
-					menuName: '新鲜蔬菜',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 2,
-					menuName: '果饮冲调',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 3,
-					menuName: '休闲零食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 4,
-					menuName: '海鲜水产',
-					isdisabled: true,
-					goodsList: []
-				},
-				{
-					menuId: 5,
-					menuName: '快手美食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 6,
-					menuName: '休闲零食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 7,
-					menuName: '海鲜水产',
-					isdisabled: true,
-					goodsList: goodsList
-				},
-				{
-					menuId: 8,
-					menuName: '快手美食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 9,
-					menuName: '休闲零食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 10,
-					menuName: '海鲜水产',
-					isdisabled: true,
-					goodsList: goodsList
-				},
-				{
-					menuId: 11,
-					menuName: '快手美食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 12,
-					menuName: '休闲零食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 13,
-					menuName: '海鲜水产',
-					isdisabled: true,
-					goodsList: goodsList
-				},
-				{
-					menuId: 14,
-					menuName: '快手美食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 15,
-					menuName: '休闲零食',
-					isdisabled: false,
-					goodsList: goodsList
-				},
-				{
-					menuId: 16,
-					menuName: '海鲜水产',
-					isdisabled: true,
-					goodsList: goodsList
-				},
-				{
-					menuId: 17,
-					menuName: '快手美食',
-					isdisabled: false,
-					goodsList: goodsList
-				}
-			];
 		}
 	}
 };
@@ -356,7 +241,7 @@ export default {
 	border-color: #008000 !important;
 }
 
->>>.van-sidebar-item{
+>>> .van-sidebar-item {
 	font-size: 12px;
 	padding: 10px 12px 15px 8px;
 }
@@ -427,12 +312,12 @@ export default {
 	display: inline-block; */
 }
 
-.goods-name-div{
-	overflow:hidden;
-	text-overflow:ellipsis;
-	display:-webkit-box; 
-	-webkit-box-orient:vertical;
-	-webkit-line-clamp:3;
+.goods-name-div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
 	height: 40px;
 	margin-left: 20px;
 	overflow-wrap: break-word;

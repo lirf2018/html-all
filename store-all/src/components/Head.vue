@@ -1,7 +1,7 @@
 <template>
 	<div class="body-bg">
 		<div class="header">
-			<van-nav-bar :title="title" left-text="返回" left-arrow>
+			<van-nav-bar :title="title" left-text="返回" left-arrow @click-left="toBack">
 				<template #right>
 					<van-icon name="wap-home-o" size="25" @click="toMain" />
 				</template>
@@ -20,6 +20,9 @@ export default {
 	methods:{
 		toMain(){
 			this.$router.push("/main");
+		},
+		toBack(){
+			this.$router.go(-1);
 		}
 	}
 };

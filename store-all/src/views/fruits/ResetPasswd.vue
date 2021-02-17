@@ -18,6 +18,7 @@
 		<div style="clear: both;"></div>
 		<div class="login-btn">
 			<div><span>重置密码</span></div>
+			<div @click="accountLogin()"><span>返回登录</span></div>
 		</div>
 		<EG />
 	</div>
@@ -35,7 +36,12 @@ export default {
 			password: '666'
 		};
 	},
-	methods: {}
+	methods: {
+		accountLogin(){
+			let url = "accountLogin";
+			this.$router.push(url);
+		}
+	}
 };
 </script>
 

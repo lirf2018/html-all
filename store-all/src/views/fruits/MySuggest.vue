@@ -19,7 +19,7 @@
 		</van-list>
 		<div>
 			<div style="height: 50px;"></div>
-			<div class="add-suggest">
+			<div class="add-suggest" @click="toPage('addSuggest')">
 				<span>+</span>
 				<span>提交反馈</span>
 			</div>
@@ -64,6 +64,9 @@ export default {
 					this.finished = true;
 				}
 			}, 1000);
+		},
+		toPage(path){
+			this.$router.push(path)
 		}
 	}
 };
