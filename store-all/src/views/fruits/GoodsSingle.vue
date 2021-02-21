@@ -1,6 +1,8 @@
 <template>
 	<div class="body-bg">
-		<div><Head :title="title" /></div>
+		<div>
+			<Head :title="title" />
+		</div>
 		<div class="banner-list">
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
 				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" /></van-swipe-item>
@@ -84,16 +86,16 @@
 				</van-tab> -->
 			</van-tabs>
 		</div>
-		<div class="footer">
+		<div class="footer" v-if="goodsInfo != null">
 			<div style="height: 51px; width: 100%;clear: both;"></div>
 			<van-goods-action>
-				<!-- <van-goods-action-icon icon="chat-o" text="客服" color="#008000" />
-				<van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
-				<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
-				<van-goods-action-button v-if="goodsStatus == 1 && goodsStore > 0" color="#53FF53" text="加入购物车" @click="showNext(0)" />
-				<van-goods-action-button v-if="goodsStatus == 1 && goodsStore > 0" color="#008000" text="立即购买" @click="showNext(1)" />
-				<div v-if="goodsStatus != 1" class="goods-down"><span>商品已下架</span></div>
-				<div v-if="goodsStatus == 1 && goodsStore == 0" class="goods-down"><span>售罄</span></div>
+					<!-- <van-goods-action-icon icon="chat-o" text="客服" color="#008000" />
+					<van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
+					<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
+					<van-goods-action-button v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2" color="#53FF53" text="加入购物车" @click="showNext(0)" />
+					<van-goods-action-button v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2" color="#008000" text="立即购买" @click="showNext(1)" />
+				<div v-if="goodsInfo.allStatus != 1 || goodsInfo.isPutaway != 2" class="goods-down"><span>商品已下架</span></div>
+				<div v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum == 0" class="goods-down"><span>售罄</span></div>
 			</van-goods-action>
 		</div>
 		<!-- 弹出选择商品数量 -->
@@ -122,7 +124,9 @@
 						<span>剩余{{ goodsInfo.goodsNum }}件</span>
 					</div>
 					<div class="goods-show-buy-count">
-						<div><van-stepper v-model="buyCount" disable-input /></div>
+						<div>
+							<van-stepper v-model="buyCount" disable-input />
+						</div>
 					</div>
 				</div>
 				<div class="goods-show-btn" @click="closeShow">
@@ -133,365 +137,413 @@
 			</van-popup>
 		</div>
 		<!-- 查看图片详情 -->
-		<div class="d-img"><van-image-preview v-model="showImgDetail" :images="imagesShow" /></div>
+		<div class="d-img">
+			<van-image-preview v-model="showImgDetail" :images="imagesShow" />
+		</div>
 	</div>
 </template>
 
 <script>
-import Head from '@/components/Head.vue';
-import axios from '@/network/request.js';
-import { Toast } from 'vant';
-export default {
-	components: { Head: Head },
-	data() {
-		return {
-			title: '商品详情',
-			activeName: 1,
-			goodsStatus: 1,
-			goodsStore: 110,
-			active: 0,
-			buyCount: 1,
-			orderRecordlist: [],
-			error: false,
-			loading: false,
-			finished: false,
-			refreshing: false,
-			showGoods: false,
-			imagesShow: [],
-			showImgDetail: false,
-			clickType: 0, //0加入购物车  1购买
-			clickTypeText: '加入购物车',
-			testIndex: 0,
-			goodsInfo: null,
-			goodsBannelList: [],
-			goodsInfoList: [],
-			goodsId: null
-		};
-	},
-	mounted: function() {
-		this.$nextTick(function() {
-			this.findGoodsInfo();
-		});
-	},
-	methods: {
-		findGoodsInfo() {
-			let vm = this;
-			let { goodsId } = this.$route.query;
-			vm.goodsId = goodsId;
-			if (!goodsId) {
-				return;
-			}
-			let params = {
-				req_type: 'query_goods_detail',
-				data: { goods_id: goodsId, user_id: 0 }
-			}; // 参数
-			axios.post('', params).then(function(res) {
-				if (res.resp_code == 1) {
-					vm.goodsInfo = res.data;
-					vm.goodsBannelList = vm.goodsInfo.bannerImgList;
-					vm.goodsInfoList = vm.goodsInfo.goodsImgList;
-					vm.imagesShow.push(vm.goodsInfo.goodsImg);
-				} else {
-				}
+	import Head from '@/components/Head.vue';
+	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
+	export default {
+		components: {
+			Head: Head
+		},
+		data() {
+			return {
+				title: '商品详情',
+				activeName: 1,
+				goodsStatus: 1,
+				goodsStore: 110,
+				active: 0,
+				buyCount: 1,
+				orderRecordlist: [],
+				error: false,
+				loading: false,
+				finished: false,
+				refreshing: false,
+				showGoods: false,
+				imagesShow: [],
+				showImgDetail: false,
+				clickType: 0, //0加入购物车  1购买
+				clickTypeText: '加入购物车',
+				testIndex: 0,
+				goodsInfo: null,
+				goodsBannelList: [],
+				goodsInfoList: [],
+				goodsId: null
+			};
+		},
+		mounted: function() {
+			this.$nextTick(function() {
+				this.findGoodsInfo();
 			});
 		},
-		showNext(clickType) {
-			this.showGoods = true;
-			this.clickTypeText = clickType == 0 ? '加入购物车' : '下一步';
-			this.clickType = clickType;
-		},
-		closeShow() {
-			this.showGoods = false;
-			if (this.clickType == 1) {
-				//下一步
-				this.$router.push('orderSubmit?goodsId=' + this.goodsId+'&buyCount='+this.buyCount);
-			} else {
-				//加入购物车
-				this.addCartGoods();
-			}
-		},
-		showImg() {
-			//展示图片
-			this.showImgDetail = true;
-		},
-		onLoad() {
-			setTimeout(() => {
-				for (let i = 0; i < 10; i++) {
-					this.testIndex = this.testIndex + 1;
-					var obj = {
-						buyerNickName: '买家名称' + this.testIndex,
-						finishTime: '2018-01-02',
-						buyCount: 10 + i
-					};
-					this.orderRecordlist.push(obj);
+		methods: {
+			findGoodsInfo() {
+				let vm = this;
+				let {
+					goodsId
+				} = this.$route.query;
+				vm.goodsId = goodsId;
+				if (!goodsId) {
+					return;
 				}
-				this.loading = false;
-
-				if (this.orderRecordlist.length >= 40) {
-					this.finished = true;
-				}
-			}, 1000);
-		},
-		onRefresh() {
-			// 清空列表数据
-			this.finished = false;
-
-			// 重新加载数据
-			// 将 loading 设置为 true，表示处于加载状态
-			this.loading = true;
-			this.onLoad();
-		},
-		addCartGoods() {
-			let vm = this;
-			let params = {
-				req_type: 'add_order_cart',
-				data: { goods_id: vm.goodsId, user_id: 0, goods_spec: null, goods_count: vm.buyCount }
-			}; // 参数
-			axios.post('', params).then(function(res) {
-				if (res.resp_code == 1) {
-					Toast('添加成功');
+				let params = {
+					req_type: 'query_goods_detail',
+					data: {
+						goods_id: goodsId,
+						user_id: 0
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.goodsInfo = res.data;
+						vm.goodsBannelList = vm.goodsInfo.bannerImgList;
+						vm.goodsInfoList = vm.goodsInfo.goodsImgList;
+						vm.imagesShow.push(vm.goodsInfo.goodsImg);
+					} else {}
+				});
+			},
+			showNext(clickType) {
+				this.showGoods = true;
+				this.clickTypeText = clickType == 0 ? '加入购物车' : '下一步';
+				this.clickType = clickType;
+			},
+			closeShow() {
+				this.showGoods = false;
+				if (this.clickType == 1) {
+					//下一步
+					this.$router.push('orderSubmit?goodsId=' + this.goodsId + '&buyCount=' + this.buyCount);
 				} else {
+					//加入购物车
+					this.addCartGoods();
 				}
-			});
+			},
+			showImg() {
+				//展示图片
+				this.showImgDetail = true;
+			},
+			onLoad() {
+				setTimeout(() => {
+					for (let i = 0; i < 10; i++) {
+						this.testIndex = this.testIndex + 1;
+						var obj = {
+							buyerNickName: '买家名称' + this.testIndex,
+							finishTime: '2018-01-02',
+							buyCount: 10 + i
+						};
+						this.orderRecordlist.push(obj);
+					}
+					this.loading = false;
+
+					if (this.orderRecordlist.length >= 40) {
+						this.finished = true;
+					}
+				}, 1000);
+			},
+			onRefresh() {
+				// 清空列表数据
+				this.finished = false;
+
+				// 重新加载数据
+				// 将 loading 设置为 true，表示处于加载状态
+				this.loading = true;
+				this.onLoad();
+			},
+			addCartGoods() {
+				let vm = this;
+				let params = {
+					req_type: 'add_order_cart',
+					data: {
+						goods_id: vm.goodsId,
+						user_id: 0,
+						goods_spec: null,
+						goods_count: vm.buyCount
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						Toast('添加成功');
+					} else {}
+				});
+			}
 		}
-	}
-};
+	};
 </script>
 
 <style scoped>
-.body-bg {
-	background-color: #f8f8f8;
-	border: none;
-	line-height: 20px;
-	margin: 0;
-	padding: 0;
-	font-size: 14px;
-	color: #323233;
-	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
-}
-.header {
-	position: fixed;
-	height: 50px;
-	width: 100%;
-	z-index: 1000;
-	top: 0;
-}
-.my-swipe .van-swipe-item {
-	text-align: center;
-}
+	.body-bg {
+		background-color: #f8f8f8;
+		border: none;
+		line-height: 20px;
+		margin: 0;
+		padding: 0;
+		font-size: 14px;
+		color: #323233;
+		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
+	}
 
-.van-grid-item__icon {
-	font-size: 3.5rem !important;
-}
+	.header {
+		position: fixed;
+		height: 50px;
+		width: 100%;
+		z-index: 1000;
+		top: 0;
+	}
 
-.banner-list img {
-	height: 13rem;
-	width: 100%;
-}
-.van-nav-bar__title {
-	color: #000000 !important;
-	font-weight: bold !important;
-}
-.van-nav-bar__text {
-	color: #008000;
-}
-.header .van-icon,
-.van-nav-bar__text {
-	color: #9ea7b4 !important;
-}
-.van-info {
-	background-color: #008000 !important;
-}
-.van-popup__close-icon--top-right {
-	top: 8px !important;
-	right: 10px !important;
-}
+	.my-swipe .van-swipe-item {
+		text-align: center;
+	}
 
-.goods-info {
-	font-weight: bold;
-	color: #464c5b;
-	padding: 10px 0;
-	overflow: auto;
-	background-color: #ffffff;
-	margin-bottom: 10px;
-}
+	.van-grid-item__icon {
+		font-size: 3.5rem !important;
+	}
 
-.goods-name,
-.goods-prop {
-	padding: 0 15px;
-	padding-top: 10px;
-}
+	.banner-list img {
+		height: 13rem;
+		width: 100%;
+	}
 
-.goods-prop > div {
-	padding-top: 10px;
-}
+	.van-nav-bar__title {
+		color: #000000 !important;
+		font-weight: bold !important;
+	}
 
-.goods-prop > div:first-child {
-	float: left;
-	width: 50%;
-	font-size: 18px;
-}
+	.van-nav-bar__text {
+		color: #008000;
+	}
 
-.goods-prop > div:nth-child(2) {
-	float: left;
-	width: 25%;
-	text-align: left;
-	font-size: 10px;
-}
+	.header .van-icon,
+	.van-nav-bar__text {
+		color: #9ea7b4 !important;
+	}
 
-.goods-prop > div:last-child {
-	float: right;
-	width: 25%;
-	text-align: right;
-	font-size: 10px;
-}
+	.van-info {
+		background-color: #008000 !important;
+	}
 
-.goods-prop {
-	color: #008000;
-}
+	.van-popup__close-icon--top-right {
+		top: 8px !important;
+		right: 10px !important;
+	}
 
-.goods-prop > div:first-child > span:first-child {
-	font-weight: bold;
-	font-size: 10px;
-}
+	.goods-info {
+		font-weight: bold;
+		color: #464c5b;
+		padding: 10px 0;
+		overflow: auto;
+		background-color: #ffffff;
+		margin-bottom: 10px;
+	}
 
-.goods-prop > div:first-child > span:last-child {
-	font-size: 10px;
-}
+	.goods-name,
+	.goods-prop {
+		padding: 0 15px;
+		padding-top: 10px;
+	}
 
-.goods-prop > div:not(:first-child) {
-	color: #657180;
-	font-size: 12px;
-	font-weight: normal;
-}
-.goods-prop > div:nth-child(2) {
-	text-align: center;
-}
-.goods-show-info {
-	padding-bottom: 10px;
-	overflow: visible;
-	position: relative;
-}
+	.goods-prop>div {
+		padding-top: 10px;
+	}
 
-.beforeBuy {
-	margin-bottom: 10px;
-}
-.beforeBuy,
-.van-cell {
-	color: #657180 !important;
-}
-.van-popup {
-	overflow-y: visible !important;
-}
+	.goods-prop>div:first-child {
+		float: left;
+		width: 50%;
+		font-size: 18px;
+	}
 
-.goods-show-img {
-	float: left;
-	width: 30%;
-	position: absolute;
-	top: -20px;
-	padding-left: 10px;
-}
+	.goods-prop>div:nth-child(2) {
+		float: left;
+		width: 25%;
+		text-align: left;
+		font-size: 10px;
+	}
 
-.goods-show-img img {
-	width: 100% !important;
-	border-radius: 15px;
-}
+	.goods-prop>div:last-child {
+		float: right;
+		width: 25%;
+		text-align: right;
+		font-size: 10px;
+	}
 
-.img-detail {
-	overflow: auto;
-	width: 100%;
-	border: 1px solid red;
-}
+	.goods-prop {
+		color: #008000;
+	}
 
-.img-detail img {
-	display: block;
-}
+	.goods-prop>div:first-child>span:first-child {
+		font-weight: bold;
+		font-size: 10px;
+	}
 
-.goods-show-goods {
-	float: left;
-	width: 54%;
-	color: #464c5b;
-	padding-left: 18px;
-	padding-top: 10px;
-	word-break: break-all;
-	margin-left: 30%;
-}
+	.goods-prop>div:first-child>span:last-child {
+		font-size: 10px;
+	}
 
-.goods-show-price {
-	color: #008000;
-	font-weight: bold;
-	padding-top: 5px;
-}
-.goods-show-price > span:first-child {
-	font-size: 10px;
-}
-.goods-show-price > span:nth-child(2) {
-	font-size: 18px;
-}
-.goods-show-buy {
-	padding: 10px 0;
-	margin-top: 1.8rem;
-	color: #464c5b;
-	overflow: auto;
-	border-top: 1px solid #f0f0f0;
-	border-bottom: 1px solid #f0f0f0;
-}
-.goods-show-buy-info {
-	float: left;
-	width: 35%;
-}
-.goods-show-buy-count {
-	float: right;
-	padding-right: 10px;
-}
-.goods-show-buy-info span {
-	display: block;
-	text-align: center;
-}
-.goods-show-buy-info > span:last-child {
-	color: #9ea7b4;
-	font-size: 12px;
-	padding-top: 2px;
-}
+	.goods-prop>div:not(:first-child) {
+		color: #657180;
+		font-size: 12px;
+		font-weight: normal;
+	}
 
-.goods-show-btn {
-	color: #ffffff;
-	background-color: #008000;
-	text-align: center;
-	padding: 12px 0;
-	font-weight: 500;
-}
+	.goods-prop>div:nth-child(2) {
+		text-align: center;
+	}
 
-/* 图片详情 */
-.both-img > img {
-	display: block;
-	/* float: left; */
-}
-.both-img img {
-	width: 100%;
-}
+	.goods-show-info {
+		padding-bottom: 10px;
+		overflow: visible;
+		position: relative;
+	}
 
-.order-record {
-	font-size: 0.8rem;
-	color: #323233;
-}
+	.beforeBuy {
+		margin-bottom: 10px;
+	}
 
-.title,
-.order-record-items {
-	text-align: center;
-	overflow: hidden;
-	background-color: #f2f2f2;
-	padding: 8px 0;
-}
-.order-record-items {
-	background-color: #ffffff;
-	border-bottom: 1px solid #f0f0f0;
-	color: #657180;
-}
-.title > span,
-.order-record-items > div > span {
-	float: left;
-	width: 33.3%;
-	display: block;
-}
+	.beforeBuy,
+	.van-cell {
+		color: #657180 !important;
+	}
+
+	.van-popup {
+		overflow-y: visible !important;
+	}
+
+	.goods-show-img {
+		float: left;
+		width: 30%;
+		position: absolute;
+		top: -20px;
+		padding-left: 10px;
+	}
+
+	.goods-show-img img {
+		width: 100% !important;
+		border-radius: 15px;
+	}
+
+	.img-detail {
+		overflow: auto;
+		width: 100%;
+		border: 1px solid red;
+	}
+
+	.img-detail img {
+		display: block;
+	}
+
+	.goods-show-goods {
+		float: left;
+		width: 54%;
+		color: #464c5b;
+		padding-left: 18px;
+		padding-top: 10px;
+		word-break: break-all;
+		margin-left: 30%;
+	}
+
+	.goods-show-price {
+		color: #008000;
+		font-weight: bold;
+		padding-top: 5px;
+	}
+
+	.goods-show-price>span:first-child {
+		font-size: 10px;
+	}
+
+	.goods-show-price>span:nth-child(2) {
+		font-size: 18px;
+	}
+
+	.goods-show-buy {
+		padding: 10px 0;
+		margin-top: 1.8rem;
+		color: #464c5b;
+		overflow: auto;
+		border-top: 1px solid #f0f0f0;
+		border-bottom: 1px solid #f0f0f0;
+	}
+
+	.goods-show-buy-info {
+		float: left;
+		width: 35%;
+	}
+
+	.goods-show-buy-count {
+		float: right;
+		padding-right: 10px;
+	}
+
+	.goods-show-buy-info span {
+		display: block;
+		text-align: center;
+	}
+
+	.goods-show-buy-info>span:last-child {
+		color: #9ea7b4;
+		font-size: 12px;
+		padding-top: 2px;
+	}
+
+	.goods-show-btn {
+		color: #ffffff;
+		background-color: #008000;
+		text-align: center;
+		padding: 12px 0;
+		font-weight: 500;
+	}
+
+	/* 图片详情 */
+	.both-img>img {
+		display: block;
+		/* float: left; */
+	}
+
+	.both-img img {
+		width: 100%;
+	}
+
+	.order-record {
+		font-size: 0.8rem;
+		color: #323233;
+	}
+
+	.title,
+	.order-record-items {
+		text-align: center;
+		overflow: hidden;
+		background-color: #f2f2f2;
+		padding: 8px 0;
+	}
+
+	.order-record-items {
+		background-color: #ffffff;
+		border-bottom: 1px solid #f0f0f0;
+		color: #657180;
+	}
+
+	.title>span,
+	.order-record-items>div>span {
+		float: left;
+		width: 33.3%;
+		display: block;
+	}
+
+	/* 售罄 /下架*/
+	.goods-down {
+		height: 100%;
+		line-height: 50px;
+		width: 100%;
+		padding-left: 15px;
+		text-align: center;
+		background-color: #008000;
+		color: white;
+		position: absolute;
+		right: 0px;
+	}
 </style>
