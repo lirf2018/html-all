@@ -198,11 +198,13 @@ export default {
 		showNext(clickType) {
 			this.showGoods = true;
 			this.clickTypeText = clickType == 0 ? '加入购物车' : '下一步';
+			this.clickType = clickType;
 		},
 		closeShow() {
 			this.showGoods = false;
 			if (this.clickType == 1) {
 				//下一步
+				this.$router.push('orderSubmit?goodsId=' + this.goodsId+'&buyCount='+this.buyCount);
 			} else {
 				//加入购物车
 				this.addCartGoods();

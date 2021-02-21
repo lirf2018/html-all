@@ -42,7 +42,7 @@
 		},
 		data() {
 			return {
-				title: '全部水果',
+				title: '全部商品',
 				goodsList: [],
 				loading: false,
 				finished: false,
@@ -162,7 +162,7 @@
 
 	.goods-img img {
 		width: 100%;
-		height: auto;
+		height: 180px;
 	}
 
 	.goods-name {

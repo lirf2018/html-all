@@ -52,6 +52,7 @@
 					<div class="goods-info">
 						<div>
 							<div class="goods-name"><span>1商品名称商品名称商品名称商品名称商品名称商品名称2</span></div>
+							<div class="space-name">规格：红色;24G;红色;24G;红色;24G;红色;24G;</div>
 							<div class="goods-price">
 								<div><span>X2</span></div>
 								<div>
@@ -235,9 +236,12 @@ export default {
 	margin-bottom: 10px;
 	position: relative;
 	overflow: hidden;
-	height: 5rem;
 }
-
+.space-name{
+	font-size: 10px;
+	color: gray;
+	line-height: 14px;
+}
 .goods-img {
 	float: left;
 	width: 30%;
@@ -245,7 +249,7 @@ export default {
 
 .goods-img img {
 	width: 100%;
-	height: 5rem;
+	height: 7rem;
 	display: block;
 	border: none;
 }

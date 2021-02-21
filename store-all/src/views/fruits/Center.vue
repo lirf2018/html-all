@@ -28,7 +28,7 @@
 		</div>
 		<div style="clear: both;"></div>
 		<div>
-			<van-cell-group><van-cell title="单元格" is-link value="查看全部订单" /></van-cell-group>
+			<van-cell-group><van-cell title="" is-link value="查看全部订单" /></van-cell-group>
 		</div>
 		<div>
 			<van-grid>
@@ -47,6 +47,12 @@
 			</div>
 		</div>
 		<div>
+			<van-cell-group><van-cell title="退款退货" is-link /></van-cell-group>
+		</div>
+		<div @click="toPage('userAddr')">
+			<van-cell-group><van-cell title="收货地址管理" is-link /></van-cell-group>
+		</div>
+		<div>
 			<van-cell-group><van-cell title="我的优惠券" is-link /></van-cell-group>
 		</div>
 		<!-- <div>
@@ -60,9 +66,6 @@
 		</div>
 		<div>
 			<van-cell-group><van-cell title="绑定列表" is-link /></van-cell-group>
-		</div>
-		<div @click="toPage('userAddr')">
-			<van-cell-group><van-cell title="收货地址管理" is-link /></van-cell-group>
 		</div>
 		<div @click="toPage('mySuggest')">
 			<van-cell-group><van-cell title="建议和反馈" is-link /></van-cell-group>
@@ -159,7 +162,7 @@ export default {
  * 退出
  */
 .exit-out {
-	margin-top: 15px;
+	margin:15px 30px;
 }
 
 .van-button {
@@ -182,5 +185,8 @@ export default {
 	right: 35px;
 	bottom: 12px;
 	padding: 2px 2px;
+}
+>>>.van-button{
+	height: 35px;
 }
 </style>

@@ -154,6 +154,7 @@
 <script>
 import Head from '@/components/Head.vue';
 import axios from '@/network/request.js';
+import { Toast } from 'vant';
 export default {
 	components: { Head: Head },
 	data() {
@@ -183,7 +184,8 @@ export default {
 			goodsInfo:null,
 			goodsBannelList:[],
 			goodsInfoList:[],
-			goodsSkuList:[]
+			goodsSkuList:[],
+			goodsId:0,
 		};
 	},
 	filters: {
@@ -225,6 +227,7 @@ export default {
 				return;
 			}
 			let vm = this;
+			vm.goodsId = goodsId;
 			let params = {
 				req_type: 'query_goods_detail',
 				data: { goods_id: goodsId, user_id: 0 }
@@ -245,10 +248,10 @@ export default {
 		},
 		initSku(goods){
 			var goodsItem = {
-				goodsId: 110,
-				goodsName: 'iphone手机',
-				goodsStore: 100,
-				goodsStatus: 1,
+				goodsId: goods.goodsId,
+				goodsName: goods.goodsName,
+				goodsStore: goods.goodsNum,
+				goodsStatus: goods.status,
 				goodsSkuPropList: goods.salePropList
 			};
 			this.goodsItem = goodsItem;
@@ -258,11 +261,38 @@ export default {
 			this.clickTypeText = clickType == 0 ? '加入购物车' : '下一步';
 		},
 		closeShow() {
-			this.showGoods = false;
-			if (this.clickType == 1) {
+			let vm = this;
+			// console.log("-----------closeShow------------goodsId="+vm.goodsId)
+			// console.log("-----------closeShow------------skuPropNameCode="+vm.skuPropNameCode)
+			vm.showGoods = false;
+			if (vm.clickType == 1) {
 				//下一步
+				let skuId = "";
+				vm.goodsSkuList.forEach(function(e){
+					if(e.propCode == chosePropValueIds){
+						if(e.propCode == vm.skuPropNameCode ){
+							skuId = e.skuId;
+						}
+					}
+				})
+				if(skuId == ""){
+					Toast('网络异常');
+					return;
+				}
+				this.$router.push('orderSubmit?goodsId=' + this.goodsId+'&buyCount='+this.buyCount);
 			} else {
 				//加入购物车
+				let vm = this;
+				let params = {
+					req_type: 'add_order_cart',
+					data: { goods_id: vm.goodsId, user_id: 0, goods_spec: vm.skuPropNameCode, goods_count: vm.buyCount }
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						Toast('添加成功');
+					} else {
+					}
+				});
 			}
 		},
 		showImg() {

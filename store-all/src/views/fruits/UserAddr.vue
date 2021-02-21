@@ -13,18 +13,18 @@
 						<span class="is-default" v-if="item.is_default == 1">默认</span>
 					</div>
 					<div>
-						<span class="user-addr">{{ item.area_name }}</span>
+						<span class="user-addr">{{ item.addr_name}}</span>
 					</div>
 				</div>
 				<div class="editer-text">
 					<span @click="delAddr(item.id)">删除</span>
-					&nbsp;&nbsp;
+					&nbsp;
 					<span @click="toPageDetail(item.id)">编辑</span>
 					&nbsp;
 				</div>
 			</div>
 		</div>
-		<div style="height: 45px;"></div>
+		<div style="height: 70px;"></div>
 		<div class="add-btn" @click="toPage('addUserAddr')">
 			<div><span>新增加地址</span></div>
 		</div>
@@ -113,7 +113,7 @@ export default {
 	line-height: 20px;
 	margin: 0;
 	padding: 0;
-	font-size: 14px;
+	font-size: 12px;
 	color: #323233;
 	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
 }
@@ -152,18 +152,19 @@ export default {
 }
 .user-info {
 	margin-left: 40px;
-	margin-right: 50px;
+	margin-right: 68px;
 	position: relative;
+	line-height: 15px;
 }
 
 .editer-text {
-	width: 20%;
+	/* width: 20%; */
 	text-align: center;
 	position: absolute;
 	top: 38%;
-	right: 0px;
+	right: 8px;
 	/* width: 50px; */
-	line-height: 30px;
+	/* line-height: 30px; */
 	height: 30px;
 	border-left: 1px solid #f8f8f8f8;
 }
@@ -190,6 +191,7 @@ export default {
 
 .user-addr {
 	font-size: 12px;
+	line-height: 10px;
 }
 .editer-text,
 .phone,

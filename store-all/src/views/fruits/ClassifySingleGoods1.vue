@@ -237,13 +237,17 @@ export default {
 .ratings-main {
 	overflow: hidden;
 }
-.van-sidebar-item--select {
+>>>.van-sidebar-item--select {
 	border-color: #008000 !important;
+}
+
+>>>.van-sidebar-item--select::before{
+	background-color: #008000;
 }
 
 >>> .van-sidebar-item {
 	font-size: 12px;
-	padding: 10px 12px 15px 8px;
+	padding: 15px 12px 15px 8px;
 }
 
 /**

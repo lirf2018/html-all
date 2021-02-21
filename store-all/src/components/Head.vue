@@ -58,8 +58,8 @@ export default {
 .van-nav-bar__text {
 	color: #008000 !important;
 }
-.header .van-icon,
-.van-nav-bar__text {
+>>>.header .van-icon,
+>>>.van-nav-bar__text {
 	color: #9ea7b4 !important;
 }
 .van-nav-bar .van-icon {

@@ -3,19 +3,19 @@
 		<div><Head :title="title" /></div>
 		<div class="chose-classify">
 			<div class="classify">
-				<span>已选条件 ：</span>
+				<span>已选 ：</span>
 				<span>{{ categoryName }}</span>
 			</div>
 			<div class="classify-cancel" @click="toAllGoods()"><span>取消</span></div>
 		</div>
-		<div style="height: 35px;"></div>
+		<div style="height: 40px;"></div>
 		<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
 			<div class="l-items">
 				<div class="goods-item" v-for="(items, index) in goodsList" :key="index">
 					<div @click="toGoodsDetailPage(items.goodsId, items.isSingle)">
 						<div class="goods-img">
 							<div>
-								<div><img :src="items.goodsImg" /></div>
+								<div><img class="goods-img-css" :src="items.goodsImg" /></div>
 							</div>
 						</div>
 						<div class="goods-name">
@@ -48,7 +48,7 @@ export default {
 	},
 	data() {
 		return {
-			title: '全部水果',
+			title: '全部商品',
 			goodsList: [],
 			loading: false,
 			finished: false,
@@ -203,9 +203,9 @@ export default {
 	padding: 0 5px;
 }
 
-.goods-img img {
+.goods-img-css{
 	width: 100%;
-	height: auto;
+	height: 180px;
 }
 .goods-name {
 	text-align: left;

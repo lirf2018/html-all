@@ -1,6 +1,6 @@
 <template>
 	<div class="body-bg">
-		<div style="height: 45px;"></div>
+		<!-- <div style="height: 45px;"></div>
 		<div class="addrs-list">
 			<div v-for="(item, index) in list" :key="index">
 				<div class="first-name"><span>李</span></div>
@@ -20,7 +20,7 @@
 		<div style="height: 45px;"></div>
 		<div class="add-btn">
 			<div><span>新增加地址</span></div>
-		</div>
+		</div> -->
 	</div>
 </template>
 

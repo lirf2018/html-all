@@ -336,7 +336,7 @@ export default {
 }
 
 .goods-list img {
-	height: 100%;
+	height: 180px;
 	width: 100%;
 }
 

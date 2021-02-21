@@ -12,7 +12,7 @@ import InfoList from '@/views/fruits/InfoList.vue'
 import InfoDetail from '@/views/fruits/InfoDetail.vue'
 import Center from '@/views/fruits/Center.vue';
 import ClassifySingleGoods1 from '@/views/fruits/ClassifySingleGoods1.vue'; //左边为菜单，右边商品列表（滚动）
-import ClassifyGoods2 from '@/views/fruits/ClassifyGoods2.vue';
+import ClassifyAllGoodsList from '@/views/fruits/ClassifyAllGoodsList.vue';
 import ClassifySingleGoods from '@/views/fruits/ClassifySingleGoods.vue'; //左边为菜单，右边商品列表（不滚动）
 import GoodsSingle from '@/views/fruits/GoodsSingle.vue'
 import GoodsSku from '@/views/fruits/GoodsSku.vue'
@@ -81,8 +81,8 @@ export const pageLink = [
 		component: ClassifySingleGoods1
 	},
 	{
-		path: "/classifyGoods2",
-		component: ClassifyGoods2
+		path: "/classifyAllGoodsList",
+		component: ClassifyAllGoodsList
 	},
 	{
 		path: "/classifySingleGoods",

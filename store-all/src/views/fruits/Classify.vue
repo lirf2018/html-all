@@ -43,7 +43,7 @@ export default {
 			});
 		},
 		toPage(id) {
-			let url = 'classifyGoods2?catogeryId=' + id;
+			let url = 'classifyAllGoodsList?catogeryId=' + id;
 			this.$router.push(url);
 		}
 	}
