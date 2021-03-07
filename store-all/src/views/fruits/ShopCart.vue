@@ -65,6 +65,60 @@
 				</div>
 			</div>
 		</div>
+		<!-- 失效 -->
+		<div style="height: 10px"></div>
+		<div class="shop-item" v-if=" outTimeGoods.length > 0">
+			<div class="shop">
+				<div class="shop-div">
+					<div>
+						<van-checkbox v-model="deleteAll" checked-color="#008000" @click="checkedDeleteGoodsAll()"></van-checkbox>
+					</div>
+					<div class="shop-o">
+					</div>
+					<div>
+						<span>&nbsp;&nbsp;失效商品</span>
+					</div>
+					<div>
+						<span @click="deleteShopCart">删除</span>
+					</div>
+				</div>
+			</div>
+			<div style="clear: both;"></div>
+			<div class="items" v-for="(goodsInfo, index) in outTimeGoods" :key="goodsInfo.cartId" >
+				<div class="goods-list">
+					<div class="select-btn">
+						<div class="checkbox-goods">
+							<van-checkbox ref="checkboxes" v-model="goodsInfo.isChecked" checked-color="#008000" @click="deleteSun"></van-checkbox>
+						</div>
+					</div>
+					<div class="goods-img">
+						<div>
+							<span><img :src="goodsInfo.goodsImg" /></span>
+						</div>
+					</div>
+					<div class="goods-info">
+						<div class="goods">
+							<div  class="goods-name">{{ goodsInfo.goodsName }}</div>
+						</div>
+						<div class="goods-sku">
+							<span>{{ goodsInfo.goodsSpecName }}</span>
+						</div>
+						<div class="goods-price goods-price-del">
+							<div>
+								<span style="font-weight: normal;color: grey;">￥</span>
+								<span style="font-weight: normal;color: grey;">{{ goodsInfo.goodsPrice }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="buy-count">
+						<div class="bc">
+							<span style="font-weight: normal;color: grey;">x{{ goodsInfo.goodsCount }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 		<div>
 			<div style="height: 52px; width: 100%;clear: both;"></div>
 			<div class="van-submit-bar">
@@ -110,7 +164,9 @@
 				cartItems: [],
 				priceAll: 0.0,
 				goodsCount: 1,
-				showCartEmptyFlag: false
+				showCartEmptyFlag: false,
+				outTimeGoods:[],
+				deleteAll:""
 			};
 		},
 		mounted: function() {
@@ -142,13 +198,14 @@
 			toGoodsDetailPage(goods) {
 				let goodsId = goods.goodsId;
 				let isSingle = goods.isSingle;
+				let timeGoodsId = goods.timeGoodsId;
 				//.goodsId, goodsInfo.isSingle
 
 				let url = '/goodsSku';
 				if (isSingle == 1) {
 					url = '/goodsSingle';
 				}
-				url = url + '?goodsId=' + goodsId;
+				url = url + '?goodsId=' + goodsId+"&timeGoodsId="+timeGoodsId;
 				this.$router.push(url);
 				//打开新页签
 				//const page  = this.$router.resolve({path: url})
@@ -165,6 +222,8 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						let datas = res.data.cartList;
+						vm.outTimeGoods = res.data.outTimeCartList;
+						vm.initOutTimeGoods();
 						vm.showCartEmptyFlag = res.data.showCartEmptyFlag;
 						var myData = [];
 						datas.forEach(function(e) {
@@ -178,6 +237,7 @@
 									goodsImg: e.goodsImg,
 									goodsPrice: e.goodsPrice,
 									goodsSpecName: e.goodsSpecName,
+									timeGoodsId:e.timeGoodsId,
 									isSingle: e.isSingle,
 									isChecked: false,
 									isValid: true,
@@ -201,6 +261,28 @@
 						vm.cartItems = myData;
 					} else {}
 				});
+			},
+			initOutTimeGoods(){
+				let vm = this;
+				let items  = [];
+				vm.outTimeGoods.forEach(function(e) {
+					var shopCartData = {
+						cartId: e.cartId,
+						goodsId: e.goodsId,
+						goodsName: e.goodsName,
+						goodsCount: e.goodsCount,
+						goodsImg: e.goodsImg,
+						goodsPrice: e.goodsPrice,
+						goodsSpecName: e.goodsSpecName,
+						isSingle: e.isSingle,
+						isChecked: false,
+						isValid: true,
+						goodsInfoCss:'goods-info',
+						buyCountCss:'buy-count'
+					};
+					items.push(shopCartData);
+				});
+				vm.outTimeGoods = items;
 			},
 			onClickLeft() {
 				this.$toast('返回');
@@ -349,9 +431,6 @@
 									if (e.isEditer) {
 										var shopCartGoodsCount = e.cartList.length; //店铺下购物车商品数量
 										e.cartList.forEach(function(e) {
-											console.log('----e.cartId=' + e.cartId);
-											console.log('----e.isValid=' + e.isValid);
-											console.log('----e.isChecked=' + e.isChecked);
 											if (e.isValid && e.isChecked) {
 												deleteCartGoods.push(e.cartId);
 												e.isValid = false;
@@ -442,7 +521,7 @@
 					return
 				}
 				// console.log(cartIds)
-				this.$router.push('orderSubmit2?cartIds=' + cartIds);
+				this.$router.push('orderSubmit?cartIds=' + cartIds);
 			},
 			initPageCss(){
 				let vm = this;
@@ -464,6 +543,59 @@
 						});
 					});
 				}
+			},
+			deleteSun(){
+				let vm = this;
+				let count = 0;
+				vm.outTimeGoods.forEach(item => {
+					if(item.isChecked){
+						count++;
+					}
+				})
+				
+				if(count == vm.outTimeGoods.length){
+					vm.deleteAll = true;
+				}else{
+					vm.deleteAll = false;
+				}
+			},
+			checkedDeleteGoodsAll(){
+				let vm = this;
+				if(vm.deleteAll){
+					vm.outTimeGoods.forEach(item => {
+						item.isChecked = true;
+					})
+				}else{
+					vm.outTimeGoods.forEach(item => {
+						item.isChecked = false;
+					})
+				}
+			},
+			deleteShopCart(){
+				let vm = this;
+				let cartIds = "";
+				vm.outTimeGoods.forEach(item => {
+					if(item.isChecked){
+						cartIds = cartIds + item.cartId + ",";
+					}
+				});
+				if(cartIds == ""){
+					Toast('请选择失效的商品');
+					return
+				}
+				let params = {
+					req_type: 'delete_order_cart',
+					data: {
+						cart_ids: cartIds,
+						user_id: 0
+					}
+				};
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						Toast('删除成功');
+						vm.findOrderCart();
+					} else {}
+				});
 			},
 			testData() {
 				const cartItems = [{
@@ -690,7 +822,7 @@
 
 	.goods-info {
 		height: 100%;
-		overflow: auto;
+		/* overflow: auto; */
 		font-size: 12px;
 		position: relative;
 	}
@@ -700,7 +832,7 @@
 	.goods-price {
 		padding-left: 10px;
 	}
-
+	
 	.goods-sku {
 		font-size: 12px;
 		margin-top: 1px;
@@ -721,6 +853,10 @@
 	.goods-price>div>span:last-child {
 		font-size: 16px;
 		font-weight: 900;
+	}
+
+   .goods-price-del{
+		overflow: auto;
 	}
 
 	.buy-count {

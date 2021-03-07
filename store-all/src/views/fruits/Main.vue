@@ -1,7 +1,9 @@
 <template>
 	<div class="body-bg">
 		<!-- <div class="search"><van-search shape="round" background="#008000" placeholder="请输入搜索关键词" /></div> -->
-		<div class="search"><van-search v-model="value" disabled placeholder="请输入搜索关键词" shape="round" background="#008000" /></div>
+		<div class="search">
+			<van-search v-model="value" disabled placeholder="请输入搜索关键词" shape="round" background="#008000" />
+		</div>
 		<div style="height: 44px;"></div>
 		<div class="banner-list">
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
@@ -28,12 +30,15 @@
 				</span>
 			</div>
 		</div> -->
-		<div class="volume" v-if="newsInfo != null"><van-notice-bar text="通知内容" left-icon="volume-o" color="#008080" /></div>
+		<div class="volume" v-if="newsInfo != null">
+			<van-notice-bar text="通知内容" left-icon="volume-o" color="#008080" />
+		</div>
 		<div class="main-menu">
 			<div>
 				<van-grid>
 					<!-- <van-grid-item icon="home-o" text="所有水果" /> -->
-					<van-grid-item :icon="item.menuImg" :text="item.menuName" v-for="(item, index) in mainMenu" :to="item.menuUrl" :key="index" />
+					<van-grid-item :icon="item.menuImg" :text="item.menuName" v-for="(item, index) in mainMenu" :to="item.menuUrl"
+					 :key="index" />
 				</van-grid>
 			</div>
 		</div>
@@ -56,7 +61,7 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single)"><span>去看看</span></div>
+						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)"><span>去看看</span></div>
 					</div>
 				</div>
 			</div>
@@ -78,7 +83,7 @@
 						<span>￥</span>
 						<span>{{ item.now_money }}</span>
 					</div>
-					<div class="goods-item2-buy" @click="toGoodsDetailPage(item.goods_id, item.is_single)"><span>去购买</span></div>
+					<div class="goods-item2-buy" @click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id,item.time_goods_id)"><span>去购买</span></div>
 				</div>
 			</div>
 		</div>
@@ -101,7 +106,7 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single)"><span>去看看</span></div>
+						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)"><span>去看看</span></div>
 					</div>
 				</div>
 			</div>
@@ -113,248 +118,254 @@
 		</div>
 		<div style="clear: both;"></div>
 		<van-divider :style="{ color: '#ADADAD', borderColor: '#ADADAD', padding: '0 16px' }">我是有底线的</van-divider>
-		<div><Tbar tbActiveParent="0" /></div>
+		<div>
+			<Tbar tbActiveParent="0" />
+		</div>
 		<EG />
 	</div>
 </template>
 <script>
-import Tbar from '@/components/Bottom-bar.vue';
-import EG from '@/components/EgMark.vue';
-import axios from '@/network/request.js';
-export default {
-	components: { Tbar: Tbar, EG: EG },
-	data() {
-		return {
-			value: '',
-			cartCount:0,
-			mainMenu: [],
-			bannelList: [],
-			newGoodsList: [],
-			hotGoodsList: [],
-			timeGoodsList: [],
-			weightGoodsList: [],
-			newsInfo: null,
-			activity1: null,
-			activity2: null,
-			activity3: null,
-			activity4: null,
-			activity5: null,
-			activity6: null
-		};
-	},
-	mounted: function() {
-		this.$nextTick(function() {
-			this.findBannelAndActivity();
-		});
-		this.$nextTick(function() {
-			this.findMenus();
-		});
-	},
-	methods: {
-		findMenus() {
-			let vm = this;
-			let params = {
-				req_type: 'main_menu',
-				data: {}
-			}; // 参数
-			axios.post('', params).then(function(res) {
-				if (res.resp_code == 1) {
-					vm.mainMenu = res.data.list;
-				}
+	import Tbar from '@/components/Bottom-bar.vue';
+	import EG from '@/components/EgMark.vue';
+	import axios from '@/network/request.js';
+	export default {
+		components: {
+			Tbar: Tbar,
+			EG: EG
+		},
+		data() {
+			return {
+				value: '',
+				cartCount: 0,
+				mainMenu: [],
+				bannelList: [],
+				newGoodsList: [],
+				hotGoodsList: [],
+				timeGoodsList: [],
+				weightGoodsList: [],
+				newsInfo: null,
+				activity1: null,
+				activity2: null,
+				activity3: null,
+				activity4: null,
+				activity5: null,
+				activity6: null
+			};
+		},
+		mounted: function() {
+			this.$nextTick(function() {
+				this.findBannelAndActivity();
+			});
+			this.$nextTick(function() {
+				this.findMenus();
 			});
 		},
-		toGoodsDetailPage(goodsId, isSingle) {
-			let url = '/goodsSku';
-			if (isSingle == 1) {
-				url = '/goodsSingle';
-			}
-			url = url + '?goodsId=' + goodsId;
-			this.$router.push(url);
-			//打开新页签
-			//const page  = this.$router.resolve({path: url})
-			//window.open(page.href,'_blank')
-		},
-		findBannelAndActivity() {
-			let vm = this;
-			let params = {
-				req_type: 'main',
-				data: {}
-			}; // 参数
-			axios.post('', params).then(function(res) {
-				if (res.resp_code == 1) {
-					// 资讯
-					// 活动
-					let activitys = res.data.activity_list;
-					vm.activityMethod(activitys);
-					// bannel
-					vm.bannelList = res.data.banner_list;
-					// 推荐商品
-					vm.weightGoodsList = res.data.weight_goods_list;
-					// 最新商品
-					vm.newGoodsList = res.data.new_goods_list;
-					// 热门商品
-					vm.hotGoodsList = res.data.hot_goods_list;
-					//限时商品
-					vm.timeGoodsList = res.data.time_goods_list;
-				} else {
+		methods: {
+			findMenus() {
+				let vm = this;
+				let params = {
+					req_type: 'main_menu',
+					data: {}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.mainMenu = res.data.list;
+					}
+				});
+			},
+			toGoodsDetailPage(goodsId, isSingle, timeGoodsId) {
+				let url = '/goodsSku';
+				if (isSingle == 1) {
+					url = '/goodsSingle';
 				}
-			});
-		},
-		findGoods() {},
-		activityMethod(activitys) {
-			let vm = this;
-			if (activitys.length > 0) {
-				vm.activity1 = activitys[0];
+				url = url + '?goodsId=' + goodsId + "&timeGoodsId="+timeGoodsId;
+				this.$router.push(url);
+				//打开新页签
+				//const page  = this.$router.resolve({path: url})
+				//window.open(page.href,'_blank')
+			},
+			findBannelAndActivity() {
+				let vm = this;
+				let params = {
+					req_type: 'main',
+					data: {}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						// 资讯
+						// 活动
+						let activitys = res.data.activity_list;
+						vm.activityMethod(activitys);
+						// bannel
+						vm.bannelList = res.data.banner_list;
+						// 推荐商品
+						vm.weightGoodsList = res.data.weight_goods_list;
+						// 最新商品
+						vm.newGoodsList = res.data.new_goods_list;
+						// 热门商品
+						vm.hotGoodsList = res.data.hot_goods_list;
+						//限时商品
+						vm.timeGoodsList = res.data.time_goods_list;
+					} else {}
+				});
+			},
+			findGoods() {},
+			activityMethod(activitys) {
+				let vm = this;
+				if (activitys.length > 0) {
+					vm.activity1 = activitys[0];
+				}
+				if (activitys.length > 1) {
+					vm.activity2 = activitys[1];
+				}
+				if (activitys.length > 2) {
+					vm.activity3 = activitys[2];
+				}
+				if (activitys.length > 3) {
+					vm.activity4 = activitys[3];
+				}
+				if (activitys.length > 4) {
+					vm.activity5 = activitys[4];
+				}
+				if (activitys.length > 5) {
+					vm.activity6 = activitys[5];
+				}
+			},
+			toPageUrl(url) {
+				if (url == null || url == '') {
+					return;
+				}
+				this.$router.push(url);
 			}
-			if (activitys.length > 1) {
-				vm.activity2 = activitys[1];
-			}
-			if (activitys.length > 2) {
-				vm.activity3 = activitys[2];
-			}
-			if (activitys.length > 3) {
-				vm.activity4 = activitys[3];
-			}
-			if (activitys.length > 4) {
-				vm.activity5 = activitys[4];
-			}
-			if (activitys.length > 5) {
-				vm.activity6 = activitys[5];
-			}
-		},
-		toPageUrl(url) {
-			if (url == null || url == '') {
-				return;
-			}
-			this.$router.push(url);
 		}
-	}
-};
+	};
 </script>
 
 <style scoped>
-.body-bg {
-	border: none;
-	line-height: 20px;
-	margin: 0;
-	padding: 0;
-	font-size: 14px;
-	color: #323233;
-	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
-}
-.my-swipe .van-swipe-item {
-	text-align: center;
-}
+	.body-bg {
+		border: none;
+		line-height: 20px;
+		margin: 0;
+		padding: 0;
+		font-size: 14px;
+		color: #323233;
+		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
+	}
 
-.van-grid-item__icon {
-	font-size: 3.5rem !important;
-}
+	.my-swipe .van-swipe-item {
+		text-align: center;
+	}
 
-.search {
-	z-index: 99999999999;
-	position: fixed;
-	top: 0;
-	width: 100%;
-	margin: 0px auto;
-}
+	.van-grid-item__icon {
+		font-size: 3.5rem !important;
+	}
 
-.banner-list img {
-	height: 10rem;
-	width: 100%;
-}
+	.search {
+		z-index: 99999999999;
+		position: fixed;
+		top: 0;
+		width: 100%;
+		margin: 0px auto;
+	}
 
-.ticket {
-	color: #008000;
-	font-weight: bold;
-	text-align: center;
-	margin: 10px 0;
-}
-.ticket-detail {
-	float: left;
-	width: 50%;
-	position: relative;
-}
+	.banner-list img {
+		height: 10rem;
+		width: 100%;
+	}
 
-.ticket-detail > span {
-	display: block;
-	padding: 30px 10px;
-	border-left: 3px dashed #f0f0f0;
-	border-right: 3px dashed #f0f0f0;
-	margin: 0 8px;
-}
+	.ticket {
+		color: #008000;
+		font-weight: bold;
+		text-align: center;
+		margin: 10px 0;
+	}
 
-.ticket-detail > span > div:first-child > span:first-child {
-	padding-right: 3px;
-	font-size: 25px;
-}
+	.ticket-detail {
+		float: left;
+		width: 50%;
+		position: relative;
+	}
 
-.ticket-detail > span > div:last-child {
-	color: grey;
-	font-weight: normal;
-	font-size: 12px;
-	clear: both;
-}
+	.ticket-detail>span {
+		display: block;
+		padding: 30px 10px;
+		border-left: 3px dashed #f0f0f0;
+		border-right: 3px dashed #f0f0f0;
+		margin: 0 8px;
+	}
 
-.volume {
-	clear: both;
-	padding: 10px 0;
-}
+	.ticket-detail>span>div:first-child>span:first-child {
+		padding-right: 3px;
+		font-size: 25px;
+	}
 
-.main-menu {
-	clear: both;
-}
+	.ticket-detail>span>div:last-child {
+		color: grey;
+		font-weight: normal;
+		font-size: 12px;
+		clear: both;
+	}
 
-.main-menu > div {
-	padding: 0 10px;
-}
+	.volume {
+		clear: both;
+		padding: 10px 0;
+	}
 
-.activity img {
-	height: auto;
-	width: 100%;
-	padding-top: 10px;
-}
+	.main-menu {
+		clear: both;
+	}
 
-.activity2 img {
-	height: auto;
-	width: 100%;
-}
+	.main-menu>div {
+		padding: 0 10px;
+	}
 
-.goods-list {
-	text-align: center;
-	padding: 0px 10px;
-	font-size: 14px;
-	color: #008000;
-}
+	.activity img {
+		height: auto;
+		width: 100%;
+		padding-top: 10px;
+	}
 
-.goods-name {
-	color: #3c3c3c;
-	font-size: 14px;
-}
+	.activity2 img {
+		height: auto;
+		width: 100%;
+	}
 
-.goods-price {
-	color: #008000;
-}
+	.goods-list {
+		text-align: center;
+		padding: 0px 10px;
+		font-size: 14px;
+		color: #008000;
+	}
 
-.goods-list img {
-	height: 180px;
-	width: 100%;
-}
+	.goods-name {
+		color: #3c3c3c;
+		font-size: 14px;
+	}
 
-.goods-item {
-	float: left;
-	width: 50%;
-	text-align: center;
-}
+	.goods-price {
+		color: #008000;
+	}
 
-.goods-item-detail {
-	padding: 10px 4px;
-}
+	.goods-list img {
+		height: 150px;
+		width: 100%;
+	}
 
-.goods-item-info {
-	padding: 2px 10px;
-}
+	.goods-item {
+		float: left;
+		width: 50%;
+		text-align: center;
+	}
 
-/* .goods-item-info > div:first-child {
+	.goods-item-detail {
+		padding: 10px 4px;
+	}
+
+	.goods-item-info {
+		padding: 2px 10px;
+	}
+
+	/* .goods-item-info > div:first-child {
 	float: left;
 	margin-right: 10px;
 	background-color: #93ff93;
@@ -362,95 +373,103 @@ export default {
 	padding: 0 3px;
 } */
 
-.goods-item-name {
-	white-space: nowrap; /*一行显示*/
-	overflow: hidden; /*超出部分隐藏*/
-	text-overflow: ellipsis; /*用...代替超出部分*/
-	color: #3c3c3c;
-}
+	.goods-item-name {
+		white-space: nowrap;
+		/*一行显示*/
+		overflow: hidden;
+		/*超出部分隐藏*/
+		text-overflow: ellipsis;
+		/*用...代替超出部分*/
+		color: #3c3c3c;
+	}
 
-.goods-item-price-div {
-	padding: 5px 10px;
-	margin-bottom: 5px;
-}
+	.goods-item-price-div {
+		padding: 5px 10px;
+		margin-bottom: 5px;
+	}
 
-.goods-item-price {
-	float: left;
-	width: 30%;
-}
-.goods-item-price > span:first-child {
-	font-size: 12px;
-}
-.goods-item-price > span:last-child {
-	font-size: 16px;
-	font-weight: 900;
-}
-.goods-item-go {
-	float: right;
-	font-size: 12px !important;
-	border: 1px solid #008000;
-	padding: 2px 8px;
-	border-radius: 50px;
-}
+	.goods-item-price {
+		float: left;
+		width: 30%;
+	}
 
-.goods-item2 {
-	height: 7.5rem;
-	padding: 10px 10px;
-	/* color: #3c3c3c; */
-}
+	.goods-item-price>span:first-child {
+		font-size: 12px;
+	}
 
-.goods-item2-img {
-	float: left;
-}
-.goods-item2-img img {
-	width: 7.5rem;
-	height: 7.5rem;
-}
+	.goods-item-price>span:last-child {
+		font-size: 16px;
+		font-weight: 900;
+	}
 
-.goods-item2-info {
-	color: #3c3c3c;
-	font-size: 14px;
-	margin-left: 8rem;
-	height: 7.5rem;
-	position: relative;
-}
+	.goods-item-go {
+		float: right;
+		font-size: 12px !important;
+		border: 1px solid #008000;
+		padding: 2px 8px;
+		border-radius: 50px;
+	}
 
-.goods-item2-name {
-	padding-top: 8px;
-}
+	.goods-item2 {
+		height: 7.5rem;
+		padding: 10px 10px;
+		/* color: #3c3c3c; */
+	}
 
-.goods-item2-price-dev {
-	position: absolute;
-	bottom: 0px;
-	width: 100%;
-}
+	.goods-item2-img {
+		float: left;
+	}
 
-.goods-item2-price {
-	float: left;
-	width: 50%;
-	color: #008000;
-	border: 0px;
-}
+	.goods-item2-img img {
+		width: 7.5rem;
+		height: 7.5rem;
+	}
 
-.goods-item2-price > span:first-child,
-.goods-item2-price > span:last-child {
-	font-size: 12px;
-}
-.goods-item2-price > span:nth-child(2) {
-	font-size: 16px;
-	font-weight: 900;
-}
+	.goods-item2-info {
+		color: #3c3c3c;
+		font-size: 14px;
+		margin-left: 8rem;
+		height: 7.5rem;
+		position: relative;
+	}
 
-.goods-item2-buy {
-	float: right;
-	font-size: 12px;
-	border: 1px solid #008000;
-	padding: 2px 10px;
-	border-radius: 50px;
-	color: #008000;
-}
+	.goods-item2-name {
+		padding-top: 8px;
+	}
 
->>> .van-search .van-cell {
-	padding: 0px 8px 0px 0;
-}
+	.goods-item2-price-dev {
+		position: absolute;
+		bottom: 0px;
+		width: 100%;
+	}
+
+	.goods-item2-price {
+		float: left;
+		width: 50%;
+		color: #008000;
+		border: 0px;
+	}
+
+	.goods-item2-price>span:first-child,
+	.goods-item2-price>span:last-child {
+		font-size: 12px;
+	}
+
+	.goods-item2-price>span:nth-child(2) {
+		font-size: 16px;
+		font-weight: 900;
+	}
+
+	.goods-item2-buy {
+		float: right;
+		font-size: 12px;
+		border: 1px solid #008000;
+		padding: 2px 10px;
+		border-radius: 50px;
+		color: #008000;
+	}
+
+	>>>.van-search .van-cell {
+		padding: 0px 8px 0px 0;
+	}
 </style>

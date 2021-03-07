@@ -3,15 +3,6 @@
 		<div>
 			<Head :title="title" />
 		</div>
-		<div class="order-tab">
-			<div>
-				<van-tabs v-model="active" animated color="#008000" title-active-color="#008000" title-inactive-color="#657180"
-				 @change="onChange">
-					<van-tab :title="item.statusName" v-for="(item, index) in tabList" :key="item.orderStatus"></van-tab>
-				</van-tabs>
-			</div>
-		</div>
-		<div style="clear: both;height: 43px;width: 100%;"></div>
 		<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
 			<div class="order-items" v-for="(item, index) in orderList" :key="item.orderId">
 				<div class="order-info">
@@ -71,9 +62,7 @@
 		data() {
 			return {
 				title: '我的订单',
-				active: 0,
-				onClickOrderStatus: -1,
-				tabList: [],
+				orderStatus: -1,
 				orderList: [],
 				// 分页
 				loading: false,
@@ -83,48 +72,25 @@
 				hasNext: true
 			};
 		},
-		created() {
-			this.tabList = [{
-					orderStatus: -1,
-					statusName: '全部'
-				},
-				{
-					orderStatus: 0,
-					statusName: '待付款'
-				},
-				{
-					orderStatus: 2,
-					statusName: '确认中'
-				},
-				{
-					orderStatus: 5,
-					statusName: '待收货'
-				}
-			];
-		},
+		created() {},
 		methods: {
 			toPage(orderId) {
-				// 登出系统
-				this.$router.push("orderDetail?orderId="+orderId);
+				this.$router.push("orderDetail?orderId=" + orderId);
 			},
-			onChange(index) {
-				this.onClickOrderStatus = this.tabList[index].orderStatus;
-				console.log('----选中的标签-----' + index + " this.onClickOrderStatus=" + this.onClickOrderStatus);
-				this.orderList.length = 0;
-				this.loading = false;
-				this.finished = false;
-				this.currePage = 1,
-				this.hasNext = true;
-				this.onLoad();
-			},
+			onChange(index) {},
 			onLoad() {
 				let vm = this;
+				let {
+					orderStatus
+				} = this.$route.query;
+				vm.orderStatus = orderStatus;
+				vm.initTitle();
 				let params = {
 					req_type: 'query_order_list',
 					data: {
 						curre_page: vm.currePage,
 						user_id: 0,
-						status: vm.onClickOrderStatus
+						status: orderStatus
 					}
 				}; // 参数
 				this.loading = true;
@@ -143,45 +109,75 @@
 						this.loading = false;
 					});
 			},
+			initTitle(){
+				let vm = this;
+				if(vm.orderStatus == 0){
+					vm.title = "我的订单(待付款)";
+				}else if(vm.orderStatus == 1){
+					vm.title = "我的订单(已付款)";
+				}else if(vm.orderStatus == 2){
+					vm.title = "我的订单(确认中)";
+				}else if(vm.orderStatus == 3){
+					vm.title = "我的订单(已失败)";
+				}else if(vm.orderStatus == 5){
+					vm.title = "我的订单(待收货)";
+				}else if(vm.orderStatus == 6){
+					vm.title = "我的订单(已完成)";
+				}else if(vm.orderStatus == 7){
+					vm.title = "我的订单(已取消)";
+				}else if(vm.orderStatus == 8){
+					vm.title = "我的订单(已删除)";
+				}else if(vm.orderStatus == 9){
+					vm.title = "我的订单(退款中)";
+				}else if(vm.orderStatus == 10){
+					vm.title = "我的订单(已退款)";
+				}else if(vm.orderStatus == 12){
+					vm.title = "我的订单(还货中)";
+				}else if(vm.orderStatus == 13){
+					vm.title = "我的订单(已还货)";
+				}else{
+					vm.title = "我的订单";
+				}
+			},
 			initOrderList(orderList, hasNext) {
 				let vm = this;
 				// 异步更新数据
 				// setTimeout 仅做示例，真实场景中一般为 ajax 请求
 				// setTimeout(() => {
-					for (let i = 0; i < orderList.length; i++) {
-						var goodsList = [];
-						var orderCount = orderList[i].order_count;
-						var realPrice = orderList[i].real_price;
-						for (let j = 0; j < orderList[i].detail_list.length; j++) {
-							var goods = {
-								goodsId: orderList[i].detail_list[j].goods_id,
-								goodsName: orderList[i].detail_list[j].goods_name,
-								goodsSalePrice: orderList[i].detail_list[j].sale_money,
-								goodsCount: orderList[i].detail_list[j].goods_count,
-								goodsSpecName: orderList[i].detail_list[j].goods_spec_name,
-								goodsImg: orderList[i].detail_list[j].goods_img
-							};
-							goodsList.push(goods);
-						}
-
-						var orderStatus = orderList[i].order_status;
-						var orderStatusName = orderList[i].order_status_name;
-
-						var order = {
-							orderId: orderList[i].order_id,
-							createTime: orderList[i].order_time,
-							orderStatusName: orderStatusName,
-							orderStatus: orderStatus,
-							orderCount: orderCount,
-							realPrice: realPrice,
-							goodsList: goodsList
+				for (let i = 0; i < orderList.length; i++) {
+					var goodsList = [];
+					var orderCount = orderList[i].order_count;
+					var realPrice = orderList[i].real_price;
+					for (let j = 0; j < orderList[i].detail_list.length; j++) {
+						var goods = {
+							goodsId: orderList[i].detail_list[j].goods_id,
+							goodsName: orderList[i].detail_list[j].goods_name,
+							goodsSalePrice: orderList[i].detail_list[j].sale_money,
+							goodsCount: orderList[i].detail_list[j].goods_count,
+							goodsSpecName: orderList[i].detail_list[j].goods_spec_name,
+							goodsImg: orderList[i].detail_list[j].goods_img
 						};
-						this.orderList.push(order);
+						goodsList.push(goods);
 					}
-					this.loading = false;
-					if (hasNext == false) {
-						this.finished = true;
-					}
+
+					var orderStatus = orderList[i].order_status;
+					var orderStatusName = orderList[i].order_status_name;
+
+					var order = {
+						orderId: orderList[i].order_id,
+						createTime: orderList[i].order_time,
+						orderStatusName: orderStatusName,
+						orderStatus: orderStatus,
+						orderCount: orderCount,
+						realPrice: realPrice,
+						goodsList: goodsList
+					};
+					this.orderList.push(order);
+				}
+				this.loading = false;
+				if (hasNext == false) {
+					this.finished = true;
+				}
 				// }, 1000);
 			}
 		}

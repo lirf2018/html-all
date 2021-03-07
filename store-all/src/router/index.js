@@ -25,6 +25,7 @@ import MyJifen from '@/views/fruits/MyJifen.vue';
 import Message from '@/views/fruits/Message.vue';
 import MySuggest from '@/views/fruits/MySuggest.vue';
 import OrderList from '@/views/fruits/OrderList.vue';
+import OrderListOne from '@/views/fruits/OrderListOne.vue'
 import OrderDetail from '@/views/fruits/OrderDetail.vue';
 import Search from '@/views/fruits/Search.vue';
 import ShopCart from '@/views/fruits/ShopCart.vue';
@@ -131,6 +132,14 @@ export const pageLink = [
 	{
 		path: "/orderList",
 		component: OrderList
+	},
+	{
+		path: "/orderListOne",
+		component: OrderListOne
+	},
+	{
+		path: "/orderListOne",
+		component: OrderListOne
 	},
 	{
 		path: "/orderDetail",

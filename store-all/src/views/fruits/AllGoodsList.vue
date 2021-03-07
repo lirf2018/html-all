@@ -6,7 +6,7 @@
 		<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
 			<div class="l-items">
 				<div class="goods-item" v-for="(items, index) in goodsList" :key="index">
-					<div @click="toGoodsDetailPage(items.goodsId,items.isSingle)">
+					<div @click="toGoodsDetailPage(items.goodsId,items.isSingle,items)">
 						<div class="goods-img">
 							<div>
 								<div><img :src="items.goodsImg" /></div>
@@ -55,7 +55,6 @@
 		mounted: function() {},
 		methods: {
 			onLoad() {
-
 				let vm = this;
 				let params = {
 					req_type: 'query_goods_list',
@@ -64,26 +63,32 @@
 						userId: 0,
 					}
 				}; // 参数
+				this.loading = true;
 				axios.post('', params).then(function(res) {
-					if (res.resp_code == 1) {
-						let goodsList = res.data.goodsList;
-						let hasNext = res.data.hasNext;
-						vm.initGoodsList(goodsList, hasNext)
-						vm.currePage = vm.currePage + 1;
-					} else {}
-				});
+						if (res.resp_code == 1) {
+							let goodsList = res.data.goodsList;
+							let hasNext = res.data.hasNext;
+							vm.initGoodsList(goodsList, hasNext)
+							vm.currePage = vm.currePage + 1;
+						} else {}
+					}).catch(err => {
+						// this.error = true;
+					})
+					.finally(() => {
+						this.loading = false;
+					});
 			},
 			initGoodsList(newGoodsList, hasNext) {
 				let vm = this;
-				setTimeout(() => {
-					for (let i = 0; i < newGoodsList.length; i++) {
-						vm.goodsList.push(newGoodsList[i]);
-					}
-					this.loading = false;
-					if (hasNext == false) {
-						this.finished = true;
-					}
-				}, 1000);
+				// setTimeout(() => {
+				for (let i = 0; i < newGoodsList.length; i++) {
+					vm.goodsList.push(newGoodsList[i]);
+				}
+				this.loading = false;
+				if (hasNext == false) {
+					this.finished = true;
+				}
+				// }, 1000);
 			},
 			onRefresh() {
 				// 清空列表数据
@@ -94,12 +99,12 @@
 				this.loading = true;
 				this.onLoad();
 			},
-			toGoodsDetailPage(goodsId,isSingle) {
+			toGoodsDetailPage(goodsId, isSingle, items) {
 				let url = "/goodsSku";
-				if(isSingle == 1){
+				if (isSingle == 1) {
 					url = "/goodsSingle";
 				}
-				url = url + "?goodsId="+goodsId;
+				url = url + "?goodsId=" + goodsId + "&timeGoodsId=" + items.timeGoodsId;
 				this.$router.push(url);
 				//打开新页签
 				//const page  = this.$router.resolve({path: url})
@@ -115,7 +120,7 @@
 		line-height: 20px;
 		margin: 0;
 		padding: 0;
-		font-size: 14px;
+		font-size: 12px;
 		color: #323233;
 		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
 	}
@@ -138,7 +143,7 @@
 		float: left;
 		width: 50%;
 		text-align: center;
-		font-size: 14px;
+		font-size: 12px;
 		color: #3c3c3c;
 		padding-bottom: 8px;
 	}
@@ -162,7 +167,7 @@
 
 	.goods-img img {
 		width: 100%;
-		height: 180px;
+		height: 150px;
 	}
 
 	.goods-name {

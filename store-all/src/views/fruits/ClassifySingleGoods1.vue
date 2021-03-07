@@ -22,14 +22,14 @@
 										<span style="font-size: 12px;">{{ item.menuName }}</span>
 									</div>
 									<div class="goods-items" v-for="g in item.goodsList" :key="g.goodsId">
-										<div class="goods-img"><img :src="g.goodsImg" /></div>
+										<div class="goods-img" @click="toGoodsDetailPage(g.goodsId,1,g)"><img :src="g.goodsImg" /></div>
 										<div class="goods-contents">
-											<div class="goods-name-div">
+											<div class="goods-name-div" @click="toGoodsDetailPage(g.goodsId,1,g)">
 												<span class="goods-name">{{ g.goodsName }}</span>
 											</div>
 											<!-- <span class="goods-desc">{{ g.goodsDesc }}</span> -->
 											<div class="price-div">
-												<div class="price">
+												<div class="price" @click="toGoodsDetailPage(g.goodsId,1,g)">
 													<span class="goods-currency">￥</span>
 													<span class="goods-price">{{ g.nowMoney }}</span>
 												</div>
@@ -215,6 +215,17 @@ export default {
 				} else {
 				}
 			});
+		},
+		toGoodsDetailPage(goodsId, isSingle,g) {
+			let url = '/goodsSku';
+			if (isSingle == 1) {
+				url = '/goodsSingle';
+			}
+			url = url + '?goodsId=' + goodsId+"&timeGoodsId="+g.timeGoodsId;
+			this.$router.push(url);
+			//打开新页签
+			//const page  = this.$router.resolve({path: url})
+			//window.open(page.href,'_blank')
 		}
 	}
 };

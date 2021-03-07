@@ -1,192 +1,252 @@
 <template>
 	<div class="body-bg">
-		<div class="center-head">
-			<div class="user-img">
-				<div><van-image round width="7rem" height="7rem" src="https://img.yzcdn.cn/vant/cat.jpeg" /></div>
-				<div>昵称</div>
+		<div v-if="data != null">
+			<div class="center-head">
+				<div class="user-img">
+					<div>
+						<van-image round width="7rem" height="7rem" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+					</div>
+					<div>{{data.member_id}}</div>
+				</div>
+				<div class="user-ql">
+					<div class="jifen-div">
+						<div>
+							<span>积分</span>
+							<!-- <span>敬请期待</span> -->
+							<span>{{data.user_jifen}}</span>
+						</div>
+					</div>
+					<div class="ticket-div">
+						<div>
+							<span>优惠券</span>
+							<span>敬请期待</span>
+						</div>
+					</div>
+					<div class="cost-div">
+						<div>
+							<span>累计消费</span>
+							<span>{{data.order_price_all}}</span>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="user-ql">
-				<div class="jifen-div">
-					<div>
-						<span>积分</span>
-						<span>100</span>
-					</div>
-				</div>
-				<div class="ticket-div">
-					<div>
-						<span>优惠券</span>
-						<span>10</span>
-					</div>
-				</div>
-				<div class="cost-div">
-					<div>
-						<span>累计消费</span>
-						<span>1000000.10 元</span>
-					</div>
-				</div>
+			<div style="clear: both;"></div>
+			<div @click="toPage('/orderList')">
+				<van-cell-group>
+					<van-cell title="" is-link value="查看全部订单" />
+				</van-cell-group>
 			</div>
-		</div>
-		<div style="clear: both;"></div>
-		<div>
-			<van-cell-group><van-cell title="" is-link value="查看全部订单" /></van-cell-group>
-		</div>
-		<div>
-			<van-grid>
-				<van-grid-item icon="pending-payment" text="待付款" />
-				<van-grid-item icon="send-gift-o" text="待发货" />
-				<van-grid-item icon="logistics" text="已发货" />
-				<van-grid-item icon="sign" text="已完成" />
-			</van-grid>
-		</div>
-		<div class="shop-cart">
 			<div>
+				<van-grid>
+					<van-grid-item icon="pending-payment" text="待付款" @click="toOrderListOne(0)" :badge="data.order_dfk"/>
+					<van-grid-item icon="send-gift-o" text="确认中" @click="toOrderListOne(2)" :badge="data.order_qrz"/>
+					<van-grid-item icon="send-gift-o" text="待收货" @click="toOrderListOne(5)" :badge="data.order_dsh"/>
+					<van-grid-item icon="sign" text="已完成" @click="toOrderListOne(6)" :badge="data.order_ywc"/>
+				</van-grid>
+			</div>
+			<div class="shop-cart" @click="toPage('/shopCart')">
 				<div>
-					<van-cell-group><van-cell title="购物车" is-link /></van-cell-group>
+					<div>
+						<van-cell-group>
+							<van-cell title="购物车" is-link />
+						</van-cell-group>
+					</div>
+					<div class="cart-count"><span>{{data.cart_goods_count}}</span></div>
 				</div>
-				<div class="cart-count"><span>10</span></div>
+			</div>
+			<div>
+				<van-cell-group>
+					<van-cell title="退款退货" is-link />
+				</van-cell-group>
+			</div>
+			<div @click="toPage('userAddr')">
+				<van-cell-group>
+					<van-cell title="收货地址管理" is-link />
+				</van-cell-group>
+			</div>
+			<div>
+				<van-cell-group>
+					<van-cell title="我的优惠券" is-link />
+				</van-cell-group>
+			</div>
+			<!-- <div>
+				<van-cell-group><van-cell title="我的优惠码" is-link /></van-cell-group>
+			</div> -->
+			<div>
+				<van-cell-group>
+					<van-cell title="我的推广码" is-link />
+				</van-cell-group>
+			</div>
+			<div>
+				<van-cell-group>
+					<van-cell title="我的消息" is-link />
+				</van-cell-group>
+			</div>
+			<div>
+				<van-cell-group>
+					<van-cell title="绑定列表" is-link />
+				</van-cell-group>
+			</div>
+			<div @click="toPage('mySuggest')">
+				<van-cell-group>
+					<van-cell title="建议和反馈" is-link />
+				</van-cell-group>
+			</div>
+			<div class="exit-out" @click="toPage('accountLogin')">
+				<van-button color="#008000">退出</van-button>
+			</div>
+			<div>
+				<Tbar tbActiveParent="3" />
 			</div>
 		</div>
-		<div>
-			<van-cell-group><van-cell title="退款退货" is-link /></van-cell-group>
-		</div>
-		<div @click="toPage('userAddr')">
-			<van-cell-group><van-cell title="收货地址管理" is-link /></van-cell-group>
-		</div>
-		<div>
-			<van-cell-group><van-cell title="我的优惠券" is-link /></van-cell-group>
-		</div>
-		<!-- <div>
-			<van-cell-group><van-cell title="我的优惠码" is-link /></van-cell-group>
-		</div> -->
-		<div>
-			<van-cell-group><van-cell title="我的推广码" is-link /></van-cell-group>
-		</div>
-		<div>
-			<van-cell-group><van-cell title="我的消息" is-link /></van-cell-group>
-		</div>
-		<div>
-			<van-cell-group><van-cell title="绑定列表" is-link /></van-cell-group>
-		</div>
-		<div @click="toPage('mySuggest')">
-			<van-cell-group><van-cell title="建议和反馈" is-link /></van-cell-group>
-		</div>
-		<div class="exit-out" @click="toPage('accountLogin')"><van-button color="#008000" >退出</van-button></div>
-		<div><Tbar tbActiveParent="3" /></div>
 		<EG />
 	</div>
 </template>
 
 <script>
-import Tbar from '@/components/Bottom-bar.vue';
-import EG from '@/components/EgMark.vue';
-export default {
-	components: { Tbar: Tbar, EG: EG },
-	data() {
-		return {
-			tbActive: 3
-		};
-	},
-	mounted:function(){
-		
-	},
-	methods:{
-		toPage(path){
-			// 登出系统
-			this.$router.push(path);
+	import Tbar from '@/components/Bottom-bar.vue';
+	import EG from '@/components/EgMark.vue';
+	import axios from '@/network/request.js';
+	export default {
+		components: {
+			Tbar: Tbar,
+			EG: EG
+		},
+		data() {
+			return {
+				tbActive: 3,
+				data:null
+			};
+		},
+		mounted: function() {
+			this.$nextTick(function() {
+				this.findUserCenter();
+			});
+		},
+		methods: {
+			toPage(path) {
+				this.$router.push(path);
+			},
+			toOrderListOne(status) {
+				this.$router.push("orderListOne?orderStatus=" + status);
+			},
+			findUserCenter() {
+				let vm = this;
+				let params = {
+					req_type: 'query_user_center',
+					data: {
+						user_id: 0
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.data = res.data;
+					}
+				});
+			}
 		}
-	}
-};
+	};
 </script>
 
 <style scoped>
-.body-bg {
-	border: none;
-	line-height: 20px;
-	margin: 0;
-	padding: 0;
-	font-size: 14px;
-	color: #323233;
-	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
-}
-.user-img {
-	text-align: center;
-	padding: 38px 0 5px 0;
-	background-color: #ffffff;
-}
-.user-ql {
-	background-color: #ffffff;
-	color: #969799;
-	font-size: 14px;
-	overflow: auto;
-	text-align: center;
-	margin-bottom: 10px;
-}
+	.body-bg {
+		border: none;
+		line-height: 20px;
+		margin: 0;
+		padding: 0;
+		font-size: 14px;
+		color: #323233;
+		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
+	}
 
-.user-ql span {
-	display: block;
-}
-.user-ql > div > div > span:first-child {
-	color: #323233;
-	padding: 15px 0 5px 0;
-}
-.user-ql > div > div {
-	padding-bottom: 15px;
-}
-.jifen-div {
-	float: left;
-	width: 30%;
-}
-.ticket-div {
-	float: left;
-	width: 30%;
-}
-.cost-div {
-	float: left;
-	width: 40%;
-}
+	.user-img {
+		text-align: center;
+		padding: 38px 0 5px 0;
+		background-color: #ffffff;
+	}
 
-.jifen-div > div,
-.ticket-div > div {
-	border-right: 1px solid #f0f0f0;
-}
+	.user-ql {
+		background-color: #ffffff;
+		color: #969799;
+		font-size: 14px;
+		overflow: auto;
+		text-align: center;
+		margin-bottom: 10px;
+	}
 
-.user-img > div:last-child {
-	padding-top: 10px;
-}
+	.user-ql span {
+		display: block;
+	}
 
-.shop-cart {
-	padding: 10px 0;
-}
+	.user-ql>div>div>span:first-child {
+		color: #323233;
+		padding: 15px 0 5px 0;
+	}
 
-/**
+	.user-ql>div>div {
+		padding-bottom: 15px;
+	}
+
+	.jifen-div {
+		float: left;
+		width: 30%;
+	}
+
+	.ticket-div {
+		float: left;
+		width: 30%;
+	}
+
+	.cost-div {
+		float: left;
+		width: 40%;
+	}
+
+	.jifen-div>div,
+	.ticket-div>div {
+		border-right: 1px solid #f0f0f0;
+	}
+
+	.user-img>div:last-child {
+		padding-top: 10px;
+	}
+
+	.shop-cart {
+		padding: 10px 0;
+	}
+
+	/**
  * 退出
  */
-.exit-out {
-	margin:15px 30px;
-}
+	.exit-out {
+		margin: 15px 30px;
+	}
 
-.van-button {
-	border-radius: 20px !important;
-	width: 100%;
-}
+	.van-button {
+		border-radius: 20px !important;
+		width: 100%;
+	}
 
-.shop-cart > div {
-	position: relative;
-}
+	.shop-cart>div {
+		position: relative;
+	}
 
-.cart-count {
-	background-color: #008000;
-	color: #ffffff;
-	height: 15px;
-	line-height: 15px;
-	font-size: 12px;
-	border-radius: 50px;
-	position: absolute;
-	right: 35px;
-	bottom: 12px;
-	padding: 2px 2px;
-}
->>>.van-button{
-	height: 35px;
-}
+	.cart-count {
+		background-color: #008000;
+		color: #ffffff;
+		height: 15px;
+		width: 15px;
+		text-align: center;
+		line-height: 15px;
+		font-size: 12px;
+		border-radius: 50px;
+		position: absolute;
+		right: 35px;
+		bottom: 12px;
+		padding: 2px 2px;
+	}
+
+	>>>.van-button {
+		height: 35px;
+	}
 </style>

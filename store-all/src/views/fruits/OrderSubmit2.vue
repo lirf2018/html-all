@@ -33,7 +33,7 @@
 				</div>
 				<div class="user-detail">
 					<van-cell-group>
-						<van-field placeholder="详细地址:如道路、门牌号、小区、楼栋号、单元室等" />
+						<van-field placeholder="详细地址:如道路、门牌号、小区、楼栋号、单元室等" v-model="userAddAddrs" />
 					</van-cell-group>
 				</div>
 				<div class="user-info">
@@ -140,12 +140,30 @@
 						<span class="money-other">{{postPrice}}</span>
 					</div>
 				</div>
+				<div class="order_price_div">
+					<div class="order_price_div_name">
+						<div>订单总价:</div>
+						<div>押金总价:</div>
+					</div>
+					<div class="order_price_div_value">
+						<div>
+							<span style="font-size: 12px;">￥</span>
+							<span>{{orderPrice}}</span>
+						</div>
+						<div>
+							<span style="font-size: 12px;">￥</span>
+							<span>{{depositMoneyAll}}</span>
+						</div>
+					</div>
+				</div>
 				<div class="user-remark">
-					<div><input placeholder="订单备注" /></div>
+					<div><input placeholder="用户备注" v-model="userRemark" /></div>
 				</div>
 				<div class="vant-div vant-read">
 					<van-collapse v-model="noticeName" accordion>
-						<van-collapse-item title="下单必看" name="1">内容内容内容内容内容</van-collapse-item>
+						<van-collapse-item title="下单必看" name="1">
+							<OrderRead></OrderRead>
+						</van-collapse-item>
 					</van-collapse>
 				</div>
 			</div>
@@ -160,7 +178,7 @@
 					<span class="money">{{realPrice}}</span>
 				</span>
 			</div>
-			<div><span class="to-pay">去支付</span></div>
+			<div @click="createOrder"><span class="to-pay">去支付</span></div>
 		</div>
 		<van-popup v-model="showAddrListPannelFlag" position="bottom" :style="{ height: '100%' }">
 			<PlatformListPannel :closeSowAddrListPannelFlag="closeSowAddrListPannelFlag" :indexListP="indexList" :dataListP="dataList"
@@ -196,6 +214,7 @@
 
 	import Head from '@/components/Head.vue';
 	import axios from '@/network/request.js';
+	import OrderRead from '@/components/OrderRead.vue';
 	import PlatformListPannel from '@/components/PlatformListPannel.vue';
 	import {
 		Toast
@@ -203,6 +222,7 @@
 	export default {
 		components: {
 			Head: Head,
+			OrderRead:OrderRead,
 			PlatformListPannel: PlatformListPannel
 		},
 		data() {
@@ -218,9 +238,10 @@
 				active: 0,
 				noticeName: '0',
 				title: '填写订单',
+				userRemark: "",
+				shopId: 0,
 				shopName: null,
 				goodsList: [],
-				goodsPriceAll: 0,
 				loading: false,
 				finished: false,
 				chosenCoupon: -1, // 优惠券
@@ -235,10 +256,15 @@
 				phone: '',
 				orderPrice: 0,
 				realPrice: 0,
+				goodsPriceAll: 0,
+				depositMoneyAll: 0,
+				advancePriceAll: 0,
+				discountsPriceAll: 0,
 				// 收据地址属性
 				postPrice: 0,
 				userAddrId: null,
 				addrDetail: '',
+				userAddAddrs: '', //用户填写的详情地址
 				postPrice2: 0,
 				userAddrId2: null,
 				addrDetail2: '',
@@ -288,10 +314,10 @@
 			},
 			onClickTab(name, title) {
 				this.findPlatformList(0);
-				if(this.userAddrId == null){
+				if (this.userAddrId == null) {
 					this.showAddrFlag0 = false;
 				}
-				if(this.userAddrId2 == null){
+				if (this.userAddrId2 == null) {
 					this.showAddrFlag1 = false;
 				}
 				this.initPayPrice();
@@ -302,7 +328,8 @@
 					goodsId,
 					skuId,
 					buyCount,
-					cartIds
+					cartIds,
+					timeGoodsId
 				} = this.$route.query;
 
 				let params = {
@@ -312,14 +339,18 @@
 						sku_id: skuId,
 						buy_count: buyCount,
 						cart_ids: cartIds,
-						user_id: 0
+						user_id: 0,
+						time_goods_id:timeGoodsId
 					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						vm.goodsList = res.data.goods_list;
 						vm.shopName = res.data.shop_name;
+						vm.shopId = res.data.shop_id;
 						vm.goodsPriceAll = res.data.goods_price_all;
+						vm.depositMoneyAll = res.data.deposit_money_all;
+						vm.advancePriceAll = res.data.advance_price_all;
 						vm.initPayPrice();
 					} else {}
 				});
@@ -340,7 +371,7 @@
 			},
 			initPayPrice() {
 				let vm = this;
-				let postPrice = 20;
+				let postPrice = 0;
 				if (vm.active == 0) {
 					// 配送
 					postPrice = vm.postPrice;
@@ -348,8 +379,10 @@
 					// 自取
 					postPrice = vm.postPrice2;
 				}
-				vm.orderPrice = vm.goodsPriceAll + postPrice;
-				vm.realPrice = vm.goodsPriceAll + postPrice;
+				vm.orderPrice = vm.goodsPriceAll + postPrice + vm.depositMoneyAll;
+				vm.orderPrice = vm.orderPrice.toFixed(2);
+				vm.realPrice = vm.orderPrice - vm.discountsPriceAll;
+				vm.realPrice = vm.realPrice.toFixed(2);
 			},
 			closeSowAddrListPannelFlag() {
 				if (this.showAddrListPannelFlag) {
@@ -377,6 +410,110 @@
 				}
 				vm.showAddrListPannelFlag = false;
 				this.initPayPrice();
+			},
+			createOrder() {
+				let vm = this;
+				let goodsList = [];
+				for (var i = 0; i < vm.goodsList.length; i++) {
+					let goods = {
+						goods_id: vm.goodsList[i].goodsId,
+						sku_id: vm.goodsList[i].skuId,
+						buy_count: vm.goodsList[i].buyCount,
+						time_goods_id: vm.goodsList[i].timeGoodsId,
+						cart_id: vm.goodsList[i].cartId,
+					}
+					goodsList.push(goods);
+				}
+				// 地址
+				let postPrice_ = "";
+				let userAddrId_ = "";
+				let addrDetail_ = "";
+				let postWay_ = 0; //收货方式 1.邮寄4.自取5配送地址
+				if (vm.active == 0) {
+					postPrice_ = vm.postPrice;
+					userAddrId_ = vm.userAddrId;
+					addrDetail_ = vm.addrDetail + vm.userAddAddrs;
+					postWay_ = 5;
+				} else {
+					postPrice_ = vm.postPrice2;
+					userAddrId_ = vm.userAddrId2;
+					addrDetail_ = vm.addrDetail2 + "【" + vm.serviceName + "】";
+					postWay_ = 4;
+				}
+
+				let obj = {
+					user_id: 0,
+					user_addr_id: userAddrId_,
+					addr_detail: addrDetail_,
+					user_remark: vm.userRemark,
+					user_name: vm.userName,
+					user_phone: vm.phone,
+					user_sex: vm.formData.radio,
+					post_way: postWay_,
+					post_price: postPrice_,
+					order_price: vm.orderPrice,
+					real_price: vm.realPrice,
+					goods_price_all: vm.goodsPriceAll, //商品总价
+					deposit_price_all: vm.depositMoneyAll, //押金总价
+					discounts_price_all: 0, //优惠总价
+					advance_price_all: vm.advancePriceAll,
+					shop_id: vm.shopId,
+					business_type: 1, //1正常下单2抢购3预定4租赁
+					coupon_id: 0,
+					goods_list: goodsList
+				}
+				let flag = vm.checkOrder();
+				if (!flag) {
+					return;
+				}
+				let params = {
+					req_type: 'create_order',
+					data: obj
+				};
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						Toast('下单成功');
+					} else {
+						Toast(res.resp_desc);
+					}
+				});
+			},
+			checkOrder() {
+				let vm = this;
+				// 地址
+				let postPrice_ = "";
+				let userAddrId_ = "";
+				let addrDetail_ = "";
+				let postWay_ = 0; //收货方式 1.邮寄4.自取5配送地址
+				if (vm.active == 0) {
+					postPrice_ = vm.postPrice;
+					userAddrId_ = vm.userAddrId;
+					addrDetail_ = vm.addrDetail + vm.userAddAddrs;
+					postWay_ = 5;
+				} else {
+					postPrice_ = vm.postPrice2;
+					userAddrId_ = vm.userAddrId2;
+					addrDetail_ = vm.addrDetail2 + "【" + vm.serviceName + "】";
+					postWay_ = 4;
+				}
+				if(userAddrId_ == '' || userAddrId_ == null){
+					Toast('收货地址不能为空');
+					return false;
+				}
+				if(vm.userName == '' || vm.userName == null){
+					Toast('收货人不能为空');
+					return false;
+				}
+				if(vm.phone == '' || vm.phone == null){
+					Toast('手机号不能为空');
+					return false;
+				}
+				
+				if(vm.formData.radio == '' || vm.formData.radio == null){
+					Toast('请选择先生/女士');
+					return false;
+				}
+				return true;
 			}
 		}
 	};
@@ -409,7 +546,7 @@
 		border-radius: 10px;
 		background-color: #ffffff;
 		font-weight: normal;
-		font-size: 14px;
+		font-size: 12px;
 		color: #464c5b;
 		overflow: hidden;
 	}
@@ -518,13 +655,13 @@
 	}
 
 	.title-first {
-		margin-top: 20px;
+		margin-top: 5px;
 	}
 
 	.title {
 		color: #657180;
-		font-size: 14px;
-		padding: 10px 0;
+		font-size: 12px;
+		padding: 2px 0;
 		overflow: hidden;
 		height: 20px;
 	}
@@ -545,20 +682,19 @@
 	.money-sale-price {
 		font-size: 12px;
 		color: #008000;
-		font-weight: bold;
 	}
 
 	.money-sale-price {
-		font-size: 14px;
+		font-size: 12px;
 	}
 
 	.money-other {
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: normal;
 	}
 
 	.money-goods-all {
-		font-size: 14px;
+		font-size: 12px;
 	}
 
 	.goods-all-price {
@@ -584,7 +720,7 @@
 	.order-detail {
 		background-color: #ffffff;
 		color: #657180;
-		font-size: 14px;
+		font-size: 12px;
 		line-height: 30px;
 	}
 
@@ -610,8 +746,31 @@
 		border-bottom: 1px solid #c3cbd6;
 	}
 
+	.order_price_div {
+		border-top: 1px solid #c3cbd6;
+		border-bottom: 1px solid #c3cbd6;
+		padding: 10px 0;
+		overflow: hidden;
+	}
+
+	.order_price_div_name {
+		float: left;
+		width: 65%;
+		text-align: right;
+	}
+
+	.order_price_div_value {
+		float: right;
+		width: 35%;
+		text-align: right;
+		color: #008000;
+		font-size: 16px;
+		font-weight: bold;
+	}
+
+
 	.user-remark {
-		padding: 8px 0;
+		/* padding: 8px 0; */
 	}
 
 	.advice {
@@ -672,7 +831,7 @@
 	.goods-items>>>.van-cell {
 		padding: 0 0;
 		color: #657180;
-		font-size: 14px;
+		font-size: 12px;
 	}
 
 	/* 没有用户地址 */
@@ -746,7 +905,8 @@
 	>>>.van-cell {
 		font-size: 12px;
 	}
-	>>>.van-field__label{
+
+	>>>.van-field__label {
 		width: 3rem;
 	}
 </style>
