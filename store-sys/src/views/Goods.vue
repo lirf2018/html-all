@@ -74,7 +74,7 @@
 							<FormItem label="库存预警值" prop="storeWarning"><Input placeholder="库存预警值" v-model="addFormData.storeWarning" /></FormItem>
 						</div>
 						<div class="item">
-							<FormItem label="销售价格" prop="salePrice"><Input placeholder="销售价格" number v-model="addFormData.salePrice" @keyup.native="setPrice()" /></FormItem>
+							<FormItem label="销售价格" ><Input placeholder="销售价格" number v-model="addFormData.salePrice" @keyup.native="setPrice()" /></FormItem>
 						</div>
 						<div class="item">
 							<FormItem label="促销开始时间" prop="discountsStartTimeShow">
@@ -115,12 +115,15 @@
 						<div class="item">
 							<FormItem label="规格数"><Input placeholder="规格数" disabled v-model="addFormData.unitCount" /></FormItem>
 						</div>
-						<div class="submitBtn">
-							<Button style="margin:0px 10px" type="primary" @click="save(0)">保存</Button>
-							<Button style="margin:0px 10px" @click="save(1)">保存并继续添加</Button>
-							<Button style="margin:0px 10px" @click="addGoodsFlag = false">取消</Button>
-							<Button @click="searchList2">搜索</Button>
-						</div>
+							<Form  :label-width="120" :inline="true">
+							<div class="submitBtn">
+								<FormItem><Input placeholder="商品条形码" v-model="searchForm2.goods_code"  @keyup.native="searchList2()" /></FormItem>
+								<Button @click="searchList2">搜索</Button>
+								<Button style="margin:0px 10px" type="primary" @click="save(0)">保存</Button>
+								<Button style="margin:0px 10px" @click="save(1)">保存并继续添加</Button>
+								<Button style="margin:0px 10px" @click="addGoodsFlag = false">取消</Button>
+							</div>
+						</Form>
 					</Form>
 				</div>
 				<div style="height: 20px;clear: both;"></div>
@@ -198,7 +201,8 @@ export default {
 			},
 			searchForm2: {
 				curre_page: 1,
-				page_size: 10
+				page_size: 10,
+				goods_code: ''
 			},
 			addFormData: {
 				//商品信息
@@ -334,7 +338,7 @@ export default {
 			{ title: '商品规格', key: 'goods_unit_name', align: 'center' },
 			{ title: '规格数', key: 'unit_count', align: 'center' },
 			{ title: '平均进货价', key: 'income_price', align: 'center' },
-			{ title: '操作', slot: 'action', align: 'center' }
+			{ title: '操作', slot: 'action', align: 'center', width: 320 }
 		];
 		this.listStoreInfoTitle = [
 			{ title: '标识', key: 'income_id', align: 'center', width: 80 },
@@ -511,27 +515,27 @@ export default {
 			let vm = this;
 			if (!vm.addFormData.goodsCode) {
 				let msg = '请点击添加商品';
-				vm.$Message.warning({ content: msg, duration: 5 });
+				vm.myDialog('success', msg);
 				return;
 			}
 			if (vm.addFormData.discountsStartTimeShow > vm.addFormData.discountsEndTimeShow) {
 				let msg = '促销开始时间不能大于促销结束时间';
-				vm.$Message.warning({ content: msg, duration: 5 });
+				vm.myDialog('success', msg);
 				return;
 			}
 			if (vm.addFormData.salePrice < vm.addFormData.discountsPrice) {
 				let msg = '销售价格不能小于促销价格';
-				vm.$Message.warning({ content: msg, duration: 5 });
+				vm.myDialog('success', msg);
 				return;
 			}
 			if (vm.addFormData.salePrice < vm.addFormData.memberPrice) {
 				let msg = '销售价格不能小于会员价格';
-				vm.$Message.warning({ content: msg, duration: 5 });
+				vm.myDialog('success', msg);
 				return;
 			}debugger
 			if(vm.addFormData.isDiscounts == 1 && (!vm.addFormData.discountsStartTimeShow || !vm.addFormData.discountsEndTimeShow)){
 				let msg = '促销时间不能为空';
-				vm.$Message.warning({ content: msg, duration: 5 });
+				vm.myDialog('success', msg);
 				return;
 			}
 			vm.addFormData.discountsStartTime = timeToTimestamp(vm.addFormData.discountsStartTimeShow);
@@ -564,7 +568,6 @@ export default {
 					vm.searchList2();
 				} else {
 					vm.searchList2();
-					vm.resetAddFormData();
 					vm.myDialog('error', res.resp_desc ? res.resp_desc : '操作失败');
 				}
 			});
@@ -658,7 +661,8 @@ export default {
 			}
 			if(!vm.addFormData.goodsIds){
 				let msg = '请选择数据';
-				vm.$Message.warning({ content: msg, duration: 5 });
+				// vm.$Message.warning({ content: msg, duration: 5 });
+				vm.myDialog('success', msg);
 				return
 			}
 			let data = {
@@ -681,7 +685,7 @@ export default {
 		setPrice() {
 			this.addFormData.memberPrice = this.addFormData.salePrice;
 			this.addFormData.discountsPrice = this.addFormData.salePrice;
-		}
+		},
 	}
 };
 </script>
@@ -764,11 +768,11 @@ export default {
 >>> .ivu-input,
 >>> .ivu-btn,
 >>> .ivu-table-cell {
-	font-size: 18px;
+	font-size: 12px;
 }
 >>> .ivu-modal-header p,
 >>> .ivu-modal-header-inner {
-	font-size: 20px;
+	font-size: 12px;
 }
 >>> .ivu-input[disabled],
 fieldset[disabled] .ivu-input {

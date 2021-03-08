@@ -264,10 +264,10 @@ export default {
 >>> .ivu-input,
 >>> .ivu-btn,
 >>> .ivu-table-cell {
-	font-size: 18px;
+	font-size: 12px;
 }
 >>> .ivu-modal-header p,
 >>> .ivu-modal-header-inner {
-	font-size: 20px;
+	font-size: 12px;
 }
 </style>

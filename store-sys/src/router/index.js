@@ -21,7 +21,7 @@ import Test from '@/views/Test.vue';
 Vue.use(Router)
 export const pageLink = [{
 		path: "/",
-		component: Goodsreport
+		component: Index
 	},{
 		path: "/index",
 		component: Index
