@@ -11,6 +11,7 @@
 							<span>{{ item.createTime }}</span>
 						</div>
 						<div>
+							<span v-if="orderStatus ==2 && item.realPrice>0 ">已付款--></span>
 							<span>{{ item.orderStatusName }}</span>
 						</div>
 					</div>
@@ -36,6 +37,7 @@
 					</div>
 					<div class="order-price">
 						<span>商品数量：{{ item.orderCount }}</span>
+						<span v-if="item.orderPrice != item.realPrice">总价：{{ item.orderPrice }}&nbsp;&nbsp;&nbsp;</span>
 						<span>实付：</span>
 						<span class="currency">￥</span>
 						<span class="money">{{ item.realPrice }}</span>
@@ -170,6 +172,7 @@
 						orderStatus: orderStatus,
 						orderCount: orderCount,
 						realPrice: realPrice,
+						orderPrice:orderList[i].order_price,
 						goodsList: goodsList
 					};
 					this.orderList.push(order);
@@ -230,13 +233,13 @@
 
 	.order-title>div:first-child {
 		float: left;
-		width: 70%;
+		width: 60%;
 		text-align: left;
 	}
 
 	.order-title>div:last-child {
 		float: right;
-		width: 30%;
+		width: 40%;
 		text-align: right;
 		color: #008000;
 	}

@@ -1,7 +1,7 @@
 <template>
 	<div class="body-bg">
-		<div>
-			<span>
+		<div style="background-color: white;">
+			<span style="background-color: white;">
 				5G升级包限时优惠 活动时间 即日起至2020年4月30日 参与对象： 4G套餐49元、76元及以上用户订购 活动内容： 29元10GB全国流量5G升级包（包含
 				“优惠购”权益），现首月9.9元/月；次月起恢复原价 49元20GB全国流量5G升级包（包含 “优惠购”权益），现首月19.9元/月；次月起恢复原价
 				29元、49元升级包，月费76元及以上4G套餐用户以上用户均可订购； 49元升级包，限月费49元及以上76元以下4G套餐用户订购；
@@ -30,6 +30,7 @@
 		padding: 0;
 		font-size: 12px;
 		color: #323233;
+		background-color:white;
 		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
 	}
 </style>

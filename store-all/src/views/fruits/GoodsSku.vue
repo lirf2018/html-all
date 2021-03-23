@@ -17,13 +17,19 @@
 						{{goodsInfo.skuLowMoney}}
 						<span v-if="goodsInfo.skuLowMoney<goodsInfo.skuLowMoneyTrue" style="font-size: 10px;color: gray;font-weight: 100;">
 							<span>价格 ￥</span>
-							<span style="text-decoration: line-through;">{{goodsInfo.skuLowMoneyTrue}}</span>
+							<span style="text-decoration:line-through;">{{goodsInfo.skuLowMoneyTrue}}</span>
 						</span>
 					</span>
 					<span></span>
 				</div>
 				<div><span>销量 {{goodsInfo.sellCount}}</span></div>
 				<div>库存 {{goodsInfo.goodsNum}}</div>
+			</div>
+			<div style="clear: both;"></div>
+			<div class="ya-jin" v-if="goodsInfo.depositMoney > 0">
+				<div>
+					<span>押金:￥{{goodsInfo.depositMoney}}</span>
+				</div>
 			</div>
 			<div style="clear: both;"></div>
 		</div>
@@ -708,5 +714,14 @@
 		color: white;
 		position: absolute;
 		right: 0px;
+	}
+	
+	.ya-jin{
+		background-color: white;
+		font-size: 12px;
+		color: gray;
+		font-weight: normal;
+		padding: 0 15px;
+		padding-top: 5px;	
 	}
 </style>

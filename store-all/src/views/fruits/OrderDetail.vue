@@ -42,7 +42,7 @@
 									<div>
 										<span class="currency-sale-price">￥</span>
 										<span class="money-sale-price">{{goods.sale_money}}</span>
-										<span style="font-size: 10px;color: gray;" v-if="goods.true_money > goods.sale_money">&nbsp;￥<span style="text-decoration:line-through;">{{goods.true_money}}</span></span>
+										<span style="font-size: 10px;color: gray;" v-if="goods.goods_true_money > goods.sale_money">&nbsp;￥<span>{{goods.goods_true_money}}</span></span>
 									</div>
 								</div>
 							</div>
@@ -53,7 +53,7 @@
 						<div class="title-p"><span>商品总价</span></div>
 						<div class="title-sub">
 							<span class="currency-goods-all">￥</span>
-							<span class="money-goods-all">{{order.goods_price_all}}</span>
+							<span class="money-goods-all">{{order.goods_true_price_all}}</span>
 						</div>
 					</div>
 					<div class="title">
@@ -66,6 +66,7 @@
 					<div class="order_price_div">
 						<div class="order_price_div_name">
 							<div>订单总价:</div>
+							<div>优惠总价:</div>
 							<div>押金总价:</div>
 						</div>
 						<div class="order_price_div_value">
@@ -75,7 +76,22 @@
 							</div>
 							<div>
 								<span style="font-size: 12px;">￥</span>
+								<span>{{order.discounts_price}}</span>
+							</div>
+							<div>
+								<span style="font-size: 12px;">￥</span>
 								<span>{{order.deposit_price_all}}</span>
+							</div>
+						</div>
+					</div>
+					<div class="order_price_div" style="border-top: none;">
+						<div class="order_price_div_name">
+							<div>实付总价:</div>
+						</div>
+						<div class="order_price_div_value">
+							<div>
+								<span style="font-size: 12px;">￥</span>
+								<span>{{order.real_price}}</span>
 							</div>
 						</div>
 					</div>
@@ -447,7 +463,7 @@
 	}
 
 	.foot-btn {
-		font-size: 14px;
+		font-size: 12px;
 		background-color: #ffffff;
 		position: fixed;
 		bottom: 0px;
@@ -463,7 +479,7 @@
 		display: block;
 		padding: 8px 18px;
 		border-radius: 5px;
-		margin: 10px 0;
+		margin: 8px 0;
 		margin-right: 15px;
 	}
 

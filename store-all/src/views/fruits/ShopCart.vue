@@ -7,7 +7,7 @@
 		</div>
 		<div style="height: 46px;"></div>
 		<div @click="toGoodsList" v-if="showCartEmptyFlag">
-			<van-empty class="custom-image" image="http://127.0.0.1/2021/01/10/202101101610290789993.jpg" description="去逛逛" />
+			<van-empty class="custom-image" :image="cartNullImg" description="去逛逛" />
 		</div>
 		<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId" v-if="shopCart.isValid && shopCart.cartList.length > 0">
 			<div class="shop">
@@ -166,7 +166,8 @@
 				goodsCount: 1,
 				showCartEmptyFlag: false,
 				outTimeGoods:[],
-				deleteAll:""
+				deleteAll:"",
+				cartNullImg:null
 			};
 		},
 		mounted: function() {
@@ -225,6 +226,7 @@
 						vm.outTimeGoods = res.data.outTimeCartList;
 						vm.initOutTimeGoods();
 						vm.showCartEmptyFlag = res.data.showCartEmptyFlag;
+						vm.cartNullImg = res.data.cartNullImg;
 						var myData = [];
 						datas.forEach(function(e) {
 							var dateSun = [];

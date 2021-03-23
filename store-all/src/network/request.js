@@ -6,6 +6,8 @@ const httpService = axios.create({
 	// url前缀-'http:xxx.xxx'
 	// baseURL: 'http://localhost:8082/store-info/info/test', // 需自定义
 	baseURL: 'http://localhost:9909/api/store-info/info/test', // 需自定义
+	// baseURL: 'http://lrf-13418915218.6655.la/store-info/info/test', // 需自定义
+	// baseURL: 'http://v17022b547.51mypc.cn/store-info/info/test', // 需自定义
 	// 请求超时时间
 	timeout: 3000 // 需自定义
 });

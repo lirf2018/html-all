@@ -18,8 +18,8 @@
 					<span>{{ goodsInfo.nowMoney }}</span>
 					<span>
 						<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
-							<span>价格 ￥</span>
-							<span style="text-decoration: line-through;">{{ goodsInfo.trueMoney }}</span>
+							<span> 价格 ￥</span>
+							<span style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
 						</span>
 					</span>
 				</div>
@@ -29,8 +29,13 @@
 				<div>库存 {{ goodsInfo.goodsNum }}</div>
 			</div>
 			<div style="clear: both;"></div>
+			<div class="ya-jin" v-if="goodsInfo.depositMoney > 0">
+				<div>
+					<span>押金:￥{{goodsInfo.depositMoney}}</span>
+				</div>
+			</div>
+			<div style="clear: both;"></div>
 		</div>
-
 		<div class="beforeBuy">
 			<van-collapse v-model="activeName" accordion>
 				<van-collapse-item title="订购须知">
@@ -40,7 +45,6 @@
 				</van-collapse-item>
 			</van-collapse>
 		</div>
-
 		<div class="goods-detail">
 			<!-- color="#008000" -->
 			<van-tabs v-model="active" color="#ffffff">
@@ -100,8 +104,8 @@
 							<span>{{ goodsInfo.nowMoney }}</span>
 							<span>
 								<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
-									<span>价格 ￥</span>
-									<span style="text-decoration: line-through;">{{ goodsInfo.trueMoney }}</span>
+									<span> 价格 ￥</span>
+									<span style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
 								</span>
 							</span>
 						</div>
@@ -546,5 +550,14 @@
 		color: white;
 		position: absolute;
 		right: 0px;
+	}
+	
+	.ya-jin{
+		background-color: white;
+		font-size: 12px;
+		color: gray;
+		font-weight: normal;
+		padding: 0 15px;
+		padding-top: 5px;	
 	}
 </style>

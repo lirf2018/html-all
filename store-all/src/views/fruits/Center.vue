@@ -12,8 +12,8 @@
 					<div class="jifen-div">
 						<div>
 							<span>积分</span>
-							<!-- <span>敬请期待</span> -->
-							<span>{{data.user_jifen}}</span>
+							<span>敬请期待</span>
+							<!-- <span>{{data.user_jifen}}</span> -->
 						</div>
 					</div>
 					<div class="ticket-div">
@@ -41,7 +41,7 @@
 					<van-grid-item icon="pending-payment" text="待付款" @click="toOrderListOne(0)" :badge="data.order_dfk"/>
 					<van-grid-item icon="send-gift-o" text="确认中" @click="toOrderListOne(2)" :badge="data.order_qrz"/>
 					<van-grid-item icon="send-gift-o" text="待收货" @click="toOrderListOne(5)" :badge="data.order_dsh"/>
-					<van-grid-item icon="sign" text="已完成" @click="toOrderListOne(6)" :badge="data.order_ywc"/>
+					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc"/>
 				</van-grid>
 			</div>
 			<div class="shop-cart" @click="toPage('/shopCart')">
@@ -54,29 +54,24 @@
 					<div class="cart-count"><span>{{data.cart_goods_count}}</span></div>
 				</div>
 			</div>
-			<div>
-				<van-cell-group>
-					<van-cell title="退款退货" is-link />
-				</van-cell-group>
-			</div>
 			<div @click="toPage('userAddr')">
 				<van-cell-group>
 					<van-cell title="收货地址管理" is-link />
 				</van-cell-group>
 			</div>
-			<div>
+			<!-- <div>
 				<van-cell-group>
 					<van-cell title="我的优惠券" is-link />
 				</van-cell-group>
-			</div>
+			</div> -->
 			<!-- <div>
 				<van-cell-group><van-cell title="我的优惠码" is-link /></van-cell-group>
 			</div> -->
-			<div>
+			<!-- <div>
 				<van-cell-group>
 					<van-cell title="我的推广码" is-link />
 				</van-cell-group>
-			</div>
+			</div> -->
 			<div>
 				<van-cell-group>
 					<van-cell title="我的消息" is-link />

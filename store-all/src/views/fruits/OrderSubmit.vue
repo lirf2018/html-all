@@ -45,6 +45,7 @@
 								<div>
 									<span class="currency-sale-price">￥</span>
 									<span class="money-sale-price">{{goods.nowMoney}}</span>
+									<!-- <span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span>{{goods.trueMoney}}</span></span> -->
 									<span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span style="text-decoration:line-through;">{{goods.trueMoney}}</span></span>
 								</div>
 							</div>
@@ -56,7 +57,7 @@
 					<div class="title-p"><span>商品总价</span></div>
 					<div class="title-sub">
 						<span class="currency-goods-all">￥</span>
-						<span class="money-goods-all">{{goodsPriceAll}}</span>
+						<span class="money-goods-all">{{goodsTruePriceAll}}</span>
 					</div>
 				</div>
 				<div class="title">
@@ -69,12 +70,17 @@
 				<div class="order_price_div">
 					<div class="order_price_div_name">
 						<div>订单总价:</div>
+						<div>优惠总价:</div>
 						<div>押金总价:</div>
 					</div>
 					<div class="order_price_div_value">
 						<div>
 							<span style="font-size: 12px;">￥</span>
 							<span>{{orderPrice}}</span>
+						</div>
+						<div>
+							<span style="font-size: 12px;">￥</span>
+							<span>{{discountsPriceAll}}</span>
 						</div>
 						<div>
 							<span style="font-size: 12px;">￥</span>
@@ -174,13 +180,18 @@
 				orderPrice: 0,
 				realPrice: 0,
 				goodsPriceAll: 0,
+				goodsTruePriceAll: 0,
 				depositMoneyAll: 0,
 				advancePriceAll: 0,
-				discountsPriceAll: 0,
+				discountsPriceAll: 0,//红包等优惠价格
+				discountsPrice: 0,
+				goodsDiscountsPrice:0,// 商品优惠价格
 				userAddrId: null,
 				userName: '',
 				phone: '',
-				addrDetail: ''
+				addrDetail: '',
+				//
+				order:null
 			};
 		},
 		mounted: function() {
@@ -212,12 +223,18 @@
 				}; // 参数
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
+						vm.order = res.data;
 						vm.goodsList = res.data.goods_list;
 						vm.shopName = res.data.shop_name;
 						vm.shopId = res.data.shop_id;
 						vm.goodsPriceAll = res.data.goods_price_all;
+						vm.goodsTruePriceAll = res.data.goods_true_price_all;
 						vm.depositMoneyAll = res.data.deposit_money_all;
 						vm.advancePriceAll = res.data.advance_price_all;
+						//商品优惠总额
+						vm.goodsDiscountsPrice = res.data.goods_discounts_price;
+						//
+						vm.orderPrice = res.data.order_price;
 						vm.initPayPrice();
 					} else {}
 				});
@@ -238,9 +255,10 @@
 			},
 			initPayPrice() {
 				let vm = this;
-				vm.orderPrice = Number(vm.goodsPriceAll) +  Number(vm.postPrice) +  Number(vm.depositMoneyAll);
+				vm.discountsPriceAll = vm.order.goods_discounts_price + vm.discountsPrice;
+				vm.orderPrice = Number(vm.order.order_price) +  Number(vm.postPrice) ;
 				vm.orderPrice = vm.orderPrice.toFixed(2);
-				vm.realPrice = vm.orderPrice - vm.discountsPriceAll;
+				vm.realPrice = Number(vm.orderPrice) - Number(vm.discountsPriceAll);
 				vm.realPrice = vm.realPrice.toFixed(2);
 			},
 			showUserAddrListPage() {
@@ -294,7 +312,7 @@
 					real_price: vm.realPrice,
 					goods_price_all: vm.goodsPriceAll, //商品总价
 					deposit_price_all: vm.depositMoneyAll, //押金总价
-					discounts_price_all: 0, //优惠总价
+					discounts_price_all: vm.discountsPriceAll, //优惠总价
 					advance_price_all: vm.advancePriceAll,
 					shop_id: vm.shopId,
 					business_type: 1, //1正常下单2抢购3预定4租赁
