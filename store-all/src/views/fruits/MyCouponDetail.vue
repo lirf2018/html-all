@@ -1,6 +1,8 @@
 <template>
 	<div>
-		<div><Head :title="title" /></div>
+		<div>
+			<Head :title="title" />
+		</div>
 		<div class="coupon">
 			<div>
 				<div class="coupon-img">
@@ -14,8 +16,12 @@
 			</div>
 		</div>
 		<div class="coupon-code">
-			<div class="barcode"><barcode :value="code" :options="barcodeOption" tag="svg"></barcode></div>
-			<div class="qrcode"><div id="qrcode"></div></div>
+			<div class="barcode">
+				<barcode :value="code" :options="barcodeOption" tag="svg"></barcode>
+			</div>
+			<div class="qrcode">
+				<div id="qrcode"></div>
+			</div>
 			<div class="qrcode-desc"><span>长按优惠码复制或出示二维码给店员核销</span></div>
 		</div>
 		<div class="coupon-content">
@@ -59,161 +65,172 @@
 </template>
 
 <script>
-import QRCode from 'qrcodejs2';
-import Head from '@/components/Head.vue';
-export default {
-	components: { Head: Head },
-	data() {
-		return {
-			title: '我的优惠券详情', //我的优惠券详情
-			code: '622812550451042645',
-			barcodeOption: {
-				displayValue: true, //是否默认显示条形码数据 //textPosition  :'top', //条形码数据显示的位置
-				background: '#fff', //条形码背景颜色
-				valid: function(valid) {
-					console.log(valid);
-				},
-				width: '2px', //单个条形码的宽度
-				height: '55px',
-				fontSize: '16px', //字体大小
-				fontOptions: 'bold'
-				// format: "CODE39",//选择要使用的条形码类型
-				//  width:3,//设置条之间的宽度
-				//  height:100,//高度
-				//  displayValue:true,//是否在条形码下方显示文字
-				//  text:"456",//覆盖显示的文本
-				//  fontOptions:"bold italic",//使文字加粗体或变斜体
-				//  font:"fantasy",//设置文本的字体
-				//  textAlign:"left",//设置文本的水平对齐方式
-				//  textPosition:"top",//设置文本的垂直位置
-				//  textMargin:5,//设置条形码和文本之间的间距
-				//  fontSize:15,//设置文本的大小
-				//  background:"#eee",//设置条形码的背景
-				//  lineColor:"#2196f3",//设置条和文本的颜色。
-				//  margin:15//设置条形码周围的空白边距
+	import QRCode from 'qrcodejs2';
+	import Head from '@/components/Head.vue';
+	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
+	export default {
+		components: {
+			Head: Head
+		},
+		data() {
+			return {
+				title: '我的优惠券详情', //我的优惠券详情
+				code: '622812550451042645',
+				barcodeOption: {
+					displayValue: true, //是否默认显示条形码数据 //textPosition  :'top', //条形码数据显示的位置
+					background: '#fff', //条形码背景颜色
+					valid: function(valid) {
+						console.log(valid);
+					},
+					width: '2px', //单个条形码的宽度
+					height: '55px',
+					fontSize: '16px', //字体大小
+					fontOptions: 'bold'
+					// format: "CODE39",//选择要使用的条形码类型
+					//  width:3,//设置条之间的宽度
+					//  height:100,//高度
+					//  displayValue:true,//是否在条形码下方显示文字
+					//  text:"456",//覆盖显示的文本
+					//  fontOptions:"bold italic",//使文字加粗体或变斜体
+					//  font:"fantasy",//设置文本的字体
+					//  textAlign:"left",//设置文本的水平对齐方式
+					//  textPosition:"top",//设置文本的垂直位置
+					//  textMargin:5,//设置条形码和文本之间的间距
+					//  fontSize:15,//设置文本的大小
+					//  background:"#eee",//设置条形码的背景
+					//  lineColor:"#2196f3",//设置条和文本的颜色。
+					//  margin:15//设置条形码周围的空白边距
+				}
+			};
+		},
+		created() {},
+		mounted() {
+			this.qrcode(); //调用二维码生成的方法
+		},
+		methods: {
+			qrcode() {
+				// 和div的id相同 必须是id  class类名会报错
+				// 第二参数是他的配置项
+				let qrCode = new QRCode('qrcode', {
+					width: 150,
+					height: 150,
+					text: this.code,
+					colorDark: '#000000'
+				});
 			}
-		};
-	},
-	created() {},
-	mounted() {
-		this.qrcode(); //调用二维码生成的方法
-	},
-	methods: {
-		qrcode() {
-			// 和div的id相同 必须是id  class类名会报错
-			// 第二参数是他的配置项
-			let qrCode = new QRCode('qrcode', {
-				width: 150,
-				height: 150,
-				text: this.code,
-				colorDark: '#000000'
-			});
 		}
-	}
-};
+	};
 </script>
 
 <style scoped>
-.body-bg {
-	border: none;
-	margin: 0;
-	padding: 0;
-	font-size: 14px;
-	color: #323233;
-	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
-}
-.coupon,
-.coupon-code {
-	color: #9ea7b4;
-	background-color: #ffffff;
-	margin-bottom: 10px;
-	overflow: hidden;
-	padding: 5px 0px;
-	text-align: center;
-}
+	.body-bg {
+		border: none;
+		margin: 0;
+		padding: 0;
+		font-size: 14px;
+		color: #323233;
+		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
+	}
 
-.coupon-content {
-	background-color: #ffffff;
-	padding: 5px 10px;
-}
+	.coupon,
+	.coupon-code {
+		color: #9ea7b4;
+		background-color: #ffffff;
+		margin-bottom: 10px;
+		overflow: hidden;
+		padding: 5px 0px;
+		text-align: center;
+	}
 
-.coupon > div {
-	overflow: hidden;
-	position: relative;
-	padding: 10px 10px;
-	text-align: left;
-	height: 75px;
-}
+	.coupon-content {
+		background-color: #ffffff;
+		padding: 5px 10px;
+	}
 
-.coupon-img {
-	float: left;
-	width: 35%;
-	overflow: hidden;
-}
-.coupon-img img {
-	width: 100%;
-	height: auto;
-	display: block;
-}
+	.coupon>div {
+		overflow: hidden;
+		position: relative;
+		padding: 10px 10px;
+		text-align: left;
+		height: 75px;
+	}
 
-.coupon-title {
-	float: right;
-	width: 65%;
-}
+	.coupon-img {
+		float: left;
+		width: 35%;
+		overflow: hidden;
+	}
 
-.coupon-title > span {
-	display: block;
-	font-size: 12px;
-	padding-left: 10px;
-}
-.coupon-title > span:first-child {
-	font-size: 14px;
-	color: #464c5b;
-	display: -webkit-box;
-	/* -webkit-box-orient: vertical; */
-	/*! autoprefixer: off */
-	-webkit-box-orient: vertical;
-	/* autoprefixer: on */
-	-webkit-line-clamp: 2;
-	overflow: hidden;
-	line-height: 20px;
-}
-.coupon-title > span:last-child {
-	position: absolute;
-	bottom: 3px;
-}
+	.coupon-img img {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
 
-/* barcode */
-.coupon-code {
-	padding: 25px 0;
-}
-.barcode {
-	font-size: 14px;
-	padding-bottom: 10px;
-}
+	.coupon-title {
+		float: right;
+		width: 65%;
+	}
 
-.qrcode {
-	margin: 0 auto;
-	padding-bottom: 8px;
-	font-size: 12px;
-	width: 150px;
-	height: 150px;
-}
+	.coupon-title>span {
+		display: block;
+		font-size: 12px;
+		padding-left: 10px;
+	}
 
-.qrcode img {
-	width: 150px;
-	height: 150px;
-	margin: 0 auto;
-}
+	.coupon-title>span:first-child {
+		font-size: 14px;
+		color: #464c5b;
+		display: -webkit-box;
+		/* -webkit-box-orient: vertical; */
+		/*! autoprefixer: off */
+		-webkit-box-orient: vertical;
+		/* autoprefixer: on */
+		-webkit-line-clamp: 2;
+		overflow: hidden;
+		line-height: 20px;
+	}
 
-.qrcode-desc {
-	color: #464c5b;
-	font-size: 12px;
-}
+	.coupon-title>span:last-child {
+		position: absolute;
+		bottom: 3px;
+	}
 
-.coupon-content {
-	color: #464c5b;
-	font-size: 14px;
-	line-height: 20px;
-}
+	/* barcode */
+	.coupon-code {
+		padding: 25px 0;
+	}
+
+	.barcode {
+		font-size: 14px;
+		padding-bottom: 10px;
+	}
+
+	.qrcode {
+		margin: 0 auto;
+		padding-bottom: 8px;
+		font-size: 12px;
+		width: 150px;
+		height: 150px;
+	}
+
+	.qrcode img {
+		width: 150px;
+		height: 150px;
+		margin: 0 auto;
+	}
+
+	.qrcode-desc {
+		color: #464c5b;
+		font-size: 12px;
+	}
+
+	.coupon-content {
+		color: #464c5b;
+		font-size: 14px;
+		line-height: 20px;
+	}
 </style>

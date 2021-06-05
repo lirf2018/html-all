@@ -5,9 +5,10 @@
 		</div>
 		<div class="order-tab">
 			<div>
-				<van-tabs v-model="active" animated color="#008000" title-active-color="#008000" title-inactive-color="#657180"
-				 @change="onChange">
-					<van-tab :title="item.statusName" v-for="(item, index) in tabList" :key="item.orderStatus"></van-tab>
+				<van-tabs v-model="active" animated color="#008000" title-active-color="#008000"
+					title-inactive-color="#657180" @change="onChange">
+					<van-tab :title="item.statusName" v-for="(item, index) in tabList" :key="item.orderStatus">
+					</van-tab>
 				</van-tabs>
 			</div>
 		</div>
@@ -46,7 +47,7 @@
 					</div>
 					<div class="order-price">
 						<span>商品数量：{{ item.orderCount }}</span>
-						<span v-if="item.orderPrice != item.realPrice">总价：{{ item.orderPrice }}&nbsp;&nbsp;&nbsp;</span>
+						<span v-if="item.orderPrice >= item.realPrice">总价：{{ item.orderPrice }}&nbsp;&nbsp;&nbsp;</span>
 						<span>实付：</span>
 						<span class="currency">￥</span>
 						<span class="money">{{ item.realPrice }}</span>
@@ -107,7 +108,7 @@
 		methods: {
 			toPage(orderId) {
 				// 登出系统
-				this.$router.push("orderDetail?orderId="+orderId);
+				this.$router.push("orderDetail?orderId=" + orderId);
 			},
 			onChange(index) {
 				this.onClickOrderStatus = this.tabList[index].orderStatus;
@@ -116,7 +117,7 @@
 				this.loading = false;
 				this.finished = false;
 				this.currePage = 1,
-				this.hasNext = true;
+					this.hasNext = true;
 				this.onLoad();
 			},
 			onLoad() {
@@ -136,7 +137,9 @@
 							let hasNext = res.data.has_next;
 							vm.initOrderList(orderList, hasNext)
 							vm.currePage = vm.currePage + 1;
-						} else {}
+						} else {
+							Toast(res.resp_desc);
+						}
 					})
 					.catch(err => {
 						// this.error = true;
@@ -150,41 +153,41 @@
 				// 异步更新数据
 				// setTimeout 仅做示例，真实场景中一般为 ajax 请求
 				// setTimeout(() => {
-					for (let i = 0; i < orderList.length; i++) {
-						var goodsList = [];
-						var orderCount = orderList[i].order_count;
-						var realPrice = orderList[i].real_price;
-						for (let j = 0; j < orderList[i].detail_list.length; j++) {
-							var goods = {
-								goodsId: orderList[i].detail_list[j].goods_id,
-								goodsName: orderList[i].detail_list[j].goods_name,
-								goodsSalePrice: orderList[i].detail_list[j].sale_money,
-								goodsCount: orderList[i].detail_list[j].goods_count,
-								goodsSpecName: orderList[i].detail_list[j].goods_spec_name,
-								goodsImg: orderList[i].detail_list[j].goods_img
-							};
-							goodsList.push(goods);
-						}
-
-						var orderStatus = orderList[i].order_status;
-						var orderStatusName = orderList[i].order_status_name;
-
-						var order = {
-							orderId: orderList[i].order_id,
-							createTime: orderList[i].order_time,
-							orderStatusName: orderStatusName,
-							orderStatus: orderStatus,
-							orderCount: orderCount,
-							realPrice: realPrice,
-							orderPrice:orderList[i].order_price,
-							goodsList: goodsList
+				for (let i = 0; i < orderList.length; i++) {
+					var goodsList = [];
+					var orderCount = orderList[i].order_count;
+					var realPrice = orderList[i].real_price;
+					for (let j = 0; j < orderList[i].detail_list.length; j++) {
+						var goods = {
+							goodsId: orderList[i].detail_list[j].goods_id,
+							goodsName: orderList[i].detail_list[j].goods_name,
+							goodsSalePrice: orderList[i].detail_list[j].sale_money,
+							goodsCount: orderList[i].detail_list[j].goods_count,
+							goodsSpecName: orderList[i].detail_list[j].goods_spec_name,
+							goodsImg: orderList[i].detail_list[j].goods_img
 						};
-						this.orderList.push(order);
+						goodsList.push(goods);
 					}
-					this.loading = false;
-					if (hasNext == false) {
-						this.finished = true;
-					}
+
+					var orderStatus = orderList[i].order_status;
+					var orderStatusName = orderList[i].order_status_name;
+
+					var order = {
+						orderId: orderList[i].order_id,
+						createTime: orderList[i].order_time,
+						orderStatusName: orderStatusName,
+						orderStatus: orderStatus,
+						orderCount: orderCount,
+						realPrice: realPrice,
+						orderPrice: orderList[i].order_price,
+						goodsList: goodsList
+					};
+					this.orderList.push(order);
+				}
+				this.loading = false;
+				if (hasNext == false) {
+					this.finished = true;
+				}
 				// }, 1000);
 			}
 		}

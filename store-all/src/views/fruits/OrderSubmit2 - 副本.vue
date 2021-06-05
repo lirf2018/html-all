@@ -1,6 +1,8 @@
 <template>
 	<div class="body-bg">
-		<div><Head :title="title" /></div>
+		<div>
+			<Head :title="title" />
+		</div>
 		<div class="order-detail">
 			<div>
 				<div class="order-num"><span>订单编号：20085554664643513546543212</span></div>
@@ -11,16 +13,22 @@
 				<div class="user-addr-div">
 					<div>
 						<div class="no-addr">
-							<div><van-icon name="location-o" /></div>
+							<div>
+								<van-icon name="location-o" />
+							</div>
 							<div><span>添加取货地址</span></div>
 							<div>
-								<span><van-icon name="arrow" /></span>
+								<span>
+									<van-icon name="arrow" />
+								</span>
 							</div>
 						</div>
 					</div>
 					<div style="clear: both;">
 						<div class="img">
-							<div><van-icon name="location-o" /></div>
+							<div>
+								<van-icon name="location-o" />
+							</div>
 						</div>
 						<div class="user-info">
 							<div>
@@ -31,7 +39,9 @@
 								<span>深圳市龙岗区布吉镇坂岗区布吉镇坂岗吉镇坂岗区岗区布吉镇坂岗区布吉镇坂岗区布吉镇坂岗区布吉镇坂田社区吉华路696号</span>
 							</div>
 							<div @click="choseAddr" class="show_user-addr">
-								<span><van-icon name="arrow" /></span>
+								<span>
+									<van-icon name="arrow" />
+								</span>
 							</div>
 						</div>
 					</div>
@@ -43,7 +53,9 @@
 						<div class="service-name">
 							<div>油松服务站</div>
 							<div>
-								<span><van-icon name="arrow" /></span>
+								<span>
+									<van-icon name="arrow" />
+								</span>
 							</div>
 						</div>
 						<div>
@@ -51,9 +63,11 @@
 						</div>
 					</div>
 					<div class="user-info">
-						<div style="" >
+						<div style="">
 							<div style="float: left;width: 55%;text-align: left;">
-								<van-cell-group><van-field label="提货人" placeholder="请输入姓名" /></van-cell-group>
+								<van-cell-group>
+									<van-field label="提货人" placeholder="请输入姓名" />
+								</van-cell-group>
 							</div>
 							<div style="float: left;width: 45%;text-align: left;padding: 10px 0px">
 								<van-radio-group direction="horizontal" v-model="formData.radio">
@@ -63,7 +77,9 @@
 							</div>
 						</div>
 						<div style="clear: both;">
-							<van-cell-group><van-field label="手机号  " placeholder="请输入手机号" /></van-cell-group>
+							<van-cell-group>
+								<van-field label="手机号  " placeholder="请输入手机号" />
+							</van-cell-group>
 						</div>
 					</div>
 				</div>
@@ -82,7 +98,8 @@
 								<div>
 									<span class="currency-sale-price">￥</span>
 									<span class="money-sale-price">66666.66</span>
-									<span style="font-size: 10px;color: gray;">&nbsp;￥<span style="text-decoration:line-through;">66666</span></span>
+									<span style="font-size: 10px;color: gray;">&nbsp;￥<span
+											style="text-decoration:line-through;">66666</span></span>
 								</div>
 							</div>
 						</div>
@@ -99,7 +116,8 @@
 								<div>
 									<span class="currency-sale-price">￥</span>
 									<span class="money-sale-price">66666.66</span>
-									<span style="font-size: 10px;color: gray;">&nbsp;￥<span style="text-decoration:line-through;">66666</span></span>
+									<span style="font-size: 10px;color: gray;">&nbsp;￥<span
+											style="text-decoration:line-through;">66666</span></span>
 								</div>
 							</div>
 						</div>
@@ -115,20 +133,14 @@
 				</div>
 				<div class="vant-div">
 					<!-- 红包单元格 -->
-					<van-coupon-cell :coupons="hongbaos" :chosen-coupon="chosenHongbao" @click="showListHongbao = true" title="红包" />
+					<van-coupon-cell :coupons="hongbaos" :chosen-coupon="chosenHongbao" @click="showListHongbao = true"
+						title="红包" />
 					<!-- 红包列表 -->
 					<van-popup v-model="showListHongbao" round position="bottom" style="height: 90%; padding-top: 4px;">
-						<van-coupon-list
-							:coupons="hongbaos"
-							:chosen-coupon="chosenHongbao"
-							:disabled-coupons="disabledHongbao"
-							@change="onChangeHongbao"
-							@exchange="onExchangeHongbao"
-							input-placeholder="请输入红包码"
-							close-button-text="不使用红包券"
-							enabled-title="可用"
-							disabled-title="不可用"
-						/>
+						<van-coupon-list :coupons="hongbaos" :chosen-coupon="chosenHongbao"
+							:disabled-coupons="disabledHongbao" @change="onChangeHongbao" @exchange="onExchangeHongbao"
+							input-placeholder="请输入红包码" close-button-text="不使用红包券" enabled-title="可用"
+							disabled-title="不可用" />
 					</van-popup>
 				</div>
 				<div class="vant-div">
@@ -136,13 +148,8 @@
 					<van-coupon-cell :coupons="coupons" :chosen-coupon="chosenCoupon" @click="showListCoupon = true" />
 					<!-- 优惠券列表 -->
 					<van-popup v-model="showListCoupon" round position="bottom" style="height: 90%; padding-top: 4px;">
-						<van-coupon-list
-							:coupons="coupons"
-							:chosen-coupon="chosenCoupon"
-							:disabled-coupons="disabledCoupons"
-							@change="onChangeCoupon"
-							@exchange="onExchangeCoupon"
-						/>
+						<van-coupon-list :coupons="coupons" :chosen-coupon="chosenCoupon"
+							:disabled-coupons="disabledCoupons" @change="onChangeCoupon" @exchange="onExchangeCoupon" />
 					</van-popup>
 				</div>
 				<div class="title">
@@ -156,7 +163,9 @@
 					<div><input placeholder="订单备注" /></div>
 				</div>
 				<div class="vant-div vant-read">
-					<van-collapse v-model="activeName" accordion><van-collapse-item title="下单必看" name="1">内容</van-collapse-item></van-collapse>
+					<van-collapse v-model="activeName" accordion>
+						<van-collapse-item title="下单必看" name="1">内容</van-collapse-item>
+					</van-collapse>
 				</div>
 			</div>
 		</div>
@@ -178,417 +187,443 @@
 </template>
 
 <script>
-const coupon = {
-	available: 1,
-	condition: '无使用门槛\n最多优惠12元',
-	reason: '',
-	value: 150,
-	name: '优惠券名称',
-	startAt: 1489104000,
-	endAt: 1514592000,
-	valueDesc: '1.8',
-	unitDesc: '元'
-};
+	const coupon = {
+		available: 1,
+		condition: '无使用门槛\n最多优惠12元',
+		reason: '',
+		value: 150,
+		name: '优惠券名称',
+		startAt: 1489104000,
+		endAt: 1514592000,
+		valueDesc: '1.8',
+		unitDesc: '元'
+	};
 
-const hongbao = {
-	available: 1,
-	condition: '无使用门槛',
-	reason: '',
-	value: 200,
-	name: '红包名称',
-	startAt: 1489104000,
-	endAt: 1514592000,
-	valueDesc: '20',
-	unitDesc: '元'
-};
+	const hongbao = {
+		available: 1,
+		condition: '无使用门槛',
+		reason: '',
+		value: 200,
+		name: '红包名称',
+		startAt: 1489104000,
+		endAt: 1514592000,
+		valueDesc: '20',
+		unitDesc: '元'
+	};
 
-import Head from '@/components/Head.vue';
-import UserAddrVue from '@/components/AddUserAddr.vue';
-import AddrListVue from '@/components/AddUserAddr.vue';
-export default {
-	components: { Head: Head, UserAddrVue: UserAddrVue, AddrListVue: AddrListVue },
-	data() {
-		return {
-			formData:{
-				radio:null
+	import Head from '@/components/Head.vue';
+	import UserAddrVue from '@/components/AddUserAddr.vue';
+	import AddrListVue from '@/components/AddUserAddr.vue';
+	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
+	export default {
+		components: {
+			Head: Head,
+			UserAddrVue: UserAddrVue,
+			AddrListVue: AddrListVue
+		},
+		data() {
+			return {
+				formData: {
+					radio: null
+				},
+				addrList: false,
+				showAddr: false,
+				active: 1,
+				activeName: '0',
+				title: '填写订单',
+				orderList: [],
+				loading: false,
+				finished: false,
+				testOrderId: 0,
+				chosenCoupon: -1, // 优惠券
+				coupons: [coupon], // 优惠券
+				disabledCoupons: [coupon], // 优惠券
+				showListCoupon: false, // 优惠券
+				chosenHongbao: -1, // 红包
+				hongbaos: [hongbao], // 红包
+				disabledHongbao: [hongbao], // 红包
+				showListHongbao: false // 红包
+			};
+		},
+		methods: {
+			onChangeCoupon(index) {
+				this.showListCoupon = false;
+				this.chosenCoupon = index;
 			},
-			addrList: false,
-			showAddr: false,
-			active: 1,
-			activeName: '0',
-			title: '填写订单',
-			orderList: [],
-			loading: false,
-			finished: false,
-			testOrderId: 0,
-			chosenCoupon: -1, // 优惠券
-			coupons: [coupon], // 优惠券
-			disabledCoupons: [coupon], // 优惠券
-			showListCoupon: false, // 优惠券
-			chosenHongbao: -1, // 红包
-			hongbaos: [hongbao], // 红包
-			disabledHongbao: [hongbao], // 红包
-			showListHongbao: false // 红包
-		};
-	},
-	methods: {
-		onChangeCoupon(index) {
-			this.showListCoupon = false;
-			this.chosenCoupon = index;
-		},
-		onExchangeCoupon(code) {
-			this.coupons.push(coupon);
-		},
-		onChangeHongbao(index) {
-			this.showListHongbao = false;
-			this.chosenHongbao = index;
-		},
-		onExchangeHongbao(code) {
-			this.hongbaos.push(hongbao);
-		},
-		choseAddr() {
-			this.addrList = true;
-			this.showAddr = false;
+			onExchangeCoupon(code) {
+				this.coupons.push(coupon);
+			},
+			onChangeHongbao(index) {
+				this.showListHongbao = false;
+				this.chosenHongbao = index;
+			},
+			onExchangeHongbao(code) {
+				this.hongbaos.push(hongbao);
+			},
+			choseAddr() {
+				this.addrList = true;
+				this.showAddr = false;
+			}
 		}
-	}
-};
+	};
 </script>
 
 <style scoped>
-.body-bg {
-	border: none;
-	margin: 0;
-	padding: 0;
-	font-size: 14px;
-	color: #323233;
-	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
-}
-.order-msg {
-	font-size: 15px;
-}
-.close-time {
-	color: #008000;
-}
+	.body-bg {
+		border: none;
+		margin: 0;
+		padding: 0;
+		font-size: 14px;
+		color: #323233;
+		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
+	}
 
-.user-addr-div,
-.goods-items,
-.order-price,
-.order-detail {
-	padding: 10px 10px;
-	margin: 10px 10px;
-	border-radius: 10px;
-	background-color: #ffffff;
-	font-weight: normal;
-	font-size: 14px;
-	color: #464c5b;
-	overflow: hidden;
-}
+	.order-msg {
+		font-size: 15px;
+	}
 
-.user-addr-div > div:last-child {
-	position: relative;
-}
-.user-addr-div > div:last-child > div:first-child {
-	text-align: center;
-	font-size: 25px;
-	color: #9ea7b4;
-	position: absolute;
-	top: 50%;
-	left: 4%;
-	transform: translate(-50%, -50%);
-}
+	.close-time {
+		color: #008000;
+	}
 
-.user-addr-div > div:last-child > div:last-child {
-	padding-left: 10%;
-	line-height: 20px;
-	font-size: 12px;
-}
-.user-info > div:first-child {
-	padding: 3px 0;
-}
+	.user-addr-div,
+	.goods-items,
+	.order-price,
+	.order-detail {
+		padding: 10px 10px;
+		margin: 10px 10px;
+		border-radius: 10px;
+		background-color: #ffffff;
+		font-weight: normal;
+		font-size: 14px;
+		color: #464c5b;
+		overflow: hidden;
+	}
 
-.user-info > div:first-child > span:last-child {
-	padding-left: 5px;
-	color: #9ea7b4;
-}
+	.user-addr-div>div:last-child {
+		position: relative;
+	}
 
-.show_user-addr {
-	position: absolute;
-	right: 0px;
-	top: -3px;
-	height: 30px;
-	width: 30px;
-	text-align: right;
-	line-height: 30px;
-}
+	.user-addr-div>div:last-child>div:first-child {
+		text-align: center;
+		font-size: 25px;
+		color: #9ea7b4;
+		position: absolute;
+		top: 50%;
+		left: 4%;
+		transform: translate(-50%, -50%);
+	}
 
-/* goods */
-.shop-name {
-	color: #008000;
-	padding: 5px 0;
-	margin-bottom: 10px;
-	font-size: 14px;
-	border-bottom: 1px solid #f0f0f0;
-}
+	.user-addr-div>div:last-child>div:last-child {
+		padding-left: 10%;
+		line-height: 20px;
+		font-size: 12px;
+	}
 
-.goods-list {
-	margin-bottom: 10px;
-	position: relative;
-	overflow: hidden;
-}
-.space-name{
-	font-size: 10px;
-	color: gray;
-	line-height: 14px;
-}
-.goods-img {
-	float: left;
-	width: 30%;
-}
+	.user-info>div:first-child {
+		padding: 3px 0;
+	}
 
-.goods-img img {
-	width: 100%;
-	height: 7rem;
-	display: block;
-	border: none;
-}
+	.user-info>div:first-child>span:last-child {
+		padding-left: 5px;
+		color: #9ea7b4;
+	}
 
-.goods-info {
-	float: left;
-	width: 70%;
-}
+	.show_user-addr {
+		position: absolute;
+		right: 0px;
+		top: -3px;
+		height: 30px;
+		width: 30px;
+		text-align: right;
+		line-height: 30px;
+	}
 
-.goods-info > div {
-	padding-left: 8px;
-}
+	/* goods */
+	.shop-name {
+		color: #008000;
+		padding: 5px 0;
+		margin-bottom: 10px;
+		font-size: 14px;
+		border-bottom: 1px solid #f0f0f0;
+	}
 
-.goods-price > div:first-child {
-	float: left;
-	font-size: 12px;
-	color: #9ea7b4;
-	width: 40%;
-	position: absolute;
-	bottom: 2px;
-}
+	.goods-list {
+		margin-bottom: 10px;
+		position: relative;
+		overflow: hidden;
+	}
 
-.goods-price > div:last-child {
-	float: right;
-	width: 60%;
-	text-align: right;
-	position: absolute;
-	right: 0px;
-	bottom: 2px;
-}
+	.space-name {
+		font-size: 10px;
+		color: gray;
+		line-height: 14px;
+	}
 
-.title-first {
-	margin-top: 20px;
-}
+	.goods-img {
+		float: left;
+		width: 30%;
+	}
 
-.title {
-	color: #657180;
-	font-size: 14px;
-	padding: 10px 0;
-	overflow: hidden;
-	height: 20px;
-}
+	.goods-img img {
+		width: 100%;
+		height: 7rem;
+		display: block;
+		border: none;
+	}
 
-.title-p {
-	float: left;
-}
+	.goods-info {
+		float: left;
+		width: 70%;
+	}
 
-.title-sub {
-	float: right;
-}
+	.goods-info>div {
+		padding-left: 8px;
+	}
 
-.currency-other,
-.money-other,
-.currency-goods-all,
-.money-goods-all,
-.currency-sale-price,
-.money-sale-price {
-	font-size: 12px;
-	color: #008000;
-	font-weight: bold;
-}
-.money-sale-price {
-	font-size: 14px;
-}
-.money-other {
-	font-size: 14px;
-	font-weight: normal;
-}
-.money-goods-all {
-	font-size: 14px;
-}
+	.goods-price>div:first-child {
+		float: left;
+		font-size: 12px;
+		color: #9ea7b4;
+		width: 40%;
+		position: absolute;
+		bottom: 2px;
+	}
 
-.goods-all-price {
-	border-top: 1px solid #f0f0f0;
-}
+	.goods-price>div:last-child {
+		float: right;
+		width: 60%;
+		text-align: right;
+		position: absolute;
+		right: 0px;
+		bottom: 2px;
+	}
 
-.order-price {
-	position: absolute;
-	right: 15px;
-}
+	.title-first {
+		margin-top: 20px;
+	}
 
-.currency,
-.money {
-	color: #008000;
-	font-weight: bold;
-	font-size: 12px;
-}
-.money {
-	font-size: 16px;
-}
-.order-detail {
-	background-color: #ffffff;
-	color: #657180;
-	font-size: 14px;
-	line-height: 30px;
-}
+	.title {
+		color: #657180;
+		font-size: 14px;
+		padding: 10px 0;
+		overflow: hidden;
+		height: 20px;
+	}
 
-.order-price-div {
-	position: absolute;
-	left: 0px;
-}
+	.title-p {
+		float: left;
+	}
 
-.order-num {
-	padding-bottom: 10px;
-}
+	.title-sub {
+		float: right;
+	}
 
-.order-detail > div {
-	border-bottom: 1px solid #f0f0f0;
-}
+	.currency-other,
+	.money-other,
+	.currency-goods-all,
+	.money-goods-all,
+	.currency-sale-price,
+	.money-sale-price {
+		font-size: 12px;
+		color: #008000;
+		font-weight: bold;
+	}
 
-.user-remark input {
-	border: none;
-	width: 100%;
-	padding: 5px 0;
-	padding-left: 3px;
-	border-bottom: 1px solid #c3cbd6;
-}
-.user-remark {
-	padding: 8px 0;
-}
+	.money-sale-price {
+		font-size: 14px;
+	}
 
-.advice {
-	color: #9ea7b4;
-	font-size: 12px;
-	text-align: center;
-	padding: 0px 10px;
-	margin-bottom: 30px;
-	font-weight: normal;
-}
+	.money-other {
+		font-size: 14px;
+		font-weight: normal;
+	}
 
-.foot-btn {
-	font-size: 14px;
-	background-color: #ffffff;
-	position: fixed;
-	bottom: 0px;
-	overflow: hidden;
-	width: auto;
-	color: #464c5b;
-	width: 100%;
-	border-top: 1px solid #f0f0f0;
-}
+	.money-goods-all {
+		font-size: 14px;
+	}
 
-.foot-btn > div > span {
-	float: right;
-	display: block;
-	padding: 8px 18px;
-	border-radius: 5px;
-	margin: 10px 0;
-	margin-right: 15px;
-}
+	.goods-all-price {
+		border-top: 1px solid #f0f0f0;
+	}
 
-.to-cancel {
-	border: 1px solid #c3cbd6;
-}
+	.order-price {
+		position: absolute;
+		right: 15px;
+	}
 
-.to-pay {
-	color: #ffffff;
-	background-color: #008000;
-}
+	.currency,
+	.money {
+		color: #008000;
+		font-weight: bold;
+		font-size: 12px;
+	}
 
-.next-step {
-	color: #c3cbd6;
-	font-size: 14px;
-	right: 10px;
-	float: right;
-	line-height: 23px;
-}
+	.money {
+		font-size: 16px;
+	}
 
-.vant-div {
-	padding: 10px 0;
-}
+	.order-detail {
+		background-color: #ffffff;
+		color: #657180;
+		font-size: 14px;
+		line-height: 30px;
+	}
 
-.vant-read >>> .van-cell__title {
-	color: #000000 !important;
-}
+	.order-price-div {
+		position: absolute;
+		left: 0px;
+	}
 
-.goods-items >>> .van-cell {
-	padding: 0 0;
-	color: #657180;
-	font-size: 14px;
-}
+	.order-num {
+		padding-bottom: 10px;
+	}
 
-/* 没有用户地址 */
-.no-addr{
-	font-size: 18px;
-	color: #9ea7b4;
-	position: relative;
-}
-.no-addr>div:first-child{
-	font-size: 25px;
-	position: absolute;
-	left: 0px;
-	top: 0px;
-}
-.no-addr>div:nth-child(2){
-	float: left;
-	text-align: center;
-	width: 100%;
-}
-.no-addr>div:last-child{
-	position: absolute;
-	top: 0px;
-	right: 10px;
-}
->>> .van-button--plain,
-.van-button--danger {
-	color: #008000 !important;
-}
+	.order-detail>div {
+		border-bottom: 1px solid #f0f0f0;
+	}
 
->>> .van-coupon-list__bottom button {
-	background-color: #008000 !important;
-	background: #008000 !important;
-	border: 1px solid #008000 !important;
-}
+	.user-remark input {
+		border: none;
+		width: 100%;
+		padding: 5px 0;
+		padding-left: 3px;
+		border-bottom: 1px solid #c3cbd6;
+	}
 
->>> .van-coupon__head {
-	color: #008000 !important;
-}
+	.user-remark {
+		padding: 8px 0;
+	}
 
->>> .van-coupon__amount {
-	font-weight: bold !important;
-}
+	.advice {
+		color: #9ea7b4;
+		font-size: 12px;
+		text-align: center;
+		padding: 0px 10px;
+		margin-bottom: 30px;
+		font-weight: normal;
+	}
 
->>> .van-coupon__amount {
-	font-size: 25px;
-}
->>> .van-tabs__line,
->>> .van-checkbox__icon--checked .van-icon {
-	background-color: #008000 !important;
-	background: #008000 !important;
-	border: 1px solid #008000 !important;
-}
+	.foot-btn {
+		font-size: 14px;
+		background-color: #ffffff;
+		position: fixed;
+		bottom: 0px;
+		overflow: hidden;
+		width: auto;
+		color: #464c5b;
+		width: 100%;
+		border-top: 1px solid #f0f0f0;
+	}
 
->>> .van-coupon-cell--selected {
-	color: #008000 !important;
-}
+	.foot-btn>div>span {
+		float: right;
+		display: block;
+		padding: 8px 18px;
+		border-radius: 5px;
+		margin: 10px 0;
+		margin-right: 15px;
+	}
 
-.ziti >>> .van-field__label{
-	width: auto;
-}
-.ziti >>>.van-field__control{
-	padding-left: 15px;
-}
+	.to-cancel {
+		border: 1px solid #c3cbd6;
+	}
+
+	.to-pay {
+		color: #ffffff;
+		background-color: #008000;
+	}
+
+	.next-step {
+		color: #c3cbd6;
+		font-size: 14px;
+		right: 10px;
+		float: right;
+		line-height: 23px;
+	}
+
+	.vant-div {
+		padding: 10px 0;
+	}
+
+	.vant-read>>>.van-cell__title {
+		color: #000000 !important;
+	}
+
+	.goods-items>>>.van-cell {
+		padding: 0 0;
+		color: #657180;
+		font-size: 14px;
+	}
+
+	/* 没有用户地址 */
+	.no-addr {
+		font-size: 18px;
+		color: #9ea7b4;
+		position: relative;
+	}
+
+	.no-addr>div:first-child {
+		font-size: 25px;
+		position: absolute;
+		left: 0px;
+		top: 0px;
+	}
+
+	.no-addr>div:nth-child(2) {
+		float: left;
+		text-align: center;
+		width: 100%;
+	}
+
+	.no-addr>div:last-child {
+		position: absolute;
+		top: 0px;
+		right: 10px;
+	}
+
+	>>>.van-button--plain,
+	.van-button--danger {
+		color: #008000 !important;
+	}
+
+	>>>.van-coupon-list__bottom button {
+		background-color: #008000 !important;
+		background: #008000 !important;
+		border: 1px solid #008000 !important;
+	}
+
+	>>>.van-coupon__head {
+		color: #008000 !important;
+	}
+
+	>>>.van-coupon__amount {
+		font-weight: bold !important;
+	}
+
+	>>>.van-coupon__amount {
+		font-size: 25px;
+	}
+
+	>>>.van-tabs__line,
+	>>>.van-checkbox__icon--checked .van-icon {
+		background-color: #008000 !important;
+		background: #008000 !important;
+		border: 1px solid #008000 !important;
+	}
+
+	>>>.van-coupon-cell--selected {
+		color: #008000 !important;
+	}
+
+	.ziti>>>.van-field__label {
+		width: auto;
+	}
+
+	.ziti>>>.van-field__control {
+		padding-left: 15px;
+	}
 </style>

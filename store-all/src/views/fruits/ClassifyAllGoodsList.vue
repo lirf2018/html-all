@@ -44,6 +44,9 @@
 <script>
 	import Head from '@/components/Head.vue';
 	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
 	export default {
 		components: {
 			Head: Head
@@ -66,13 +69,15 @@
 			onLoad() {
 				let vm = this;
 				let {
-					catogeryId
+					catogeryId,
+					goodsName
 				} = vm.$route.query;
 				let params = {
 					req_type: 'query_goods_list',
 					data: {
 						currePage: vm.currePage,
 						catogeryId: catogeryId,
+						goodsName: goodsName,
 						userId: 0
 					}
 				}; // 参数
@@ -84,7 +89,9 @@
 							vm.categoryName = res.data.categoryName;
 							vm.initGoodsList(goodsList, hasNext);
 							vm.currePage = vm.currePage + 1;
-						} else {}
+						} else {
+							Toast(res.resp_desc);
+						}
 					}).catch(err => {
 						// this.error = true;
 					})

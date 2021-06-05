@@ -5,7 +5,8 @@
 		</div>
 		<div class="banner-list">
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" /></van-swipe-item>
+				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" />
+				</van-swipe-item>
 			</van-swipe>
 		</div>
 		<div class="goods-info" v-if="goodsInfo != null">
@@ -15,7 +16,8 @@
 					<span>￥</span>
 					<span>
 						{{goodsInfo.skuLowMoney}}
-						<span v-if="goodsInfo.skuLowMoney<goodsInfo.skuLowMoneyTrue" style="font-size: 10px;color: gray;font-weight: 100;">
+						<span v-if="goodsInfo.skuLowMoney<goodsInfo.skuLowMoneyTrue"
+							style="font-size: 10px;color: gray;font-weight: 100;">
 							<span>价格 ￥</span>
 							<span style="text-decoration:line-through;">{{goodsInfo.skuLowMoneyTrue}}</span>
 						</span>
@@ -84,11 +86,14 @@
 				<!-- <van-goods-action-icon icon="chat-o" text="客服" color="#008000" />
 					<van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
 					<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
-				<van-goods-action-button v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
-				 color="#53FF53" text="加入购物车" @click="showNext(0)" />
-				<van-goods-action-button v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
-				 color="#008000" text="立即购买" @click="showNext(1)" />
-				<div v-if="goodsInfo.allStatus != 1 || goodsInfo.isPutaway != 2" class="goods-down"><span>商品已下架</span></div>
+				<van-goods-action-button
+					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
+					color="#53FF53" text="加入购物车" @click="showNext(0)" />
+				<van-goods-action-button
+					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
+					color="#008000" text="立即购买" @click="showNext(1)" />
+				<div v-if="goodsInfo.allStatus != 1 || goodsInfo.isPutaway != 2" class="goods-down"><span>商品已下架</span>
+				</div>
 				<div v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum == 0" class="goods-down"><span>售罄</span></div>
 			</van-goods-action>
 		</div>
@@ -126,8 +131,9 @@
 					<div class="prop-item" v-for="(propItem, index) in goodsItem.goodsSkuPropList" :key="index">
 						<div class="prop-title">{{ propItem.propName }}</div>
 						<div class="prop-value">
-							<div @click="clickValueSpan(propItem.propId, valueItem.valueId)" :class="valueItem.valueItemsCss == null?'value-items':valueItem.valueItemsCss"
-							 v-for="valueItem in propItem.valueList" :key="valueItem.valueId">
+							<div @click="clickValueSpan(propItem.propId, valueItem.valueId)"
+								:class="valueItem.valueItemsCss == null?'value-items':valueItem.valueItemsCss"
+								v-for="valueItem in propItem.valueList" :key="valueItem.valueId">
 								<span>{{ valueItem.valueName }}</span>
 							</div>
 						</div>
@@ -159,7 +165,7 @@
 	export default {
 		components: {
 			Head: Head,
-			OrderRead:OrderRead
+			OrderRead: OrderRead
 		},
 		data() {
 			return {
@@ -267,27 +273,31 @@
 				this.goodsItem = goodsItem;
 			},
 			showNext(clickType) {
+				let vm = this;
 				this.showGoods = true;
 				this.clickTypeText = clickType == 0 ? '加入购物车' : '下一步';
 				this.clickType = clickType;
+				if (null == vm.skuId || vm.skuId == "") {
+					vm.skuPrice = vm.goodsInfo.skuLowMoney;
+				}
 			},
 			closeShow() {
 				let vm = this;
 				// console.log("-----------closeShow------------goodsId="+vm.goodsId)
 				// console.log("-----------closeShow------------skuPropNameCode="+vm.skuPropNameCode)
-				vm.showGoods = false;
+				if (null == vm.skuId || vm.skuId == "") {
+					Toast('请选择商品规格');
+					return;
+				}
 				if (vm.clickType == 1) {
 					//下一步
-					if (null == vm.skuId || vm.skuId == "") {
-						Toast('请选择商品规格');
-						return;
-					}
+					vm.showGoods = false;
 					// console.log("---buyCount="+vm.buyCount+"     --skuId="+vm.skuId)
-					this.$router.push('orderSubmit?goodsId=' + this.goodsId + '&buyCount=' + this.buyCount + "&skuId=" + vm.skuId +
+					this.$router.push('orderSubmit2?goodsId=' + this.goodsId + '&buyCount=' + this.buyCount + "&skuId=" +
+						vm.skuId +
 						"&timeGoodsId=0");
 				} else {
 					//加入购物车
-					let vm = this;
 					let params = {
 						req_type: 'add_order_cart',
 						data: {
@@ -301,7 +311,10 @@
 					axios.post('', params).then(function(res) {
 						if (res.resp_code == 1) {
 							Toast('添加成功');
-						} else {}
+							vm.showGoods = false;
+						} else {
+							Toast(res.resp_desc);
+						}
 					});
 				}
 			},
@@ -715,13 +728,13 @@
 		position: absolute;
 		right: 0px;
 	}
-	
-	.ya-jin{
+
+	.ya-jin {
 		background-color: white;
 		font-size: 12px;
 		color: gray;
 		font-weight: normal;
 		padding: 0 15px;
-		padding-top: 5px;	
+		padding-top: 5px;
 	}
 </style>

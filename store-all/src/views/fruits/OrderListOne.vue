@@ -37,7 +37,7 @@
 					</div>
 					<div class="order-price">
 						<span>商品数量：{{ item.orderCount }}</span>
-						<span v-if="item.orderPrice != item.realPrice">总价：{{ item.orderPrice }}&nbsp;&nbsp;&nbsp;</span>
+						<span v-if="item.orderPrice >= item.realPrice">总价：{{ item.orderPrice }}&nbsp;&nbsp;&nbsp;</span>
 						<span>实付：</span>
 						<span class="currency">￥</span>
 						<span class="money">{{ item.realPrice }}</span>
@@ -102,7 +102,9 @@
 							let hasNext = res.data.has_next;
 							vm.initOrderList(orderList, hasNext)
 							vm.currePage = vm.currePage + 1;
-						} else {}
+						} else {
+							Toast(res.resp_desc);
+						}
 					})
 					.catch(err => {
 						// this.error = true;
@@ -111,33 +113,33 @@
 						this.loading = false;
 					});
 			},
-			initTitle(){
+			initTitle() {
 				let vm = this;
-				if(vm.orderStatus == 0){
+				if (vm.orderStatus == 0) {
 					vm.title = "我的订单(待付款)";
-				}else if(vm.orderStatus == 1){
+				} else if (vm.orderStatus == 1) {
 					vm.title = "我的订单(已付款)";
-				}else if(vm.orderStatus == 2){
+				} else if (vm.orderStatus == 2) {
 					vm.title = "我的订单(确认中)";
-				}else if(vm.orderStatus == 3){
+				} else if (vm.orderStatus == 3) {
 					vm.title = "我的订单(已失败)";
-				}else if(vm.orderStatus == 5){
+				} else if (vm.orderStatus == 5) {
 					vm.title = "我的订单(待收货)";
-				}else if(vm.orderStatus == 6){
+				} else if (vm.orderStatus == 6) {
 					vm.title = "我的订单(已完成)";
-				}else if(vm.orderStatus == 7){
+				} else if (vm.orderStatus == 7) {
 					vm.title = "我的订单(已取消)";
-				}else if(vm.orderStatus == 8){
+				} else if (vm.orderStatus == 8) {
 					vm.title = "我的订单(已删除)";
-				}else if(vm.orderStatus == 9){
+				} else if (vm.orderStatus == 9) {
 					vm.title = "我的订单(退款中)";
-				}else if(vm.orderStatus == 10){
+				} else if (vm.orderStatus == 10) {
 					vm.title = "我的订单(已退款)";
-				}else if(vm.orderStatus == 12){
+				} else if (vm.orderStatus == 12) {
 					vm.title = "我的订单(还货中)";
-				}else if(vm.orderStatus == 13){
+				} else if (vm.orderStatus == 13) {
 					vm.title = "我的订单(已还货)";
-				}else{
+				} else {
 					vm.title = "我的订单";
 				}
 			},
@@ -172,7 +174,7 @@
 						orderStatus: orderStatus,
 						orderCount: orderCount,
 						realPrice: realPrice,
-						orderPrice:orderList[i].order_price,
+						orderPrice: orderList[i].order_price,
 						goodsList: goodsList
 					};
 					this.orderList.push(order);

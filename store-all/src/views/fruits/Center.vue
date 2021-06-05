@@ -4,16 +4,16 @@
 			<div class="center-head">
 				<div class="user-img">
 					<div>
-						<van-image round width="7rem" height="7rem" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+						<van-image round width="7rem" height="7rem" :src="data.user_img" />
 					</div>
-					<div>{{data.member_id}}</div>
+					<div>{{data.nick_name}}</div>
 				</div>
 				<div class="user-ql">
 					<div class="jifen-div">
-						<div>
+						<div @click="toPage('/myJifen')">
 							<span>积分</span>
-							<span>敬请期待</span>
-							<!-- <span>{{data.user_jifen}}</span> -->
+							<!-- <span>敬请期待</span> -->
+							<span>{{data.user_jifen}}</span>
 						</div>
 					</div>
 					<div class="ticket-div">
@@ -38,10 +38,11 @@
 			</div>
 			<div>
 				<van-grid>
-					<van-grid-item icon="pending-payment" text="待付款" @click="toOrderListOne(0)" :badge="data.order_dfk"/>
-					<van-grid-item icon="send-gift-o" text="确认中" @click="toOrderListOne(2)" :badge="data.order_qrz"/>
-					<van-grid-item icon="send-gift-o" text="待收货" @click="toOrderListOne(5)" :badge="data.order_dsh"/>
-					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc"/>
+					<van-grid-item icon="pending-payment" text="待付款" @click="toOrderListOne(0)"
+						:badge="data.order_dfk" />
+					<van-grid-item icon="send-gift-o" text="确认中" @click="toOrderListOne(2)" :badge="data.order_qrz" />
+					<van-grid-item icon="send-gift-o" text="待收货" @click="toOrderListOne(5)" :badge="data.order_dsh" />
+					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc" />
 				</van-grid>
 			</div>
 			<div class="shop-cart" @click="toPage('/shopCart')">
@@ -54,11 +55,27 @@
 					<div class="cart-count"><span>{{data.cart_goods_count}}</span></div>
 				</div>
 			</div>
-			<div @click="toPage('userAddr')">
+			<div>
+				<!-- 对固定会员一次下单，多次不同时间配送场景 -->
+				<van-cell-group>
+					<van-cell title="定制果园" is-link />
+				</van-cell-group>
+			</div>
+			<div @click="toPage('tuiGuang')">
+				<van-cell-group>
+					<van-cell title="我的推广码" is-link />
+				</van-cell-group>
+			</div>
+			<!-- <div @click="toPage('userAddr')">
+				<van-cell-group>
+					<van-cell title="收入记录" is-link />
+				</van-cell-group>
+			</div> -->
+			<!-- <div @click="toPage('userAddr')">
 				<van-cell-group>
 					<van-cell title="收货地址管理" is-link />
 				</van-cell-group>
-			</div>
+			</div> -->
 			<!-- <div>
 				<van-cell-group>
 					<van-cell title="我的优惠券" is-link />
@@ -67,27 +84,22 @@
 			<!-- <div>
 				<van-cell-group><van-cell title="我的优惠码" is-link /></van-cell-group>
 			</div> -->
-			<!-- <div>
+			<div @click="toPage('bangList')">
 				<van-cell-group>
-					<van-cell title="我的推广码" is-link />
+					<van-cell title="我的绑定" is-link />
 				</van-cell-group>
-			</div> -->
-			<div>
+			</div>
+			<!-- <div>
 				<van-cell-group>
 					<van-cell title="我的消息" is-link />
 				</van-cell-group>
-			</div>
-			<div>
-				<van-cell-group>
-					<van-cell title="绑定列表" is-link />
-				</van-cell-group>
-			</div>
+			</div> -->
 			<div @click="toPage('mySuggest')">
 				<van-cell-group>
 					<van-cell title="建议和反馈" is-link />
 				</van-cell-group>
 			</div>
-			<div class="exit-out" @click="toPage('accountLogin')">
+			<div class="exit-out" @click="logOut('phoneLogin')">
 				<van-button color="#008000">退出</van-button>
 			</div>
 			<div>
@@ -102,6 +114,12 @@
 	import Tbar from '@/components/Bottom-bar.vue';
 	import EG from '@/components/EgMark.vue';
 	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
+	import {
+		mapMutations
+	} from 'vuex';
 	export default {
 		components: {
 			Tbar: Tbar,
@@ -110,7 +128,7 @@
 		data() {
 			return {
 				tbActive: 3,
-				data:null
+				data: null
 			};
 		},
 		mounted: function() {
@@ -119,7 +137,18 @@
 			});
 		},
 		methods: {
+			...mapMutations(['userLoginOut']),
+			logOut(path) {
+				let vm = this;
+				vm.userLoginOut({
+					Authorization: ""
+				});
+				vm.$router.push(path);
+			},
 			toPage(path) {
+				if (path == 'tuiGuang') {
+					path = path + "?member=" + this.data.member_id;
+				}
 				this.$router.push(path);
 			},
 			toOrderListOne(status) {
@@ -136,6 +165,8 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						vm.data = res.data;
+					} else {
+						Toast(res.resp_desc);
 					}
 				});
 			}
@@ -156,8 +187,9 @@
 
 	.user-img {
 		text-align: center;
-		padding: 38px 0 5px 0;
-		background-color: #ffffff;
+		padding: 38px 0 15px 0;
+		background-color: #008000;
+		color: white;
 	}
 
 	.user-ql {
@@ -179,7 +211,7 @@
 	}
 
 	.user-ql>div>div {
-		padding-bottom: 15px;
+		/* padding-bottom: 15px; */
 	}
 
 	.jifen-div {

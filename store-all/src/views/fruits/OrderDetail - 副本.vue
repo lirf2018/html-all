@@ -41,13 +41,16 @@
 					<div class="goods-info">
 						<div>
 							<div class="goods-name"><span>{{goods.goods_name}}</span></div>
-							<div class="space-name" v-if="goods.goods_spec_name != ''">规格：{{goods.goods_spec_name}}</div>
+							<div class="space-name" v-if="goods.goods_spec_name != ''">规格：{{goods.goods_spec_name}}
+							</div>
 							<div class="goods-price">
 								<div><span>X{{goods.goods_count}}</span></div>
 								<div>
 									<span class="currency-sale-price">￥</span>
 									<span class="money-sale-price">{{goods.sale_money}}</span>
-									<span style="font-size: 10px;color: gray;" v-if="goods.true_money > goods.sale_money">&nbsp;￥<span style="text-decoration:line-through;">{{goods.true_money}}</span></span>
+									<span style="font-size: 10px;color: gray;"
+										v-if="goods.true_money > goods.sale_money">&nbsp;￥<span
+											style="text-decoration:line-through;">{{goods.true_money}}</span></span>
 								</div>
 							</div>
 						</div>
@@ -164,7 +167,9 @@
 					if (res.resp_code == 1) {
 						vm.order = res.data;
 						vm.goodsList = res.data.detail_list;
-					} else {}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			}
 		}
@@ -351,61 +356,61 @@
 		font-size: 12px;
 		color: #008000;
 	}
-	
+
 	.money-sale-price {
 		font-size: 12px;
 		;
 	}
-	
+
 	.money-other {
 		font-size: 12px;
 		font-weight: normal;
 	}
-	
+
 	.money-goods-all {
 		font-size: 12px;
 	}
-	
+
 	.goods-all-price {
 		border-top: 1px solid #f0f0f0;
 	}
-	
+
 	.order-price {
 		position: absolute;
 		right: 15px;
 	}
-	
+
 	.currency,
 	.money {
 		color: #008000;
 		font-weight: bold;
 		font-size: 12px;
 	}
-	
+
 	.money {
 		font-size: 16px;
 	}
-	
+
 	.order-detail {
 		background-color: #ffffff;
 		color: #657180;
 		font-size: 12px;
 		line-height: 30px;
 	}
-	
+
 	.order-price-div {
 		position: absolute;
 		left: 0px;
 	}
-	
+
 	.order-num {
 		padding-bottom: 10px;
 	}
-	
+
 	.order-detail>div {
 		border-bottom: 1px solid #f0f0f0;
 	}
-	
+
 	.user-remark input {
 		border: none;
 		width: 100%;
@@ -414,20 +419,20 @@
 		font-size: 10px;
 		border-bottom: 1px solid #c3cbd6;
 	}
-	
+
 	.order_price_div {
 		border-top: 1px solid #c3cbd6;
 		border-bottom: 1px solid #c3cbd6;
 		padding: 10px 0;
 		overflow: hidden;
 	}
-	
+
 	.order_price_div_name {
 		float: left;
 		width: 65%;
 		text-align: right;
 	}
-	
+
 	.order_price_div_value {
 		float: right;
 		width: 35%;

@@ -9,11 +9,13 @@
 		<div @click="toGoodsList" v-if="showCartEmptyFlag">
 			<van-empty class="custom-image" :image="cartNullImg" description="去逛逛" />
 		</div>
-		<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId" v-if="shopCart.isValid && shopCart.cartList.length > 0">
+		<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId"
+			v-if="shopCart.isValid && shopCart.cartList.length > 0">
 			<div class="shop">
 				<div class="shop-div">
 					<div>
-						<van-checkbox v-model="shopCart.isChecked" checked-color="#008000" @click="checkedShopGoodsAll(shopCart.shopId, shopCart.isChecked)"></van-checkbox>
+						<van-checkbox v-model="shopCart.isChecked" checked-color="#008000"
+							@click="checkedShopGoodsAll(shopCart.shopId, shopCart.isChecked)"></van-checkbox>
 					</div>
 					<div class="shop-o">
 						<van-icon name="shop-o" />
@@ -27,11 +29,14 @@
 				</div>
 			</div>
 			<div style="clear: both;"></div>
-			<div class="items" v-for="(goodsInfo, index) in shopCart.cartList" :key="goodsInfo.cartId" v-if="goodsInfo.isValid">
+			<div class="items" v-for="(goodsInfo, index) in shopCart.cartList" :key="goodsInfo.cartId"
+				v-if="goodsInfo.isValid">
 				<div class="goods-list">
 					<div class="select-btn">
 						<div class="checkbox-goods">
-							<van-checkbox checked-color="#008000" ref="checkboxes" v-model="goodsInfo.isChecked" @click="checkedShopGoods(shopCart.shopId, goodsInfo.cartId, goodsInfo.isChecked)"></van-checkbox>
+							<van-checkbox checked-color="#008000" ref="checkboxes" v-model="goodsInfo.isChecked"
+								@click="checkedShopGoods(shopCart.shopId, goodsInfo.cartId, goodsInfo.isChecked)">
+							</van-checkbox>
 						</div>
 					</div>
 					<div class="goods-img" @click="toGoodsDetailPage(goodsInfo)">
@@ -42,9 +47,13 @@
 					<div :class="goodsInfo.goodsInfoCss">
 						<div class="goods">
 							<div v-show="shopCart.isEditer" class="editer-goods">
-								<van-stepper v-model="goodsInfo.goodsCount" disable-input integer :key="goodsInfo.cartId" @change="updateCartGoodsCount(shopCart.shopId, goodsInfo.cartId, goodsInfo.goodsCount)" />
+								<van-stepper v-model="goodsInfo.goodsCount" disable-input integer
+									:key="goodsInfo.cartId"
+									@change="updateCartGoodsCount(shopCart.shopId, goodsInfo.cartId, goodsInfo.goodsCount)" />
 							</div>
-							<div v-show="!shopCart.isEditer" class="goods-name" @click="toGoodsDetailPage(goodsInfo)">{{ goodsInfo.goodsName }}</div>
+							<div v-show="!shopCart.isEditer" class="goods-name" @click="toGoodsDetailPage(goodsInfo)">
+								{{ goodsInfo.goodsName }}
+							</div>
 						</div>
 						<div class="goods-sku" @click="toGoodsDetailPage(goodsInfo)">
 							<span>{{ goodsInfo.goodsSpecName }}</span>
@@ -60,7 +69,9 @@
 						<div v-show="!shopCart.isEditer" class="bc">
 							<span>x{{ goodsInfo.goodsCount }}</span>
 						</div>
-						<div v-show="shopCart.isEditer" class="delete-goods" @click="deleteCartGoods(goodsInfo.cartId)"><span>删除</span></div>
+						<div v-show="shopCart.isEditer" class="delete-goods" @click="deleteCartGoods(goodsInfo.cartId)">
+							<span>删除</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -71,7 +82,8 @@
 			<div class="shop">
 				<div class="shop-div">
 					<div>
-						<van-checkbox v-model="deleteAll" checked-color="#008000" @click="checkedDeleteGoodsAll()"></van-checkbox>
+						<van-checkbox v-model="deleteAll" checked-color="#008000" @click="checkedDeleteGoodsAll()">
+						</van-checkbox>
 					</div>
 					<div class="shop-o">
 					</div>
@@ -84,11 +96,12 @@
 				</div>
 			</div>
 			<div style="clear: both;"></div>
-			<div class="items" v-for="(goodsInfo, index) in outTimeGoods" :key="goodsInfo.cartId" >
+			<div class="items" v-for="(goodsInfo, index) in outTimeGoods" :key="goodsInfo.cartId">
 				<div class="goods-list">
 					<div class="select-btn">
 						<div class="checkbox-goods">
-							<van-checkbox ref="checkboxes" v-model="goodsInfo.isChecked" checked-color="#008000" @click="deleteSun"></van-checkbox>
+							<van-checkbox ref="checkboxes" v-model="goodsInfo.isChecked" checked-color="#008000"
+								@click="deleteSun"></van-checkbox>
 						</div>
 					</div>
 					<div class="goods-img">
@@ -98,7 +111,7 @@
 					</div>
 					<div class="goods-info">
 						<div class="goods">
-							<div  class="goods-name">{{ goodsInfo.goodsName }}</div>
+							<div class="goods-name">{{ goodsInfo.goodsName }}</div>
 						</div>
 						<div class="goods-sku">
 							<span>{{ goodsInfo.goodsSpecName }}</span>
@@ -118,7 +131,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div>
 			<div style="height: 52px; width: 100%;clear: both;"></div>
 			<div class="van-submit-bar">
@@ -165,9 +178,9 @@
 				priceAll: 0.0,
 				goodsCount: 1,
 				showCartEmptyFlag: false,
-				outTimeGoods:[],
-				deleteAll:"",
-				cartNullImg:null
+				outTimeGoods: [],
+				deleteAll: "",
+				cartNullImg: null
 			};
 		},
 		mounted: function() {
@@ -206,7 +219,7 @@
 				if (isSingle == 1) {
 					url = '/goodsSingle';
 				}
-				url = url + '?goodsId=' + goodsId+"&timeGoodsId="+timeGoodsId;
+				url = url + '?goodsId=' + goodsId + "&timeGoodsId=" + timeGoodsId;
 				this.$router.push(url);
 				//打开新页签
 				//const page  = this.$router.resolve({path: url})
@@ -239,12 +252,12 @@
 									goodsImg: e.goodsImg,
 									goodsPrice: e.goodsPrice,
 									goodsSpecName: e.goodsSpecName,
-									timeGoodsId:e.timeGoodsId,
+									timeGoodsId: e.timeGoodsId,
 									isSingle: e.isSingle,
 									isChecked: false,
 									isValid: true,
-									goodsInfoCss:'goods-info',
-									buyCountCss:'buy-count'
+									goodsInfoCss: 'goods-info',
+									buyCountCss: 'buy-count'
 								};
 								dateSun.push(shopCartData);
 							});
@@ -261,12 +274,14 @@
 							// console.info(shopCart)
 						});
 						vm.cartItems = myData;
-					} else {}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			},
-			initOutTimeGoods(){
+			initOutTimeGoods() {
 				let vm = this;
-				let items  = [];
+				let items = [];
 				vm.outTimeGoods.forEach(function(e) {
 					var shopCartData = {
 						cartId: e.cartId,
@@ -279,8 +294,8 @@
 						isSingle: e.isSingle,
 						isChecked: false,
 						isValid: true,
-						goodsInfoCss:'goods-info',
-						buyCountCss:'buy-count'
+						goodsInfoCss: 'goods-info',
+						buyCountCss: 'buy-count'
 					};
 					items.push(shopCartData);
 				});
@@ -377,7 +392,9 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						Toast('添加成功');
-					} else {}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			},
 			deleteCartGoods(cartId) {
@@ -523,9 +540,9 @@
 					return
 				}
 				// console.log(cartIds)
-				this.$router.push('orderSubmit?cartIds=' + cartIds);
+				this.$router.push('orderSubmit2?cartIds=' + cartIds);
 			},
-			initPageCss(){
+			initPageCss() {
 				let vm = this;
 				if (vm.isEditer) {
 					// 编辑
@@ -536,7 +553,7 @@
 							e.buyCountCss = "buy-count2";
 						});
 					});
-				}else{
+				} else {
 					vm.cartItems.forEach(function(e) {
 						var cartList = e.cartList;
 						cartList.forEach(function(e) {
@@ -546,42 +563,42 @@
 					});
 				}
 			},
-			deleteSun(){
+			deleteSun() {
 				let vm = this;
 				let count = 0;
 				vm.outTimeGoods.forEach(item => {
-					if(item.isChecked){
+					if (item.isChecked) {
 						count++;
 					}
 				})
-				
-				if(count == vm.outTimeGoods.length){
+
+				if (count == vm.outTimeGoods.length) {
 					vm.deleteAll = true;
-				}else{
+				} else {
 					vm.deleteAll = false;
 				}
 			},
-			checkedDeleteGoodsAll(){
+			checkedDeleteGoodsAll() {
 				let vm = this;
-				if(vm.deleteAll){
+				if (vm.deleteAll) {
 					vm.outTimeGoods.forEach(item => {
 						item.isChecked = true;
 					})
-				}else{
+				} else {
 					vm.outTimeGoods.forEach(item => {
 						item.isChecked = false;
 					})
 				}
 			},
-			deleteShopCart(){
+			deleteShopCart() {
 				let vm = this;
 				let cartIds = "";
 				vm.outTimeGoods.forEach(item => {
-					if(item.isChecked){
+					if (item.isChecked) {
 						cartIds = cartIds + item.cartId + ",";
 					}
 				});
-				if(cartIds == ""){
+				if (cartIds == "") {
 					Toast('请选择失效的商品');
 					return
 				}
@@ -783,6 +800,7 @@
 		display: block;
 		line-height: 16px;
 	}
+
 	.goods-info2 {
 		width: 45%;
 		float: left;
@@ -795,6 +813,7 @@
 		float: right;
 		display: block;
 	}
+
 	.buy-count2 {
 		width: 20%;
 		float: right;
@@ -834,7 +853,7 @@
 	.goods-price {
 		padding-left: 10px;
 	}
-	
+
 	.goods-sku {
 		font-size: 12px;
 		margin-top: 1px;
@@ -857,7 +876,7 @@
 		font-weight: 900;
 	}
 
-   .goods-price-del{
+	.goods-price-del {
 		overflow: auto;
 	}
 

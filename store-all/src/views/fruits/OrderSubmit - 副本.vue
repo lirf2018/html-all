@@ -121,7 +121,7 @@
 					<span class="money">66.66</span>
 				</span>
 			</div>
-			<div><span class="to-pay">去支付</span></div>
+			<div><span class="to-pay">去下单</span></div>
 		</div>
 	</div>
 </template>

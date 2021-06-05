@@ -46,7 +46,9 @@
 									<span class="currency-sale-price">￥</span>
 									<span class="money-sale-price">{{goods.nowMoney}}</span>
 									<!-- <span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span>{{goods.trueMoney}}</span></span> -->
-									<span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span style="text-decoration:line-through;">{{goods.trueMoney}}</span></span>
+									<span style="font-size: 10px;color: gray;"
+										v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span
+											style="text-decoration:line-through;">{{goods.trueMoney}}</span></span>
 								</div>
 							</div>
 						</div>
@@ -101,6 +103,8 @@
 			</div>
 		</div>
 		<div class="advice"><span>如收到的商品出现质量、错发、漏发等问题，请联系客服处理</span></div>
+		<div style="border-top: 1px solid #c3cbd6; font-weight: normal;"></div>
+		<PriceMsg />
 		<div style="height: 55px; width: 100%;"></div>
 		<div class="foot-btn">
 			<div class="order-price-div">
@@ -110,10 +114,11 @@
 					<span class="money">{{realPrice}}</span>
 				</span>
 			</div>
-			<div><span class="to-pay" @click="createOrder()">去支付</span></div>
+			<div><span class="to-pay" @click="createOrder()">去下单</span></div>
 		</div>
 		<van-popup v-model="showAddrListPannelFlag" position="bottom" :style="{ height: '100%' }">
-			<UserAddr :setShowAddrListPannelFlag="setShowAddrListPannelFlag" :setUserChoseAddr="setUserChoseAddr"></UserAddr>
+			<UserAddr :setShowAddrListPannelFlag="setShowAddrListPannelFlag" :setUserChoseAddr="setUserChoseAddr">
+			</UserAddr>
 		</van-popup>
 	</div>
 </template>
@@ -146,6 +151,7 @@
 	import Head from '@/components/Head.vue';
 	import axios from '@/network/request.js';
 	import OrderRead from '@/components/OrderRead.vue';
+	import PriceMsg from '@/components/PriceMsg.vue';
 	import UserAddr from '@/components/UserAddrListPannel.vue'
 	import {
 		Toast
@@ -154,7 +160,8 @@
 		components: {
 			Head: Head,
 			UserAddr: UserAddr,
-			OrderRead:OrderRead
+			OrderRead: OrderRead,
+			PriceMsg: PriceMsg
 		},
 		data() {
 			return {
@@ -183,15 +190,15 @@
 				goodsTruePriceAll: 0,
 				depositMoneyAll: 0,
 				advancePriceAll: 0,
-				discountsPriceAll: 0,//红包等优惠价格
+				discountsPriceAll: 0, //红包等优惠价格
 				discountsPrice: 0,
-				goodsDiscountsPrice:0,// 商品优惠价格
+				goodsDiscountsPrice: 0, // 商品优惠价格
 				userAddrId: null,
 				userName: '',
 				phone: '',
 				addrDetail: '',
 				//
-				order:null
+				order: null
 			};
 		},
 		mounted: function() {
@@ -200,6 +207,12 @@
 			});
 		},
 		methods: {
+			toDetailPage(orderId) {
+				let vm = this
+				setTimeout(() => {
+					vm.$router.push("orderDetail?orderId=" + orderId);
+				}, 2000);
+			},
 			findGoodsData() {
 				let vm = this;
 				let {
@@ -218,7 +231,7 @@
 						buy_count: buyCount,
 						cart_ids: cartIds,
 						user_id: 0,
-						time_goods_id:timeGoodsId
+						time_goods_id: timeGoodsId
 					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
@@ -236,7 +249,9 @@
 						//
 						vm.orderPrice = res.data.order_price;
 						vm.initPayPrice();
-					} else {}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			},
 			onChangeCoupon(index) {
@@ -256,7 +271,7 @@
 			initPayPrice() {
 				let vm = this;
 				vm.discountsPriceAll = vm.order.goods_discounts_price + vm.discountsPrice;
-				vm.orderPrice = Number(vm.order.order_price) +  Number(vm.postPrice) ;
+				vm.orderPrice = Number(vm.order.order_price) + Number(vm.postPrice);
 				vm.orderPrice = vm.orderPrice.toFixed(2);
 				vm.realPrice = Number(vm.orderPrice) - Number(vm.discountsPriceAll);
 				vm.realPrice = vm.realPrice.toFixed(2);
@@ -330,6 +345,8 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						Toast('下单成功');
+						let orderId = res.data.order_id;
+						vm.toDetailPage(orderId);
 					} else {
 						Toast(res.resp_desc);
 					}
@@ -597,8 +614,21 @@
 		font-size: 12px;
 		text-align: center;
 		padding: 0px 10px;
+		margin-bottom: 10px;
+		font-weight: normal;
+	}
+
+	.advice2 {
+		color: #9ea7b4;
+		font-size: 12px;
+		text-align: left;
+		padding: 0px 10px;
 		margin-bottom: 30px;
 		font-weight: normal;
+	}
+
+	.advice2>span {
+		display: block;
 	}
 
 	.foot-btn {

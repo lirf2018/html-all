@@ -5,7 +5,8 @@
 		</div>
 		<div class="banner-list">
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" /></van-swipe-item>
+				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" />
+				</van-swipe-item>
 			</van-swipe>
 		</div>
 		<div class="goods-info" v-if="goodsInfo != null">
@@ -17,9 +18,11 @@
 					<span>￥</span>
 					<span>{{ goodsInfo.nowMoney }}</span>
 					<span>
-						<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
+						<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney"
+							style="font-size: 10px;color: gray;font-weight: 100;">
 							<span> 价格 ￥</span>
-							<span style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
+							<span
+								style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
 						</span>
 					</span>
 				</div>
@@ -52,7 +55,8 @@
 					<div v-if="goodsInfo != null">
 						<div class="text-img" v-html="goodsInfo.intro">{{ goodsInfo.intro }}</div>
 					</div>
-					<div class="both-img"><img :src="item.imgUrl" v-for="(item, index) in goodsInfoList" :key="index" /></div>
+					<div class="both-img"><img :src="item.imgUrl" v-for="(item, index) in goodsInfoList" :key="index" />
+					</div>
 					<div style="height: 10px; width: 100%;clear: both;"></div>
 					<!-- <van-divider dashed color="red">价格说明</van-divider> -->
 				</van-tab>
@@ -84,11 +88,14 @@
 				<!-- <van-goods-action-icon icon="chat-o" text="客服" color="#008000" />
 					<van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
 					<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
-				<van-goods-action-button v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
-				 color="#53FF53" text="加入购物车" @click="showNext(0)" />
-				<van-goods-action-button v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
-				 color="#008000" text="立即购买" @click="showNext(1)" />
-				<div v-if="goodsInfo.allStatus != 1 || goodsInfo.isPutaway != 2" class="goods-down"><span>商品已下架</span></div>
+				<van-goods-action-button
+					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
+					color="#53FF53" text="加入购物车" @click="showNext(0)" />
+				<van-goods-action-button
+					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
+					color="#008000" text="立即购买" @click="showNext(1)" />
+				<div v-if="goodsInfo.allStatus != 1 || goodsInfo.isPutaway != 2" class="goods-down"><span>商品已下架</span>
+				</div>
 				<div v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum == 0" class="goods-down"><span>售罄</span></div>
 			</van-goods-action>
 		</div>
@@ -103,9 +110,11 @@
 							<span>￥</span>
 							<span>{{ goodsInfo.nowMoney }}</span>
 							<span>
-								<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney" style="font-size: 10px;color: gray;font-weight: 100;">
+								<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney"
+									style="font-size: 10px;color: gray;font-weight: 100;">
 									<span> 价格 ￥</span>
-									<span style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
+									<span
+										style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
 								</span>
 							</span>
 						</div>
@@ -147,7 +156,7 @@
 	export default {
 		components: {
 			Head: Head,
-			OrderRead:OrderRead
+			OrderRead: OrderRead
 		},
 		data() {
 			return {
@@ -203,13 +212,15 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						vm.goodsInfo = res.data;
-						if(vm.timeGoodsId != vm.goodsInfo.timeGoodsId){
+						if (vm.timeGoodsId != vm.goodsInfo.timeGoodsId) {
 							vm.timeGoodsId = 0;
 						}
 						vm.goodsBannelList = vm.goodsInfo.bannerImgList;
 						vm.goodsInfoList = vm.goodsInfo.goodsImgList;
 						vm.imagesShow.push(vm.goodsInfo.goodsImg);
-					} else {}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			},
 			showNext(clickType) {
@@ -221,7 +232,8 @@
 				this.showGoods = false;
 				if (this.clickType == 1) {
 					//下一步
-					this.$router.push('orderSubmit?goodsId=' + this.goodsId + '&buyCount=' + this.buyCount+"&timeGoodsId="+this.timeGoodsId);
+					this.$router.push('orderSubmit2?goodsId=' + this.goodsId + '&buyCount=' + this.buyCount +
+						"&timeGoodsId=" + this.timeGoodsId);
 				} else {
 					//加入购物车
 					this.addCartGoods();
@@ -268,13 +280,15 @@
 						goods_spec: null,
 						goods_count: vm.buyCount,
 						time_goods_id: vm.timeGoodsId,
-						now_price:vm.goodsInfo.nowMoney
+						now_price: vm.goodsInfo.nowMoney
 					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						Toast('添加成功');
-					} else {}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			}
 		}
@@ -551,13 +565,13 @@
 		position: absolute;
 		right: 0px;
 	}
-	
-	.ya-jin{
+
+	.ya-jin {
 		background-color: white;
 		font-size: 12px;
 		color: gray;
 		font-weight: normal;
 		padding: 0 15px;
-		padding-top: 5px;	
+		padding-top: 5px;
 	}
 </style>

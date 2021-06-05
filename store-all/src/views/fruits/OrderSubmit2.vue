@@ -44,7 +44,7 @@
 							</van-cell-group>
 						</div>
 						<div style="float: left;width: 40%;text-align: left;padding: 10px 0px">
-							<van-radio-group direction="horizontal" v-model="formData.radio">
+							<van-radio-group direction="horizontal" v-model="formData.sex">
 								<van-radio name="1" checked-color="#008000">先生</van-radio>
 								<van-radio name="0" checked-color="#008000">女士</van-radio>
 							</van-radio-group>
@@ -91,7 +91,7 @@
 							</van-cell-group>
 						</div>
 						<div style="float: left;width: 45%;text-align: left;padding: 10px 0px;border-top: 1px solid #f0f0f0;">
-							<van-radio-group direction="horizontal" v-model="formData.radio">
+							<van-radio-group direction="horizontal" v-model="formData.sex">
 								<van-radio name="1" checked-color="#008000">先生</van-radio>
 								<van-radio name="0" checked-color="#008000">女士</van-radio>
 							</van-radio-group>
@@ -119,8 +119,8 @@
 								<div>
 									<span class="currency-sale-price">￥</span>
 									<span class="money-sale-price">{{goods.nowMoney}}</span>
-									<span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span>{{goods.trueMoney}}</span></span>
-									<!-- <span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span style="text-decoration:line-through;">{{goods.trueMoney}}</span></span> -->
+									<!-- <span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span>{{goods.trueMoney}}</span></span> -->
+									<span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span style="text-decoration:line-through;">{{goods.trueMoney}}</span></span>
 								</div>
 							</div>
 						</div>
@@ -175,6 +175,8 @@
 			</div>
 		</div>
 		<div class="advice"><span>如收到的商品出现质量、错发、漏发等问题，请联系客服处理</span></div>
+		<div style="border-top: 1px solid #c3cbd6; font-weight: normal;"></div>
+		<PriceMsg />
 		<div style="height: 55px; width: 100%;"></div>
 		<div class="foot-btn">
 			<div class="order-price-div">
@@ -184,7 +186,7 @@
 					<span class="money">{{realPrice}}</span>
 				</span>
 			</div>
-			<div @click="createOrder"><span class="to-pay">去支付</span></div>
+			<div @click="createOrder"><span class="to-pay">去下单</span></div>
 		</div>
 		<van-popup v-model="showAddrListPannelFlag" position="bottom" :style="{ height: '100%' }">
 			<PlatformListPannel :closeSowAddrListPannelFlag="closeSowAddrListPannelFlag" :indexListP="indexList" :dataListP="dataList"
@@ -221,7 +223,9 @@
 	import Head from '@/components/Head.vue';
 	import axios from '@/network/request.js';
 	import OrderRead from '@/components/OrderRead.vue';
+	import PriceMsg from '@/components/PriceMsg.vue';
 	import PlatformListPannel from '@/components/PlatformListPannel.vue';
+	import store from '../../store'
 	import {
 		Toast
 	} from 'vant';
@@ -229,13 +233,14 @@
 		components: {
 			Head: Head,
 			OrderRead:OrderRead,
+			PriceMsg:PriceMsg,
 			PlatformListPannel: PlatformListPannel
 		},
 		data() {
 			return {
 				showAddrListPannelFlag: false,
 				formData: {
-					radio: null
+					sex: '1'
 				},
 				showAddrFlag0: false,
 				showAddrFlag1: false,
@@ -290,8 +295,15 @@
 				this.findGoodsData();
 				this.findPlatformList(0);
 			});
+			this.phone = localStorage.getItem("phone");
 		},
 		methods: {
+			toDetailPage(orderId) {
+				let vm = this;
+				setTimeout(() => {
+					vm.$router.push("orderDetail?orderId="+orderId);
+				}, 2000);
+			},
 			findPlatformList(type) {
 				let vm = this;
 				let addrType = -1;
@@ -421,6 +433,7 @@
 				} else if (vm.active == 1) {
 					// 自取
 					vm.postPrice2 = item.freight;
+					vm.postPrice = item.freight;
 					vm.userAddrId2 = item.id;
 					vm.addrDetail2 = item.detail_addr;
 					vm.serviceName = item.addr_name;
@@ -466,7 +479,7 @@
 					user_remark: vm.userRemark,
 					user_name: vm.userName,
 					user_phone: vm.phone,
-					user_sex: vm.formData.radio,
+					user_sex: vm.formData.sex,
 					post_way: postWay_,
 					post_price: postPrice_,
 					order_price: vm.orderPrice,
@@ -491,6 +504,8 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						Toast('下单成功');
+						let orderId = res.data.order_id;
+						vm.toDetailPage(orderId);
 					} else {
 						Toast(res.resp_desc);
 					}
@@ -527,7 +542,7 @@
 					return false;
 				}
 				
-				if(vm.formData.radio == '' || vm.formData.radio == null){
+				if(vm.formData.sex == '' || vm.formData.sex == null){
 					Toast('请选择先生/女士');
 					return false;
 				}
@@ -798,6 +813,17 @@
 		padding: 0px 10px;
 		margin-bottom: 30px;
 		font-weight: normal;
+	}
+	.advice2 {
+		color: #9ea7b4;
+		font-size: 12px;
+		text-align: left;
+		padding: 0px 10px;
+		margin-bottom: 30px;
+		font-weight: normal;
+	}
+	.advice2>span{
+		display: block;
 	}
 
 	.foot-btn {

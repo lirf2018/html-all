@@ -1,12 +1,12 @@
 <template>
 	<div class="body-bg">
+		<div>
+			<Head :title="title" />
+		</div>
 		<div v-if="null!=order">
-			<div>
-				<Head :title="title" />
-			</div>
 			<div class="order-status" v-if="null!=order && order.order_status == 0">
 				<div class="status"><span>待付款</span></div>
-				<div class="status-remark"><span>15分钟后内未支付，订单将自动消失</span></div>
+				<div class="status-remark"><span>{{closeTime}}分钟后内未支付，订单将自动消失</span></div>
 			</div>
 			<div class="user-addr-div" v-if="null!=order">
 				<div>
@@ -36,13 +36,16 @@
 						<div class="goods-info">
 							<div>
 								<div class="goods-name"><span>{{goods.goods_name}}</span></div>
-								<div class="space-name" v-if="goods.goods_spec_name != ''">规格：{{goods.goods_spec_name}}</div>
+								<div class="space-name" v-if="goods.goods_spec_name != ''">规格：{{goods.goods_spec_name}}
+								</div>
 								<div class="goods-price">
 									<div><span>X{{goods.goods_count}}</span></div>
 									<div>
 										<span class="currency-sale-price">￥</span>
 										<span class="money-sale-price">{{goods.sale_money}}</span>
-										<span style="font-size: 10px;color: gray;" v-if="goods.goods_true_money > goods.sale_money">&nbsp;￥<span>{{goods.goods_true_money}}</span></span>
+										<span style="font-size: 10px;color: gray;"
+											v-if="goods.goods_true_money > goods.sale_money">&nbsp;￥<span
+												style="text-decoration:line-through;">{{goods.goods_true_money}}</span></span>
 									</div>
 								</div>
 							</div>
@@ -114,6 +117,8 @@
 				</div>
 			</div>
 			<div class="advice"><span>如收到的商品出现质量、错发、漏发等问题，请联系客服处理</span></div>
+			<div style="border-top: 1px solid #c3cbd6; font-weight: normal;"></div>
+			<PriceMsg />
 			<div style="height: 55px; width: 100%;"></div>
 			<div class="foot-btn" v-if="null!=order">
 				<div v-if="order.order_status == 0">
@@ -131,6 +136,7 @@
 <script>
 	import Head from '@/components/Head.vue';
 	import OrderRead from '@/components/OrderRead.vue';
+	import PriceMsg from '@/components/PriceMsg.vue';
 	import axios from '@/network/request.js';
 	import {
 		Toast
@@ -138,7 +144,8 @@
 	export default {
 		components: {
 			Head: Head,
-			OrderRead:OrderRead
+			OrderRead: OrderRead,
+			PriceMsg: PriceMsg
 		},
 		data() {
 			return {
@@ -146,7 +153,8 @@
 				activeName: 0,
 				order: null,
 				goodsList: [],
-				orderId: 0
+				orderId: 0,
+				closeTime: 0
 			};
 		},
 		mounted: function() {
@@ -167,7 +175,6 @@
 				let params = {
 					req_type: 'query_order_detail',
 					data: {
-						user_id: 0,
 						order_id: orderId
 					}
 				}; // 参数
@@ -175,7 +182,10 @@
 					if (res.resp_code == 1) {
 						vm.order = res.data;
 						vm.goodsList = res.data.detail_list;
-					} else {}
+						vm.closeTime = res.data.close_time;
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			}
 		}
@@ -458,8 +468,21 @@
 		font-size: 12px;
 		text-align: center;
 		padding: 10px 10px 0 10px;
+		margin-bottom: 10px;
+		font-weight: normal;
+	}
+
+	.advice2 {
+		color: #9ea7b4;
+		font-size: 12px;
+		text-align: left;
+		padding: 10px 10px 0 10px;
 		margin-bottom: 30px;
 		font-weight: normal;
+	}
+
+	.advice2>span {
+		display: block;
 	}
 
 	.foot-btn {

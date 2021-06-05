@@ -36,6 +36,9 @@
 <script>
 	import Head from '@/components/Head.vue';
 	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
 	export default {
 		components: {
 			Head: Head
@@ -70,7 +73,9 @@
 							let hasNext = res.data.hasNext;
 							vm.initGoodsList(goodsList, hasNext)
 							vm.currePage = vm.currePage + 1;
-						} else {}
+						} else {
+							Toast(res.resp_desc);
+						}
 					}).catch(err => {
 						// this.error = true;
 					})
@@ -90,15 +95,15 @@
 				}
 				// }, 1000);
 			},
-			onRefresh() {
-				// 清空列表数据
-				this.finished = false;
+			// onRefresh() {
+			// 	// 清空列表数据
+			// 	this.finished = false;
 
-				// 重新加载数据
-				// 将 loading 设置为 true，表示处于加载状态
-				this.loading = true;
-				this.onLoad();
-			},
+			// 	// 重新加载数据
+			// 	// 将 loading 设置为 true，表示处于加载状态
+			// 	this.loading = true;
+			// 	this.onLoad();
+			// },
 			toGoodsDetailPage(goodsId, isSingle, items) {
 				let url = "/goodsSku";
 				if (isSingle == 1) {

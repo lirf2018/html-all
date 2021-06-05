@@ -1,3 +1,5 @@
+// 在使用地方直接 import 引入，然后在 rules 校验中加入即可。
+
 // 1、是否合法IP地址
 export function validateIP(rule, value, callback) {
 	if (value == '' || value == undefined || value == null) {
@@ -376,6 +378,9 @@ export const timeToTimestamp = (time) =>{
 	return (new Date(time)).getTime()
 }
 
+
+// 在使用地方直接 import 引入，通过。   validTelphone() 调用
+
 // 下划线转换驼峰
 function toHump(name) {
     return name.replace(/\_(\w)/g, function(all, letter){
@@ -385,4 +390,18 @@ function toHump(name) {
 // 驼峰转换下划线
 function toLine(name) {
   return name.replace(/([A-Z])/g,"_$1").toLowerCase();
+}
+
+function validTelphone(value){
+	const reg = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+	if (value == '' || value == undefined || value == null || ((!reg.test(value)) && value != '')) {
+		return false;
+	}
+	return true;
+}
+
+export {
+	toHump,
+	toLine,
+	validTelphone
 }

@@ -1,386 +1,457 @@
 <template>
-	<div class="body-bg">
-		<div><Head :title="title" /></div>
-		<!-- <div style="height: 46px;"></div> -->
-		<div class="classfy-contents">
-			<van-row>
-				<van-col span="6">
-					<div class="left-main" ref="ratingsmain" :style="myStyle" id="scrollDiv" >
-						<van-sidebar v-model="activeKey" @change="onchange" >
-							<div ref="lItem" v-for="(item, index) in menuList" :key="index" v-if="item.goodsList.length>0">
-								<van-sidebar-item :style="{ color: item.menuId == onclickMenu ? '#008000' : '' }" :title="item.menuName" />
-							</div>
-						</van-sidebar>
-					</div>
-				</van-col>
-				<van-col span="18" class="ratings-main-col">
-					<div class="ratings-main" ref="ratingsmain" :style="myStyle">
-						<div>
-							<div v-for="(item, index) in menuList" :key="index" class="goods-list" ref="vansticky" v-if="item.goodsList.length>0">
-								<div ref="rItem">
-									<div class="second-tab-name">
-										<span style="font-size: 12px;">{{ item.menuName }}</span>
+	<div>
+		<div>
+			<Head :title="title" />
+		</div>
+		<section class="box">
+			<div class="content">
+				<div class="left" ref="left">
+					<ul>
+						<div v-for="(item, index) in left" :key="index"
+							:class="{current: currentIndex == index || clickIndex == index}"
+							@click="selectItem(index, $event)">
+							<li class="ul-leftli-item">
+								<span class="left-item">{{item.menuName}}</span>
+							</li>
+						</div>
+					</ul>
+				</div>
+				<div class="right" ref="right">
+					<ul>
+						<li class="right-item right-item-hook" v-for="(item,index) in right" :key="item.menuId">
+							<div class="menu-title"><span>{{item.menuName}}</span></div>
+							<ul>
+								<li class="goods-item" v-for="(g,index2) in item.goodsList" :key="index2">
+									<div class="goods-img" @click="toGoodsDetailPage(g.goodsId,1,g)">
+										<img :src="g.goodsImg" />
 									</div>
-									<div class="goods-items" v-for="g in item.goodsList" :key="g.goodsId">
-										<div class="goods-img" @click="toGoodsDetailPage(g.goodsId,1,g)"><img :src="g.goodsImg" /></div>
-										<div class="goods-contents">
-											<div class="goods-name-div" @click="toGoodsDetailPage(g.goodsId,1,g)">
-												<span class="goods-name">{{ g.goodsName }}</span>
+									<div class="goods-contents">
+										<div class="goods-name-div" @click="toGoodsDetailPage(g.goodsId,1,g)">
+											<span class="goods-name">{{ g.goodsName }}</span>
+										</div>
+										<!-- <span class="goods-desc">{{ g.goodsName }}</span> -->
+										<div class="price-div">
+											<div class="price" @click="toGoodsDetailPage(g.goodsId,1,g)">
+												<span class="goods-currency">￥</span>
+												<span class="goods-price">{{ g.nowMoney }}</span>
 											</div>
-											<!-- <span class="goods-desc">{{ g.goodsDesc }}</span> -->
-											<div class="price-div">
-												<div class="price" @click="toGoodsDetailPage(g.goodsId,1,g)">
-													<span class="goods-currency">￥</span>
-													<span class="goods-price">{{ g.nowMoney }}</span>
+											<div class="add-cart">
+												<div v-if="g.userGoodsCount == 0" class="shop-cart"
+													@click="onclickShopCart(item.menuId, g.goodsId)">
+													<van-icon name="cart-circle-o" color="#008000;" />
 												</div>
-												<div class="add-cart">
-													<div v-if="g.userGoodsCount == 0" class="shop-cart" @click="onclickShopCart(item.menuId, g.goodsId)">
-														<van-icon name="cart-circle-o" color="#008000;" />
-													</div>
-													<div v-if="g.userGoodsCount > 0">
-														<van-stepper
-															input-width="20px"
-															button-size="12px"
-															v-model="g.userGoodsCount"
-															disable-input
-															@change="onChangeGoods(item.menuId, g.goodsId, g.userGoodsCount)"
-														/>
-													</div>
+												<div v-if="g.userGoodsCount > 0">
+													<van-stepper input-width="20px" button-size="12px"
+														v-model="g.userGoodsCount" disable-input
+														@change="onChangeGoods(item.menuId, g.goodsId, g.userGoodsCount)" />
 												</div>
+											</div>
+											<div class="click-div" @click="toGoodsDetailPage(g.goodsId,1,g)">
+												
+											</div>
+											<div class="click-div2" @click="toGoodsDetailPage(g.goodsId,1,g)">
+												
 											</div>
 										</div>
 									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</van-col>
-			</van-row>
-		</div>
-		<!-- <div style="display: none;"><Tbar :tbActive="tbActive" /></div> -->
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</section>
 	</div>
 </template>
 
+
 <script>
-import BScroll from 'better-scroll';
-import Head from '@/components/Head.vue';
-import Tbar from '@/components/Bottom-bar.vue';
-import axios from '@/network/request.js';
-import { Toast } from 'vant';
-export default {
-	components: { Head: Head, Tbar: Tbar },
-	data() {
-		return {
-			tbActive: 1,
-			title: '商品分类',
-			activeKey: 0,
-			onclickMenu: 1,
-			heightList: [], //保存每一个的高度,
-			menuHeightList: [], //保存每一个菜单的高度
-			showheight: 0, //内容高度
-			menuList: [],
-			myStyle: '',
-			testId: 0
-		};
-	},
-	created() {
-		var h = document.documentElement.clientHeight || document.body.clientHeight;
-		// this.showheight = h - 50 - 51;
-		this.showheight = h - 50; // 设置底部高度
-		this.myStyle = 'height:' + this.showheight + 'px';
-		this._Bscroll();
-
-		//测试
-		this.searchGoodsList();
-	},
-	mounted() {
-		//增加滚动监听
-		// window.addEventListener('scroll', this.handleScroll);
-		// this.$refs.Box.addEventListener('scroll', this.handleScroll);
-	},
-	methods: {
-		onchange(index) {
-			this.onclickMenu = this.menuList[index].menuId;
-			this.scroll.scrollToElement(this.$refs.vansticky[index], 100, 0, 0);
+	import BScroll from 'better-scroll'
+	import Head from '@/components/Head.vue';
+	import Tbar from '@/components/Bottom-bar.vue';
+	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
+	export default {
+		components: {
+			Head: Head,
+			Tbar: Tbar
 		},
-		getHeight() {
-			// 获取每一个li的高度
-			const lis = this.$refs.rItem;
-			// 获取p标签的高度  这里想错，应该把上面的标题也列入进去
-			/* const heightp = this.$refs.vansticky
-		heightp.forEach(item => {
-		  //console.log(item.clientHeight)
-		}) */
-			// console.log(heightp.offsetHeight)
-			// heightList的第一个元素为0
-			let height = 0;
-			this.heightList.push(height);
-			// 之后的高度即为当前li的高度加上之前面li的高度和
-			lis.forEach(item => {
-				height += item.clientHeight;
-				this.heightList.push(height);
-				// console.log(this.heightList)
-			});
-
-			//菜单
-			height = 0;
-			this.menuHeightList.push(height);
-			const list = this.$refs.lItem;
-			list.forEach(item => {
-				height += item.clientHeight;
-				this.menuHeightList.push(height);
-				// console.log(this.heightList)
-			});
+		data() {
+			return {
+				title: '商品分类',
+				left: [],
+				right: [],
+				listHeight: [],
+				listLeftHeight: [],
+				scrollY: 0, //实时获取当前y轴的高度
+				clickEvent: false,
+				clickIndex: -1,
+				index: 0
+			}
 		},
-		_Bscroll() {
-			this.$nextTick(() => {
-				// if (this.goods) {
-				this.scroll = new BScroll(this.$refs.ratingsmain, {
+		methods: {
+			_initScroll() {
+				// console.log("-----_initScroll--------")
+				//better-scroll的实现原理是监听了touchStart,touchend事件，所以阻止了默认的事件（preventDefault）
+				//所以在这里做点击的话，需要在初始化的时候传递属性click,派发一个点击事件
+				//在pc网页浏览模式下，点击事件是不会阻止的，所以可能会出现2次事件，所以为了避免2次，可以在绑定事件的时候把$event传递过去
+				this.lefts = new BScroll(this.$refs.left, {
 					click: true,
-					probeType: 3
-				});
-				// }
-				this.scroll.on('scroll', res => {
-					// console.log(res)
-					this.scrollY = Math.abs(res.y);
-					// // console.log(res.y)
-					this.scrolly = res.y;
-					this.getHeight();
-					this.currentIndex();
-					var div = document.getElementById('scrollDiv');
+					probeType: 3 //探针的效果，实时获取滚动高度
+				})
+				this.lefts.on('scroll', (pos) => {
+					//this.leftScrollY = Math.abs(Math.round(pos.y))
+				})
+				//rights这个对象监听事件，实时获取位置pos.y
+				this.rights = new BScroll(this.$refs.right, {
+					click: true,
+					probeType: 3 //探针的效果，实时获取滚动高度
+				})
+				//rights这个对象监听事件，实时获取位置pos.y
+				this.rights.on('scroll', (pos) => {
+					this.scrollY = Math.abs(Math.round(pos.y))
+				})
+			},
+			_getHeight() {
+				let rightItems = this.$refs.right.getElementsByClassName('right-item-hook')
+				let height = 0
+				this.listHeight.push(height)
+				for (let i = 0; i < rightItems.length; i++) {
+					let item = rightItems[i]
+					height += item.clientHeight
+					this.listHeight.push(height)
+				}
+			},
+			_getLeftHeight() {
+				let leftItems = this.$refs.left.getElementsByClassName('ul-leftli-item')
+				let height = 0
+				this.listLeftHeight.push(height)
+				for (let i = 0; i < leftItems.length; i++) {
+					let item = leftItems[i]
+					height += item.clientHeight
+					this.listLeftHeight.push(height)
+				}
+			},
+			selectItem(index, event) {
+				// console.log("====selectItem======" + index)
+				this.clickIndex = index;
+				this.index = index;
+				//在better-scroll的派发事件的event和普通浏览器的点击事件event有个属性区别_constructed
+				//浏览器原生点击事件没有_constructed所以当时浏览器监听到该属性的时候return掉
+				if (!event._constructed) {
+					return
+				} else {
+					let rightItems = this.$refs.right.getElementsByClassName('right-item-hook')
+					let el = rightItems[index]
+					this.rights.scrollToElement(el, 300)
+				}
+			},
+			initLeftItem() {
+				let vm = this;
+				// 可见范围高度
+				var h = document.documentElement.clientHeight || document.body.clientHeight;
+				h = h - 50
+				// console.log("----hhhhhhhhhhhhhhhhhhh-----" + h)
+				if (this.lefts) {
+					let leftItems = this.$refs.left.getElementsByClassName('ul-leftli-item')
+					// 左侧每个菜单高度间距
+					if (this.listLeftHeight.length > 1) {
+						let leftHeigth = this.listLeftHeight[1] - this.listLeftHeight[0]
 
-					//可视范围   0 < y < this.showheight
+						// 当前滑动高度
+						let scrollHeight = leftHeigth * this.index + leftHeigth;
+						// console.log("----当前滑动高度-----" + scrollHeight+"========this.index======="+this.index)
 
-					// div.scrollTop = div.scrollHeight;
-					// console.log(this.activeKey + '======' + this.menuHeightList[this.activeKey] + '===可见：' + this.showheight);
-					// div.scrollTop = this.showheight;
-					// console.log("===6==="+this.showheight)
-					if (this.menuHeightList[this.activeKey] > this.showheight - this.menuHeightList[1]) {
-						div.scrollTop = this.menuHeightList[this.activeKey] - this.menuHeightList[2];
+						for (var i = 0; i < this.listLeftHeight.length; i++) {
+							// console.log("----h * i * leftHeigth - scrollHeight-----" + (i * leftHeigth - scrollHeight))
+							if (scrollHeight < h) {
+								if(this.index == 0){
+									let el = leftItems[0]
+									this.lefts.scrollToElement(el, 300)
+									
+								}else{
+									let el = leftItems[1]
+									this.lefts.scrollToElement(el, 300)
+								}
+								return
+							} else {
+								let el = leftItems[this.index-1]
+								this.lefts.scrollToElement(el, 300)
+							}
+						}
+					}
+				}
+			},
+			searchGoodsList() {
+				let vm = this;
+				let params = {
+					req_type: 'query_goods_list1',
+					data: {}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						let menusList = res.data.menusList;
+						vm.left = menusList;
+						vm.right = menusList;
+						vm.initVueScroll();
 					} else {
-						div.scrollTop = 0;
+						Toast(res.resp_desc);
 					}
 				});
-			});
-		},
-		currentIndex() {
-			for (let i = -1; i < this.heightList.length; i++) {
-				const height1 = this.heightList[i];
-				const height2 = this.heightList[i + 1];
-				if (this.scrollY < height2 && this.scrollY >= height1) {
-					return i;
+			},
+			initVueScroll() {
+				this.$nextTick(() => {
+					this._initScroll()
+					this._getHeight()
+					this._getLeftHeight()
+				})
+			},
+			toGoodsDetailPage(goodsId, isSingle, g) {
+				let url = '/goodsSku';
+				if (isSingle == 1) {
+					url = '/goodsSingle';
 				}
-				// 通过打印的控制台信息，，然后进行调试，我也不知道为啥第一个默认不出来，难搞
-				this.activeKey = i + 1;
-				this.onclickMenu = this.menuList[this.activeKey].menuId;
-				// console.log(i)
-			}
+				url = url + '?goodsId=' + goodsId + "&timeGoodsId=" + g.timeGoodsId;
+				this.$router.push(url);
+				//打开新页签
+				//const page  = this.$router.resolve({path: url})
+				//window.open(page.href,'_blank')
+			},
+			onChangeGoods(menuId, goodsId, userGoodsCount) {
+				let vm = this;
+				let params = {
+					req_type: 'add_order_cart',
+					data: {
+						goods_id: goodsId,
+						user_id: 0,
+						goods_spec: null,
+						goods_count: userGoodsCount,
+						add_model: 1
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						Toast('添加成功');
+					} else {
+						Toast(res.resp_desc);
+					}
+				});
+			},
+			onclickShopCart(menuId, goodsId) {
+				let vm = this
+				let flag = 1;
+				this.right.forEach(function(e) {
+					if (menuId == e.menuId) {
+						e.goodsList.forEach(function(e) {
+							if (e.goodsId == goodsId) {
+								e.userGoodsCount = 1;
+								vm.onChangeGoods(null, goodsId, 1);
+							}
+						});
+					}
+				});
+			},
 		},
-		onChangeGoods(menuId, goodsId, userGoodsCount) {
-			let vm = this;
-			let params = {
-				req_type: 'add_order_cart',
-				data: { goods_id: goodsId, user_id: 0, goods_spec: null, goods_count: userGoodsCount, add_model: 1 }
-			}; // 参数
-			axios.post('', params).then(function(res) {
-				if (res.resp_code == 1) {
-					Toast('添加成功');
-				} else {
-				}
-			});
+		created: function() {},
+		mounted() {
+			this.$nextTick(() => {
+				this.searchGoodsList();
+			})
 		},
-		onclickShopCart(menuId, goodsId) {
-			let vm = this
-			let flag = 1;
-			this.menuList.forEach(function(e) {
-				if (menuId == e.menuId) {
-					e.goodsList.forEach(function(e) {
-						if (e.goodsId == goodsId) {
-							e.userGoodsCount = 1;
-							vm.onChangeGoods(null,goodsId,1);
+		computed: {
+			currentIndex() {
+				this.initLeftItem();
+				// console.log("---------currentIndex-------")
+				for (let i = 0; i < this.listHeight.length; i++) {
+					let height = this.listHeight[i]
+					let height2 = this.listHeight[i + 1]
+					//当height2不存在的时候，或者落在height和height2之间的时候，直接返回当前索引
+					//>=height，是因为一开始this.scrollY=0,height=0
+					if (!height2 || (this.scrollY >= height && this.scrollY < height2)) {
+						// console.log("--------return i---------"+i)
+						if (this.clickIndex != -1) {
+							if (this.clickIndex == i) {
+								this.clickIndex = -1;
+								this.index = i;
+								return i
+							}
+							return -1;
 						}
-					});
+						this.index = i;
+						return i
+					}
+					/* if (this.listHeight[this.listHeight.length - 1] - this.$refs.right.clientHeight <= this.scrollY) {
+						if (this.clickTrue) {
+							console.log("---------currentIndex--sssss-----"+this.clickTrue)
+							return this.currentNum
+						} else {
+							return (this.listHeight.length - 1)
+						}
+					} */
 				}
-			});
-		},
-		searchGoodsList() {
-			let vm = this;
-			let params = {
-				req_type: 'query_goods_list1',
-				data: { user_id: 0 }
-			}; // 参数
-			axios.post('', params).then(function(res) {
-				if (res.resp_code == 1) {
-					vm.menuList = res.data.menusList;
-				} else {
-				}
-			});
-		},
-		toGoodsDetailPage(goodsId, isSingle,g) {
-			let url = '/goodsSku';
-			if (isSingle == 1) {
-				url = '/goodsSingle';
+				//如果this.listHeight没有的话，就返回0
+				return 0
 			}
-			url = url + '?goodsId=' + goodsId+"&timeGoodsId="+g.timeGoodsId;
-			this.$router.push(url);
-			//打开新页签
-			//const page  = this.$router.resolve({path: url})
-			//window.open(page.href,'_blank')
 		}
 	}
-};
 </script>
 
+
 <style scoped>
-.body-bg {
-	border: none;
-	line-height: 20px;
-	margin: 0;
-	padding: 0;
-	font-size: 12px;
-	color: #323233;
-	font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
-}
-.left-main {
-	overflow-y: scroll;
-	overflow-x: hidden;
-}
-.ratings-main {
-	overflow: hidden;
-}
->>>.van-sidebar-item--select {
-	border-color: #008000 !important;
-}
+	.content {
+		display: flex;
+		position: absolute;
+		top: 46px;
+		/* bottom: 100px; */
+		bottom: 0px;
+		width: 100%;
+		overflow: hidden;
+		background: #FFFFFF;
+	}
 
->>>.van-sidebar-item--select::before{
-	background-color: #008000;
-}
+	.left {
+		flex: 0 0 80px;
+		width: 80px;
+		background-color: #f3f5f7;
+	}
 
->>> .van-sidebar-item {
-	font-size: 12px;
-	padding: 15px 12px 15px 8px;
-}
+	.left li {
+		width: 100%;
+		height: 100%;
+	}
 
-/**
- * goods-item
- */
-.goods-list {
-	padding: 0px 10px;
-	background-color: #ffffff;
-}
+	.current {
+		background-color: #FFFFFF;
+		border-left: 5px solid #008000;
+		border-radius: 5px 5px 5px 5px;
+	}
 
-.second-tab-name {
-	padding: 15px 0 5px 0;
-	margin-bottom: 8px;
-	color: #464c5b;
-	font-size: 14px;
-	border-bottom: 1px solid #f0f0f0;
-}
+	.left-item {
+		display: block;
+		width: 100%;
+		height: 50px;
+		line-height: 50px;
+		text-align: center;
+		/* border-bottom: 1px solid red; */
+	}
 
-.goods-list > .goods-items:not(:last-child) {
-	border-bottom: 1px solid #ebedf0;
-}
+	.right {
+		flex: 1;
+	}
 
-.goods-items {
-	overflow: hidden;
-	font-size: 14px;
-	color: #657180;
-	height: 4.5rem;
-	position: relative;
-	padding: 7px 0;
-}
+	.right-item li {
+		width: 100%;
+		height: 100px;
+		text-align: center;
+		/* border-bottom: 1px solid red; */
+	}
 
-.goods-img {
-	float: left;
-	width: 20%;
-}
+	* {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
 
-.goods-contents {
-	float: right;
-	width: 80%;
-	overflow: hidden;
-}
+	.menu-title {
+		padding: 10px 0px 5px 0;
+		color: #464c5b;
+		font-weight: 900;
+		font-size: 14px;
+		border-bottom: 1px solid #f0f0f0;
+	}
 
-.goods-img > img {
-	width: 4rem;
-	height: 4rem;
-}
+	.menu-title span {
+		padding: 8px 10px 5px 10px;
+	}
 
-.goods-contents > span {
-	display: block;
-}
+	.goods-item {
+		position: relative;
+	}
 
-.goods-name,
-.goods-desc {
-	/* display: inline-block;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	font-size: 12px;
-	padding-bottom: 5px;
-	padding-left: 1.5rem; */
-	/* overflow:hidden; 
-	text-overflow:ellipsis;
-	display:-webkit-box; 
-	-webkit-box-orient:vertical;
-	-webkit-line-clamp:2; 
-	display: inline-block; */
-}
+	.goods-img {
+		float: left;
+		/* width: 20%; */
+		height: 100%;
+		/* border: 1px solid red; */
+		/* clear: both; */
+		display: table-cell;
+		/*主要是这个属性*/
+		vertical-align: middle;
+	}
 
-.goods-name-div {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	display: -webkit-box;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 3;
-	height: 40px;
-	margin-left: 20px;
-	overflow-wrap: break-word;
-}
+	.goods-img>img {
+		width: 70px;
+		height: 80px;
+		margin-top: 10px;
+		margin-left: 5px;
+		border: 1px solid #f0f0f0;
+	}
 
-.goods-name {
-	color: #464c5b;
-	font-size: 12px;
-}
+	.goods-contents {
+		/* overflow: hidden; */
+		
+	}
 
-.price-div {
-	padding: 0 5px;
-	overflow: auto;
-	width: 100%;
-	margin-top: 15px;
-	font-size: 0.5rem;
-}
+	.goods-name-div {
+		height: 20px;
+		/* overflow: hidden; */
+		/* text-overflow: ellipsis;
+		white-space: nowrap; */
+		font-size: 12px;
+		font-weight: bold;
+		/* padding-left: 5px; */
+		text-align: left;
+		padding-top: 10px;
+		margin-left: 85px;
+	}
 
-.price {
-	float: left;
-	width: 20%;
-	position: absolute;
-	bottom: 5px;
-	padding-left: 15px;
-}
+	.goods-desc {
+		font-size: 12px;
+		color: gray;
+		display: block;
+		font-weight: normal;
+		text-align: left;
+	}
 
-.price > span {
-	color: #008000;
-}
-.price > span:last-child {
-	font-size: 16px;
-	font-weight: bold;
-}
-.add-cart {
-	float: right;
-	text-align: right;
-	padding-right: 8px;
-	font-size: 1.4rem;
-	color: #464c5b !important;
-	position: absolute;
-	right: 0px;
-	bottom: 11px;
-}
+	.price-div {}
 
-.shop-cart {
-	margin-top: 11px;
-	position: absolute;
-	bottom: -10px;
-	right: 0px;
-}
+	.price {
+		color: #008000;
+		font-size: 14px;
+		bottom: 13px;
+		left: 80px;
+		font-weight: 900;
+	}
+
+	.goods-currency {
+		font-weight: bold;
+		font-size: 12px;
+	}
+
+	.price,
+	.add-cart {
+		bottom: 13px;
+		position: absolute;
+	}
+
+	.add-cart {
+		right: 15px;
+		font-size: 18px;
+	}
+
+	.shop-cart {
+		font-weight: bold;
+	}
+	
+	/*  */
+	.click-div{
+		height: 60px;
+		width: 55%;
+	}
+	.click-div2{
+		height: 50px;
+		margin-top: 15px;
+	}
 </style>

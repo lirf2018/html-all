@@ -8,6 +8,7 @@ import AllGoodsList from '@/views/fruits/AllGoodsList.vue';
 import SearchGoods from '@/views/fruits/SearchGoods.vue';
 import AddSuggest from '@/views/fruits/AddSuggest.vue';
 import SuggestDetail from '@/views/fruits/SuggestDetail.vue';
+import SuggestDetail2 from '@/views/fruits/SuggestDetail2.vue';
 import InfoList from '@/views/fruits/InfoList.vue'
 import InfoDetail from '@/views/fruits/InfoDetail.vue'
 import Center from '@/views/fruits/Center.vue';
@@ -44,14 +45,26 @@ import OrderSubmit2 from '@/views/fruits/OrderSubmit2.vue';
 import UserAddr from '@/views/fruits/UserAddr.vue';
 import AddUserAddr from '@/views/fruits/AddUserAddr.vue';
 
+import TuiGuang from '@/views/fruits/TuiGuang.vue';
 
+import BangMemberNum from '@/views/fruits/BangMemberNum.vue';
+
+import TuiGuangYonghu from '@/views/fruits/TuiGuangYonghu.vue';
 
 import ShowMain from '@/views/ShowMain.vue';
 
+import ShopInfo from '@/views/fruits/ShopInfo.vue';
+
+import test from '@/views/testMenu.vue';
+
 export const pageLink = [
 	{
+		path: "/test",
+		component: test
+	},
+	{
 		path: "/",
-		component: Main
+		component: PhoneLogin
 	},
 	{
 		path: "/main",
@@ -178,6 +191,10 @@ export const pageLink = [
 		component: SuggestDetail
 	},
 	{
+		path: "/suggestDetail2",
+		component: SuggestDetail2
+	},
+	{
 		path: "/updatePasswd",
 		component: UpdatePasswd
 	},
@@ -206,11 +223,23 @@ export const pageLink = [
 		component: AddUserAddr
 	},
 	{
-		path:"/orderSubmit",
-		component:OrderSubmit
-	},{
-		path:"/orderSubmit2",
-		component:OrderSubmit2
+		path: "/orderSubmit",
+		component: OrderSubmit
+	}, {
+		path: "/orderSubmit2",
+		component: OrderSubmit2
+	}, {
+		path: "/tuiGuang",
+		component: TuiGuang
+	}, {
+		path: "/bangMemberNum",
+		component: BangMemberNum
+	}, {
+		path: "/tuiGuangYonghu",
+		component: TuiGuangYonghu
+	}, {
+		path: "/shopInfo",
+		component: ShopInfo
 	}
 ]
 
@@ -222,5 +251,11 @@ export default new Router({
 	//mode: 'history',
 	routes: [
 		...pageLink
-	]
+	],
+	scrollBehavior(to, from, savedPosition) { // 解决vue页面之间跳转，页面不是在顶部的问题
+		return {
+			x: 0,
+			y: 0
+		}
+	}
 })

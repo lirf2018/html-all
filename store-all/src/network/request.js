@@ -1,5 +1,11 @@
 // 引入axios
 import axios from 'axios';
+import store from '../store'
+import router from '../router'
+
+import {
+	Toast
+} from 'vant';
 
 // 创建axios实例
 const httpService = axios.create({
@@ -12,14 +18,25 @@ const httpService = axios.create({
 	timeout: 3000 // 需自定义
 });
 
+// 创建axios实例
+const httpUploadService = axios.create({
+	// url前缀-'http:xxx.xxx'
+	// baseURL: 'http://localhost:8082/store-info/info/test', // 需自定义
+	baseURL: 'http://localhost:9909/api/store-info/file/uploadFile', // 需自定义
+	// baseURL: 'http://lrf-13418915218.6655.la/store-info/info/test', // 需自定义
+	// baseURL: 'http://v17022b547.51mypc.cn/store-info/info/test', // 需自定义
+	// 请求超时时间
+	timeout: 3000 // 需自定义
+});
+
+
 // request拦截器
 httpService.interceptors.request.use(
 	config => {
 		// 根据条件加入token-安全携带
-		if (true) { // 需自定义
-			// 让每个请求携带token
-			config.headers['User-Token'] = '';
-		}
+		// 让每个请求携带token
+		config.headers['User-Token'] = store.state.Authorization;
+		delete config.data.data.userId;
 		return config;
 	},
 	error => {
@@ -31,20 +48,25 @@ httpService.interceptors.request.use(
 // respone拦截器
 httpService.interceptors.response.use(
 	response => {
-		// return response.data;
 		// 统一处理状态
-		// const res = response.data;
+		const res = response.data;
+		if (res.resp_code != 1) { // 需自定义
+
+			if (res.resp_code == 401) {
+				// 返回 401 清除token信息并跳转到登录页面
+				store.commit('userLoginOut');
+				router.replace({
+					path: 'phoneLogin'
+				})
+			} else {
+				// 返回异常
+				/* return Promise.reject({
+					status: res.resp_code,
+					message: res.resp_desc
+				}); */
+			}
+		}
 		return response.data;
-		// if (res.resp_code != 1) { // 需自定义
-		// 	// 返回异常
-		// 	// return Promise.reject({
-		// 	// 	status: res.statuscode,
-		// 	// 	message: res.message
-		// 	// });
-		// 	alert(res.resp_desc)
-		// } else {
-		// 	return res.data;
-		// }
 	},
 	// 处理处理
 	error => {
@@ -132,6 +154,7 @@ export function post(url, params = {}) {
 			resolve(response);
 		}).catch(error => {
 			reject(error);
+
 		});
 	});
 }
@@ -143,7 +166,7 @@ export function post(url, params = {}) {
  * */
 export function fileUpload(url, params = {}) {
 	return new Promise((resolve, reject) => {
-		httpService({
+		httpUploadService({
 			url: url,
 			method: 'post',
 			data: params,

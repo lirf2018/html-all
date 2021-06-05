@@ -2,12 +2,14 @@
 	<div class="body-bg">
 		<!-- <div class="search"><van-search shape="round" background="#008000" placeholder="请输入搜索关键词" /></div> -->
 		<div class="search">
-			<van-search v-model="value" disabled placeholder="请输入搜索关键词" shape="round" background="#008000" />
+			<van-search v-model="goodsName" placeholder="请输入搜索关键词" shape="round" background="#008000"
+				@search="onSearch" />
 		</div>
 		<div style="height: 44px;"></div>
 		<div class="banner-list">
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-				<van-swipe-item v-for="(bannel, index) in bannelList" :key="index"><img :src="bannel.banner_img" @click="toPageUrl(bannel.banner_link)" /></van-swipe-item>
+				<van-swipe-item v-for="(bannel, index) in bannelList" :key="index"><img :src="bannel.banner_img"
+						@click="toPageUrl(bannel.banner_link)" /></van-swipe-item>
 			</van-swipe>
 		</div>
 		<!-- <div class="ticket">
@@ -37,12 +39,13 @@
 			<div>
 				<van-grid>
 					<!-- <van-grid-item icon="home-o" text="所有水果" /> -->
-					<van-grid-item :icon="item.menuImg" :text="item.menuName" v-for="(item, index) in mainMenu" :to="item.menuUrl"
-					 :key="index" />
+					<van-grid-item :icon="item.menuImg" :text="item.menuName" v-for="(item, index) in mainMenu"
+						:to="item.menuUrl" :key="index" />
 				</van-grid>
 			</div>
 		</div>
-		<div class="activity" v-if="activity1 != null"><img :src="activity1.activity_img" @click="toPageUrl(activity1.activity_link)" /></div>
+		<div class="activity" v-if="activity1 != null"><img :src="activity1.activity_img"
+				@click="toPageUrl(activity1.activity_link)" /></div>
 		<div class="goods-list">
 			<div class="goods-item" v-for="(item, index) in newGoodsList" :key="index">
 				<div class="goods-item-detail">
@@ -61,7 +64,10 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)"><span>去看看</span></div>
+						<div class="goods-item-go"
+							@click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)">
+							<span>去看看</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -83,11 +89,15 @@
 						<span>￥</span>
 						<span>{{ item.now_money }}</span>
 					</div>
-					<div class="goods-item2-buy" @click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id,item.time_goods_id)"><span>去购买</span></div>
+					<div class="goods-item2-buy"
+						@click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id,item.time_goods_id)">
+						<span>去购买</span>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="activity" v-if="activity4 != null"><img :src="activity4.activity_img" @click="toPageUrl(activity4.activity_link)" /></div>
+		<div class="activity" v-if="activity4 != null"><img :src="activity4.activity_img"
+				@click="toPageUrl(activity4.activity_link)" /></div>
 		<div class="goods-list">
 			<div class="goods-item" v-for="(item, index) in hotGoodsList" :key="index">
 				<div class="goods-item-detail">
@@ -106,7 +116,10 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go" @click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)"><span>去看看</span></div>
+						<div class="goods-item-go"
+							@click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)">
+							<span>去看看</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -128,6 +141,9 @@
 	import Tbar from '@/components/Bottom-bar.vue';
 	import EG from '@/components/EgMark.vue';
 	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
 	export default {
 		components: {
 			Tbar: Tbar,
@@ -135,7 +151,7 @@
 		},
 		data() {
 			return {
-				value: '',
+				goodsName: '',
 				cartCount: 0,
 				mainMenu: [],
 				bannelList: [],
@@ -170,15 +186,21 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						vm.mainMenu = res.data.list;
+					} else {
+						Toast(res.resp_desc);
 					}
 				});
+			},
+			onSearch() {
+				let url = '/classifyAllGoodsList?goodsName=' + this.goodsName;
+				this.$router.push(url);
 			},
 			toGoodsDetailPage(goodsId, isSingle, timeGoodsId) {
 				let url = '/goodsSku';
 				if (isSingle == 1) {
 					url = '/goodsSingle';
 				}
-				url = url + '?goodsId=' + goodsId + "&timeGoodsId="+timeGoodsId;
+				url = url + '?goodsId=' + goodsId + "&timeGoodsId=" + timeGoodsId;
 				this.$router.push(url);
 				//打开新页签
 				//const page  = this.$router.resolve({path: url})
@@ -206,7 +228,9 @@
 						vm.hotGoodsList = res.data.hot_goods_list;
 						//限时商品
 						vm.timeGoodsList = res.data.time_goods_list;
-					} else {}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			},
 			findGoods() {},

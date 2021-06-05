@@ -25,7 +25,8 @@
 						<div>
 							<span>查看详情</span>
 							<span>
-								<van-icon name="arrow" /></span>
+								<van-icon name="arrow" />
+							</span>
 						</div>
 					</div>
 				</div>
@@ -37,13 +38,16 @@
 <script>
 	import Head from '@/components/Head.vue';
 	import axios from '@/network/request.js';
+	import {
+		Toast
+	} from 'vant';
 	export default {
 		components: {
 			Head: Head
 		},
 		data() {
 			return {
-				title: '资讯',
+				title: '活动资讯',
 				infoList: [],
 				loading: false,
 				finished: false,
@@ -58,8 +62,7 @@
 				let params = {
 					req_type: 'query_info_page',
 					data: {
-						currePage: vm.currePage,
-						userId: 0
+						currePage: vm.currePage
 					}
 				}; // 参数
 				this.loading = true;
@@ -69,7 +72,9 @@
 							let hasNext = res.data.hasNext;
 							vm.initDataList(dataList, hasNext);
 							vm.currePage = vm.currePage + 1;
-						} else {}
+						} else {
+							Toast(res.resp_desc);
+						}
 					}).catch(err => {
 						// this.error = true;
 					})
