@@ -55,6 +55,9 @@ import ShowMain from '@/views/ShowMain.vue';
 
 import ShopInfo from '@/views/fruits/ShopInfo.vue';
 
+
+import MyFruits from '@/views/fruits/MyFruits.vue';
+
 import test from '@/views/testMenu.vue';
 
 export const pageLink = [
@@ -240,6 +243,9 @@ export const pageLink = [
 	}, {
 		path: "/shopInfo",
 		component: ShopInfo
+	}, {
+		path: "/myFruits",
+		component: MyFruits
 	}
 ]
 

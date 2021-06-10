@@ -10,6 +10,11 @@
 					<span>No. </span>
 					<span>{{memberNum}}</span>
 				</div>
+				<div class="show-qrcode" v-show="showClickQr" @click="show = true">
+					<div class="qrcode">
+						<div id="qrcode"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="login-info" v-show="!memberNumFlag">
@@ -22,6 +27,9 @@
 			<div v-show="memberNumFlag" @click="delBang"><span>解绑会员号</span></div>
 			<div v-show="!memberNumFlag" @click="addBang"><span>绑定会员号</span></div>
 		</div>
+		<van-popup v-model="show">
+			<MyQrCode :memberCode="memberNum" />
+		</van-popup>
 		<EG />
 	</div>
 </template>
@@ -30,11 +38,14 @@
 	import Head from '@/components/Head.vue';
 	import EG from '@/components/EgMark.vue';
 	import axios from '@/network/request.js';
+	import MyQrCode from '@/components/MyQrCode.vue';
+	import QRCode from 'qrcodejs2';
 	import {
 		Toast
 	} from 'vant';
 	export default {
 		components: {
+			MyQrCode: MyQrCode,
 			EG: EG,
 			Head: Head
 		},
@@ -43,11 +54,16 @@
 				title: '会员号',
 				memberNumFlag: false,
 				memberNum: '',
+				show: false,
+				showClickQr:false,
 				imgCard:''
 			};
 		},
 		mounted: function() {
 			this.findUserBangList();
+			this.$nextTick(function() {
+				this.qrcode();
+			});
 		},
 		methods: {
 			findUserBangList() {
@@ -67,6 +83,7 @@
 								vm.memberNum = data[i].memberNum;
 								if (vm.memberNum != '' && vm.memberNum != null) {
 									vm.memberNumFlag = true;
+									vm.showClickQr = true;
 								}
 							}
 						}
@@ -96,6 +113,7 @@
 							if (res.resp_code == 1) {
 								Toast('解绑成功');
 								vm.findUserBangList();
+								vm.showClickQr = false;
 							} else {
 								Toast(res.resp_desc);
 							}
@@ -123,9 +141,21 @@
 					if (res.resp_code == 1) {
 						Toast('绑定成功');
 						vm.findUserBangList();
+						vm.showClickQr = true;
 					} else {
 						Toast(res.resp_desc);
 					}
+				});
+			},
+			qrcode() {
+				let vm = this;
+				// 和div的id相同 必须是id  class类名会报错
+				// 第二参数是他的配置项
+				let qrCode = new QRCode('qrcode', {
+					width: 25,
+					height: 25,
+					text: '0',
+					colorDark: '#969799'
 				});
 			}
 		}
@@ -187,5 +217,19 @@
 		border-radius: 50px;
 		color: #ffffff;
 		background: #008000;
+	}
+	
+	/*  */
+	.show-qrcode {
+		position: absolute;
+		bottom: 30px;
+		right: 15px;
+	}
+
+	.qrcode {
+		margin: 0 auto;
+		font-size: 12px;
+		width: 30px;
+		height: 30px;
 	}
 </style>

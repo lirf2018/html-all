@@ -249,13 +249,13 @@
 	}
 
 	.no-list>span:last-child {
-		font-size: 16px;
+		font-size: 14px;
 	}
 
 	/*  */
 	.ji-list,
 	.ji-change-record {
-		font-size: 16px;
+		font-size: 14px;
 		color: #323233;
 		width: 100%;
 		margin-top: 7rem !important;
@@ -263,7 +263,7 @@
 
 	.list-items {
 		margin-top: 4rem;
-		font-size: 14px;
+		font-size: 12px;
 	}
 
 	.list-title {

@@ -154,6 +154,7 @@
 				order: null,
 				goodsList: [],
 				orderId: 0,
+				orderNo:'',
 				closeTime: 0
 			};
 		},
@@ -166,16 +167,19 @@
 			findOrderDetail() {
 				let vm = this;
 				let {
-					orderId
+					orderId,
+					orderNo
 				} = this.$route.query;
 				if (null == orderId) {
 					return;
 				}
 				vm.orderId = orderId;
+				vm.orderNo = orderNo;
 				let params = {
 					req_type: 'query_order_detail',
 					data: {
-						order_id: orderId
+						order_id: orderId,
+						order_no:orderNo
 					}
 				}; // 参数
 				axios.post('', params).then(function(res) {

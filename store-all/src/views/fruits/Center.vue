@@ -55,10 +55,10 @@
 					<div class="cart-count"><span>{{data.cart_goods_count}}</span></div>
 				</div>
 			</div>
-			<div>
+			<div @click="toPage('myFruits')">
 				<!-- 对固定会员一次下单，多次不同时间配送场景 -->
 				<van-cell-group>
-					<van-cell title="定制果园" is-link />
+					<van-cell title="定制套餐" is-link />
 				</van-cell-group>
 			</div>
 			<div @click="toPage('tuiGuang')">
@@ -106,6 +106,14 @@
 				<Tbar tbActiveParent="3" />
 			</div>
 		</div>
+		<van-popup v-model="show">
+			<MyQrCode :memberCode="memberCode" />
+		</van-popup>
+		<div class="show-qrcode" @click="show = true">
+			<div class="qrcode">
+				<div id="qrcode"></div>
+			</div>
+		</div>
 		<EG />
 	</div>
 </template>
@@ -114,6 +122,8 @@
 	import Tbar from '@/components/Bottom-bar.vue';
 	import EG from '@/components/EgMark.vue';
 	import axios from '@/network/request.js';
+	import MyQrCode from '@/components/MyQrCode.vue';
+	import QRCode from 'qrcodejs2';
 	import {
 		Toast
 	} from 'vant';
@@ -123,11 +133,14 @@
 	export default {
 		components: {
 			Tbar: Tbar,
+			MyQrCode: MyQrCode,
 			EG: EG
 		},
 		data() {
 			return {
 				tbActive: 3,
+				memberCode: '',
+				show: false,
 				data: null
 			};
 		},
@@ -165,9 +178,26 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						vm.data = res.data;
+						vm.memberCode = res.data.member_id;
+						if (vm.memberCode != null && vm.memberCode != '') {
+							vm.$nextTick(function() {
+								vm.qrcode();
+							});
+						}
 					} else {
 						Toast(res.resp_desc);
 					}
+				});
+			},
+			qrcode() {
+				let vm = this;
+				// 和div的id相同 必须是id  class类名会报错
+				// 第二参数是他的配置项
+				let qrCode = new QRCode('qrcode', {
+					width: 25,
+					height: 25,
+					text: '0000',
+					colorDark: '#969799'
 				});
 			}
 		}
@@ -271,6 +301,26 @@
 		right: 35px;
 		bottom: 12px;
 		padding: 2px 2px;
+	}
+
+	/*  */
+	.show-qrcode {
+		position: absolute;
+		top: 30px;
+		right: 30px;
+	}
+
+	.qrcode {
+		margin: 0 auto;
+		font-size: 12px;
+		width: 30px;
+		height: 30px;
+	}
+
+	.qrcode>>>img {
+		/* border-radius: 50%; */
+		/* -moz-border-radius: 50%; */
+		/* -webkit-border-radius: 50%; */
 	}
 
 	>>>.van-button {
