@@ -21,7 +21,7 @@
 						<span>{{ item.couponBegin }}-{{ item.couponEnd }}</span>
 					</div>
 				</div>
-				<div class="coupon-use">
+				<div class="coupon-use" @click="toPage('myCouponDetail')">
 					<div><span :style="{ color: onClickStatus == 0 ? '#008000' : '#9ea7b4' }">立即使用</span></div>
 				</div>
 			</div>
@@ -83,6 +83,9 @@
 		methods: {
 			onChange(index) {
 				this.onClickStatus = this.tabList[index].status;
+			},
+			toPage(path) {
+				this.$router.push(path);
 			}
 		}
 	};

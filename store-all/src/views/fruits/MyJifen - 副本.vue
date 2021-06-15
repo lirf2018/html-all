@@ -9,30 +9,49 @@
 			<div class="use-jifen" @click="toChangeJiFen">去兑换</div>
 		</div>
 		<div class="jf-items">
-			<van-list v-model="loadingA" :finished="finishedA" finished-text="没有更多了" @load="onLoadA">
-				<div class="no-list" v-show="!showJf">
-					<span>
-						<van-icon name="bookmark-o" />
-					</span>
-					<span>暂无积分记录</span>
-				</div>
-				<div class="ji-list" v-show="showJf">
-					<div class="list-title">
-						<div class="title-item"><span>事项</span></div>
-						<div class="score"><span>分值</span></div>
-						<div class="create-time"><span>时间</span></div>
-					</div>
-					<div style="width: 100%;clear: both;height: 35px;"></div>
-					<div class="list-items">
-						<div class="item-info" v-for="(item, index) in jiList" :key="index">
-							<span class="title-item">{{ item.title }}</span>
-							<span class="score">{{item.isInout == '0'?'':'+'}}{{ item.score }}</span>
-							<span class="create-time">{{ item.date }}</span>
+			<van-tabs v-model="active" color="#008000">
+				<van-tab title="积分记录">
+					<van-list v-model="loadingA" :finished="finishedA" finished-text="没有更多了" @load="onLoadA">
+						<div class="no-list" v-show="!showJf">
+							<span>
+								<van-icon name="bookmark-o" />
+							</span>
+							<span>暂无积分记录</span>
 						</div>
-					</div>
-					<div style="width: 100%;clear: both;"></div>
-				</div>
-			</van-list>
+						<div class="ji-list" v-show="showJf">
+							<div class="list-title">
+								<div class="title-item"><span>事项</span></div>
+								<div class="score"><span>分值</span></div>
+								<div class="create-time"><span>时间</span></div>
+							</div>
+							<div style="width: 100%;clear: both;height: 35px;"></div>
+							<div class="list-items">
+								<div class="item-info" v-for="(item, index) in jiList" :key="index">
+									<span class="title-item">{{ item.title }}</span>
+									<span class="score">{{item.isInout == '0'?'':'+'}}{{ item.score }}</span>
+									<span class="create-time">{{ item.date }}</span>
+								</div>
+							</div>
+							<div style="width: 100%;clear: both;"></div>
+						</div>
+					</van-list>
+				</van-tab>
+				<van-tab title="兑换记录">
+					<van-list v-model="loadingB" :finished="finishedB" finished-text="功能敬请期待" @load="onLoadB">
+						<div class="ji-change-record" >
+							<div class="list-title">
+								<div  class="title-item"><span>事项</span></div>
+								<div  class="score"><span>分值</span></div>
+								<div  class="create-time"><span>时间</span></div>
+							</div>
+							<div style="width: 100%;clear: both;height: 35px;"></div>
+							<div class="list-items">
+							</div>
+							<div style="width: 100%;clear: both;"></div>
+						</div>
+					</van-list>
+				</van-tab>
+			</van-tabs>
 		</div>
 	</div>
 </template>
@@ -75,7 +94,7 @@
 		},
 		methods: {
 			toChangeJiFen() {
-				this.$router.push("couponList");
+				Toast('敬请期待');
 			},
 			onLoadB() {
 				let vm = this;
@@ -234,11 +253,12 @@
 	}
 
 	.list-items {
-		margin-top: 1rem;
+		margin-top: 4rem;
 		font-size: 12px;
 	}
 
 	.list-title {
+		margin-top: 2.5rem !important;
 		position: fixed;
 		width: 100%;
 		z-index: 999;

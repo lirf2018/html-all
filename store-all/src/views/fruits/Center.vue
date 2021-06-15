@@ -16,10 +16,11 @@
 							<span>{{data.user_jifen}}</span>
 						</div>
 					</div>
-					<div class="ticket-div">
+					<div class="ticket-div" @click="toPage('/myCouponList')">
 						<div>
 							<span>优惠券</span>
-							<span>敬请期待</span>
+							<!-- <span>敬请期待</span> -->
+							<span>3张</span>
 						</div>
 					</div>
 					<div class="cost-div">
@@ -45,15 +46,10 @@
 					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc" />
 				</van-grid>
 			</div>
-			<div class="shop-cart" @click="toPage('/shopCart')">
-				<div>
-					<div>
-						<van-cell-group>
-							<van-cell title="购物车" is-link />
-						</van-cell-group>
-					</div>
-					<div class="cart-count"><span>{{data.cart_goods_count}}</span></div>
-				</div>
+			<div @click="toPage('bangMemberNum')">
+				<van-cell-group>
+					<van-cell title="我的会员卡" is-link />
+				</van-cell-group>
 			</div>
 			<div @click="toPage('myFruits')">
 				<!-- 对固定会员一次下单，多次不同时间配送场景 -->
@@ -71,16 +67,11 @@
 					<van-cell title="收入记录" is-link />
 				</van-cell-group>
 			</div> -->
-			<!-- <div @click="toPage('userAddr')">
+			<div @click="toPage('userAddr')">
 				<van-cell-group>
 					<van-cell title="收货地址管理" is-link />
 				</van-cell-group>
-			</div> -->
-			<!-- <div>
-				<van-cell-group>
-					<van-cell title="我的优惠券" is-link />
-				</van-cell-group>
-			</div> -->
+			</div>
 			<!-- <div>
 				<van-cell-group><van-cell title="我的优惠码" is-link /></van-cell-group>
 			</div> -->
