@@ -43,7 +43,7 @@ export default {
 	position: fixed;
 	height: 50px;
 	width: 100%;
-	z-index: 1000;
+	z-index: 999999999;
 	top: 0;
 }
 

@@ -20,7 +20,7 @@ export default {};
 	height: 1rem;
 	overflow: hidden;
 	position: relative;
-	z-index: 999999999;
+	z-index: 99;
 	margin: 15px 0;
 }
 

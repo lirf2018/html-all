@@ -5,17 +5,22 @@
 		</div>
 		<van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
 			<div class="coupon">
-				<div class="coupon-list" v-for="(item, index) in couponList" :key="item.couponId">
+				<div class="coupon-list" v-for="(item, index) in couponList" :key="index">
 					<div class="coupon-content">
-						<div class="coupon-img"><img :src="item.couponImg" /></div>
+						<div class="coupon-img"><img :src="item.coupon_img" /></div>
 						<div class="coupon-title">
-							<span>{{ item.couponName }}</span>
-							<span>{{ item.couponBegin }}-{{ item.couponEnd }}</span>
+							<span>{{ item.coupon_name }}</span>
+							<span>{{ item.start_time }}-{{ item.end_time }}</span>
 						</div>
 					</div>
-					<div class="coupon-use">
+					<div @click="toPage(1,item.coupon_id)" class="coupon-use"
+						v-if="item.appoint_type ==2 && item.now_use_date == 0 ">
+						<span>点击领取</span>
+						<span>{{ item.count_get }}领取</span>
+					</div>
+					<div @click="toPage(0,item.coupon_id)" class="coupon-use" v-else>
 						<span>点击使用</span>
-						<span>{{ item.couponGet }}领取</span>
+						<span>{{ item.count_get }}领取</span>
 					</div>
 				</div>
 			</div>
@@ -39,36 +44,71 @@
 				couponList: [],
 				loading: false,
 				finished: false,
-				testId: 0
+				refreshing: false,
+				testGoodsId: 0,
+				currePage: 1,
+				hasNext: false
 			};
 		},
 		created() {},
 		methods: {
 			onLoad() {
-				// 异步更新数据
-				// setTimeout 仅做示例，真实场景中一般为 ajax 请求
-				setTimeout(() => {
-					for (let i = 0; i < 10; i++) {
-						this.testId = this.testId + 1;
-						var obj = {
-							couponId: this.testId,
-							couponName: this.testId + '莎莎SUISSE 产品满700立减250优惠券优惠券',
-							couponImg: 'https://img.yzcdn.cn/vant/apple-2.jpg',
-							couponGet: 563253,
-							couponBegin: '2020.01.01',
-							couponEnd: '2020.02.02'
-						};
-						this.couponList.push(obj);
+				let vm = this;
+				let {
+					catogeryId,
+					goodsName
+				} = vm.$route.query;
+				let params = {
+					req_type: 'query_coupon_list',
+					data: {
+						currePage: vm.currePage,
+						userId: 0
 					}
+				}; // 参数
+				this.loading = true;
+				axios.post('', params).then(function(res) {
+						if (res.resp_code == 1) {
+							let list = res.data.list;
+							let hasNext = res.data.hasNext;
+							vm.initdata(list, hasNext);
+							vm.currePage = vm.currePage + 1;
+						} else {
+							Toast(res.resp_desc);
+						}
+					}).catch(err => {
+						// this.error = true;
+					})
+					.finally(() => {
+						this.loading = false;
+					});
+			},
+			initdata(list, hasNext) {
+				let vm = this;
+				for (let i = 0; i < list.length; i++) {
+					this.couponList.push(list[i]);
+				}
+				this.loading = false;
+				if (hasNext == false) {
+					this.finished = true;
+				}
+			},
+			onRefresh() {
+				// 清空列表数据
+				this.finished = false;
 
-					// 加载状态结束
-					this.loading = false;
-
-					// 数据全部加载完成
-					if (this.couponList.length >= 40) {
-						this.finished = true;
-					}
-				}, 1000);
+				// 重新加载数据
+				// 将 loading 设置为 true，表示处于加载状态
+				this.loading = true;
+				this.onLoad();
+			},
+			toPage(type, couponId) {
+				if (type == 1) {
+					// 点击领取
+					this.$router.push('allGoodsList');
+				} else {
+					// 详情
+					this.$router.push('couponDetail?couponId=' + couponId);
+				}
 			}
 		}
 	};
@@ -113,6 +153,7 @@
 		border: 1px solid #c3cbd6;
 		border-radius: 5px 10px 10px 5px;
 		border-right: 1px dashed #e1e1e1;
+		width: 100%;
 	}
 
 	.coupon-img,

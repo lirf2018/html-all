@@ -4,20 +4,20 @@
 			<Head :title="title" />
 		</div>
 		<div class="coupon">
-			<div class="shop-info">
+			<div class="shop-info" v-if="shop != null">
 				<div>
-					<span><img src="https://img.yzcdn.cn/vant/apple-4.jpg" /></span>
-					<span>上沙硕果</span>
+					<span><img :src="imgPath+shop.shopLogo" /></span>
+					<span>{{shop.shopName}}</span>
 				</div>
 			</div>
 			<div>
 				<CouponLine />
 			</div>
-			<div class="title">
-				<div><span>莎莎SUISSE 产品满700立减250优惠券</span></div>
-				<div><span>立减250元</span></div>
+			<div class="title" v-if="coupon != null">
+				<div><span>{{coupon.couponName}}</span></div>
+				<div><span>{{coupon.title}}</span></div>
 			</div>
-			<div class="coupon-code">
+			<div class="coupon-code" v-show="showCodeFlag">
 				<div class="barcode">
 					<barcode :value="code" :options="barcodeOption" tag="svg"></barcode>
 				</div>
@@ -30,59 +30,28 @@
 				<CouponLine />
 			</div>
 			<div class="coupon-detail"><span>优惠券详情</span></div>
-			<div class="coupon-effect">
-				<div><span>有效期:</span></div>
+			<div class="coupon-effect" v-if="coupon != null">
+				<div><span>领取时间:</span></div>
 				<div>
-					<span>2020-01-05</span>
+					<span>{{beginDate}}</span>
 					<span>&nbsp;至&nbsp;</span>
-					<span>2020-01-05</span>
+					<span>{{endDate}}</span>
 				</div>
 			</div>
-			<div class="coupon-use-condition">
-				<div><span>使用条件:</span></div>
-				<div><span>银联（62开头）持卡人在莎莎香港或澳门门店（除SHINE by Sa Sa以外）购买SUISSE PROGRAMME产品，单笔消费金额满500港币立减250港币</span></div>
+			<div class="coupon-use-condition" v-if="coupon != null && coupon.needKnow != ''">
+				<div><span>使用须知:</span></div>
+				<div><span>{{coupon.needKnow}}</span></div>
 			</div>
-			<div class="coupon-content">
+			<div class="coupon-content" v-if="coupon != null">
 				<div>
-					<article class="html_1XgRZFOt">
-						<p><span style="font-size: 0.14rem">【港澳地区】莎莎Suisse Programme银联卡消费满港币/澳门币700立减港币/澳门币250</span>
-						</p>
-						<p><span style="font-size: 0.14rem">【活动范围】所有银联卡（卡号以62开头）</span></p>
-						<p><span style="font-size: 0.14rem">【活动地点】莎莎香港及澳门所有门店</span></p>
-						<p>
-							<span style="font-size: 0.14rem">
-								【活动内容】优惠活动期内，银联持卡人在莎莎香港或澳门门店以银联卡购买单件或同一系列的Suisse
-								Programme产品，购买单一产品或单组产品每笔消费金额满港币或澳门币700元及经验证莎莎专属优惠二维码/条形码后，单笔消费金额立减港币或澳门币250元。
-							</span>
-						</p>
-						<p><span style="font-size: 0.14rem">【活动细则】&nbsp;</span></p>
-						<p>
-							<span style="font-size: 0.14rem">
-								1.活动时间：
-								<span style="font-size: 0.14rem">即日起至2020年05月31日</span>
-							</span>
-						</p>
-						<p><span style="font-size: 0.14rem">2.具体电子优惠券可使用时间以券显示有效期为准，单笔交易仅可使用一张电子优惠券。</span></p>
-						<p><span style="font-size: 0.14rem">3.电子优惠券数量有限，先到先得。</span></p>
-						<p><span style="font-size: 0.14rem">4.此优惠只适用于购买Suisse Programme系列产品。</span></p>
-						<p><span style="font-size: 0.14rem">5.每一62银联卡持卡人于同一交易日内最多只可用1张莎莎专属优惠劵。</span></p>
-						<p><span style="font-size: 0.14rem">6.每张莎莎电子优惠券仅可使用一次，不可拆分，不能提现。</span></p>
-						<p><span style="font-size: 0.14rem">7.必须于付款前声明使用且主动出示电子优惠券。</span></p>
-						<p><span style="font-size: 0.14rem">8.该优惠不适用于购买礼券、联合推广换购产品、美容疗程，发型服务，餐饮服务，批发产品以及指定正价货品。</span>
-						</p>
-						<p><span style="font-size: 0.14rem">9.该优惠不可与莎莎贵宾卡会员折扣优惠、其他银联优惠、其他信用卡之额外折扣、现金券或其他推广优惠同时使用。</span>
-						</p>
-						<p><span style="font-size: 0.14rem">10.如交易发生退款或退货，仅退还持卡人实际支付的金额，并不包含优惠金额。</span></p>
-						<p><span style="font-size: 0.14rem">11.如退货后适用商品金额未达到活动指定金额，将不能享用此电子优惠券。</span></p>
-						<p><span style="font-size: 0.14rem">12.已使用的电子优惠券即时失效，如发生退货交易，电子优惠券将不获返还。</span></p>
-						<p><span style="font-size: 0.14rem">13.可兑换券数量有限，按实际交易发生顺序计算，额满活动即止。</span></p>
-						<p><span style="font-size: 0.14rem">14.活动详情以店内信息为准。</span></p>
-						<p><br /></p>
+					<article class="html_1XgRZFOt" v-html="coupon.intro">
 					</article>
 				</div>
 			</div>
 		</div>
-	</div>
+		<div style="height: 15px;">
+			</div?>
+		</div>
 </template>
 
 <script>
@@ -101,7 +70,8 @@
 		data() {
 			return {
 				title: '优惠券详情',
-				code: '622812550451042645',
+				showCodeFlag: false,
+				code: '000000000',
 				barcodeOption: {
 					displayValue: true, //是否默认显示条形码数据 //textPosition  :'top', //条形码数据显示的位置
 					background: '#fff', //条形码背景颜色
@@ -126,12 +96,25 @@
 					//  background:"#eee",//设置条形码的背景
 					//  lineColor:"#2196f3",//设置条和文本的颜色。
 					//  margin:15//设置条形码周围的空白边距
-				}
+				},
+				coupon: null,
+				shop: null,
+				couponId: null,
+				imgPath: '',
+				beginDate: '',
+				endDate: ''
 			};
 		},
 		created() {},
 		mounted() {
-			this.qrcode(); //调用二维码生成的方法
+			let vm = this;
+			let {
+				couponId
+			} = this.$route.query;
+			vm.couponId = couponId;
+			this.$nextTick(function() {
+				vm.findData();
+			});
 		},
 		methods: {
 			qrcode() {
@@ -143,7 +126,34 @@
 					text: this.code,
 					colorDark: '#000000'
 				});
+			},
+			findData() {
+				let vm = this;
+				let params = {
+					req_type: 'query_coupon_detail',
+					data: {
+						couponId: vm.couponId
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.coupon = res.data.coupon;
+						vm.shop = res.data.shop;
+						vm.imgPath = res.data.imgPath;
+						vm.beginDate = res.data.beginDate;
+						vm.endDate = res.data.endDate;
+						//
+						// vm.code = "99";
+						// vm.showCodeFlag = true;
+						vm.$nextTick(function() {
+							vm.qrcode(); //调用二维码生成的方法
+						});
+					} else {
+						Toast(res.resp_desc);
+					}
+				});
 			}
+
 		}
 	};
 </script>
@@ -330,6 +340,10 @@
 	}
 
 	.coupon-content {
-		line-height: 20px;
+		/* line-height: 20px; */
+	}
+	
+	.coupon{
+		z-index: 0;
 	}
 </style>
