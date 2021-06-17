@@ -13,13 +13,17 @@
 							<span>{{ item.start_time }}-{{ item.end_time }}</span>
 						</div>
 					</div>
-					<div @click="toPage(1,item.coupon_id)" class="coupon-use"
+					<!-- <div @click="toPage(1,item.coupon_id)" class="coupon-use"
 						v-if="item.appoint_type ==2 && item.now_use_date == 0 ">
 						<span>点击领取</span>
 						<span>{{ item.count_get }}领取</span>
 					</div>
 					<div @click="toPage(0,item.coupon_id)" class="coupon-use" v-else>
 						<span>点击使用</span>
+						<span>{{ item.count_get }}领取</span>
+					</div> -->
+					<div @click="toPage(0,item.coupon_id)" class="coupon-use">
+						<span>点击查看</span>
 						<span>{{ item.count_get }}领取</span>
 					</div>
 				</div>

@@ -3,74 +3,58 @@
 		<div>
 			<Head :title="title" />
 		</div>
-		<div class="coupon-div">
-			<div style="height: 45px;"></div>
-			<div class="coupon" :style="{ height: screenHeight + 'px' }">
-				<div class="shop-info" v-if="shop != null">
-					<div>
-						<span><img :src="imgPath+shop.shopLogo" /></span>
-						<span>{{shop.shopName}}</span>
-					</div>
-				</div>
+		<div class="coupon">
+			<div class="shop-info" v-if="shop != null">
 				<div>
-					<CouponLine />
+					<span><img :src="imgPath+shop.shopLogo" /></span>
+					<span>{{shop.shopName}}</span>
 				</div>
-				<div class="title" v-if="coupon != null">
-					<div><span>{{coupon.couponName}}</span></div>
-					<div><span>{{coupon.title}}</span></div>
+			</div>
+			<div>
+				<CouponLine />
+			</div>
+			<div class="title" v-if="coupon != null">
+				<div><span>{{coupon.couponName}}</span></div>
+				<div><span>{{coupon.title}}</span></div>
+			</div>
+			<div class="coupon-code" v-show="showCodeFlag">
+				<div class="barcode">
+					<barcode :value="code" :options="barcodeOption" tag="svg"></barcode>
 				</div>
-				<div class="coupon-code" v-show="showCodeFlag">
-					<div class="barcode">
-						<barcode :value="code" :options="barcodeOption" tag="svg"></barcode>
-					</div>
-					<div class="qrcode">
-						<div id="qrcode"></div>
-					</div>
-					<div class="qrcode-desc">
-						<span>出示二维码给店员核销</span>&nbsp;
-						<span style="color: #008000;text-decoration: underline;">
-							<van-icon name="replay" />刷新
-						</span>
-					</div>
+				<div class="qrcode">
+					<div id="qrcode"></div>
 				</div>
+				<div class="qrcode-desc"><span>长按优惠码复制或出示二维码给店员核销</span></div>
+			</div>
+			<div>
+				<CouponLine />
+			</div>
+			<div class="coupon-detail"><span>优惠券详情</span></div>
+			<div class="coupon-effect" v-if="coupon != null">
+				<div><span>领取时间:</span></div>
 				<div>
-					<CouponLine />
+					<span>{{beginDate}}</span>
+					<span>&nbsp;至&nbsp;</span>
+					<span>{{endDate}}</span>
 				</div>
-				<div class="dowm-qr" v-if="!showCodeFlag && coupon != null && coupon.appointType == 2">
-					<!-- 指定使用时间 -->
-					<div @click="downQr"><span>领取</span></div>
-				</div>
-				<div class="dowm-qr" v-if="!showCodeFlag && coupon != null && coupon.appointType != 2">
-					<!-- 按过期时间 -->
-					<div @click="downQr"><span>领取</span></div>
-					<div @click="downQr"><span>使用</span></div>
-				</div>
-				<div class="coupon-detail"><span>优惠券详情</span></div>
-				<div class="coupon-effect" v-if="coupon != null">
-					<div><span>领取时间:</span></div>
-					<div>
-						<span>{{beginDate}}</span>
-						<span>&nbsp;至&nbsp;</span>
-						<span>{{endDate}}</span>
-					</div>
-				</div>
-				<div class="limit-use-day" v-if="coupon != null && coupon.appointType == 2">
-					<span style="text-decoration: underline;color: #008000;">限 {{appointDate}} 当天使用</span>
-				</div>
-				<div class="coupon-use-condition" v-if="coupon != null && coupon.needKnow != ''">
-					<div><span>使用须知:</span></div>
-					<div><span>{{coupon.needKnow}}</span></div>
-				</div>
-				<div class="coupon-content" v-if="coupon != null">
-					<div>
-						<article class="html_1XgRZFOt" v-html="coupon.intro"></article>
-					</div>
+			</div>
+			<div class="limit-use-day" v-if="coupon != null && coupon.appointType == 2">
+				<span>限 {{beginDate}} 当天使用</span>
+			</div>
+			<div class="coupon-use-condition" v-if="coupon != null && coupon.needKnow != ''">
+				<div><span>使用须知:</span></div>
+				<div><span>{{coupon.needKnow}}</span></div>
+			</div>
+			<div class="coupon-content" v-if="coupon != null">
+				<div>
+					<article class="html_1XgRZFOt" v-html="coupon.intro">
+					</article>
 				</div>
 			</div>
 		</div>
-
-		<div style="height: 15px;"></div>
-	</div>
+		<div style="height: 15px;">
+			</div?>
+		</div>
 </template>
 
 <script>
@@ -91,7 +75,6 @@
 				title: '优惠券详情',
 				showCodeFlag: false,
 				code: '000000000',
-				screenHeight: 0,
 				barcodeOption: {
 					displayValue: true, //是否默认显示条形码数据 //textPosition  :'top', //条形码数据显示的位置
 					background: '#fff', //条形码背景颜色
@@ -122,15 +105,10 @@
 				couponId: null,
 				imgPath: '',
 				beginDate: '',
-				endDate: '',
-				appointDate: '',
-				qrId: -1
+				endDate: ''
 			};
 		},
-		created() {
-			var h = document.documentElement.clientHeight || document.body.clientHeight;
-			this.screenHeight = h - 90;
-		},
+		created() {},
 		mounted() {
 			let vm = this;
 			let {
@@ -140,7 +118,6 @@
 			this.$nextTick(function() {
 				vm.findData();
 			});
-
 		},
 		methods: {
 			qrcode() {
@@ -168,20 +145,15 @@
 						vm.imgPath = res.data.imgPath;
 						vm.beginDate = res.data.beginDate;
 						vm.endDate = res.data.endDate;
-						vm.appointDate = res.data.appointDate;
-						vm.qrId = res.data.qrId;
 						//
+						// vm.code = "99";
+						// vm.showCodeFlag = true;
+						vm.$nextTick(function() {
+							vm.qrcode(); //调用二维码生成的方法
+						});
 					} else {
 						Toast(res.resp_desc);
 					}
-				});
-			},
-			downQr() {
-				let vm = this;
-				vm.code = "999999999";
-				vm.showCodeFlag = true;
-				vm.$nextTick(function() {
-					vm.qrcode(); //调用二维码生成的方法
 				});
 			}
 
@@ -198,24 +170,18 @@
 		background-color: #008000;
 		font-size: 14px;
 		color: #323233;
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
 		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
 	}
 
 	.coupon {
 		color: #464c5b;
 		background-color: #ffffff;
+		margin-bottom: 10px;
+		overflow: hidden;
 		padding: 5px 0px;
 		margin: 15px 15px;
 		border-radius: 20px;
-		overflow: hidden;
-		position: relative;
-		overflow-y: scroll;
 	}
-
 
 	.shop-info {
 		overflow: hidden;
@@ -379,25 +345,10 @@
 	.limit-use-day {
 		padding: 0 10px 18px 10px;
 		font-size: 14px;
-
+		
 	}
-
-	.coupon {
+	
+	.coupon{
 		z-index: 0;
-	}
-
-	/*  */
-	.dowm-qr {
-		text-align: center;
-	}
-
-	.dowm-qr>div {
-		border: 2px solid #008000;
-		width: 50%;
-		border-radius: 5px;
-		margin: 0 auto;
-		height: 25px;
-		line-height: 25px;
-		margin-bottom: 20px;
 	}
 </style>
