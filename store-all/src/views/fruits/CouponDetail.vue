@@ -29,30 +29,40 @@
 					<div class="qrcode-desc">
 						<span>出示二维码给店员核销</span>&nbsp;
 						<span style="color: #008000;text-decoration: underline;">
-							<van-icon name="replay" />刷新
+							<van-icon name="replay" @click="refreshQr"/>刷新
 						</span>
+					</div>
+					<div class="qrcode-desc">
+						<span>{{changeCodeOutTime}}</span>&nbsp;
 					</div>
 				</div>
 				<div>
 					<CouponLine />
 				</div>
-				<div class="dowm-qr" v-if="!showCodeFlag && coupon != null && coupon.appointType == 2">
-					<!-- 指定使用时间 -->
+				<div class="dowm-qr" v-if="qrId == 0 || qrId == -1">
 					<div @click="downQr"><span>领取</span></div>
 				</div>
-				<div class="dowm-qr" v-if="!showCodeFlag && coupon != null && coupon.appointType != 2">
-					<!-- 按过期时间 -->
-					<div @click="downQr"><span>领取</span></div>
-					<div @click="downQr"><span>使用</span></div>
+				<div class="dowm-qr" v-if="qrId > 0 && !showCodeFlag ">
+					<div @click="toQrDetailPage('myCouponDetail')">
+						<span>
+							已领取
+							<span class="to-coupon">
+								<van-icon name="arrow" />
+							</span>
+						</span>
+					</div>
 				</div>
 				<div class="coupon-detail"><span>优惠券详情</span></div>
 				<div class="coupon-effect" v-if="coupon != null">
-					<div><span>领取时间:</span></div>
 					<div>
-						<span>{{beginDate}}</span>
-						<span>&nbsp;至&nbsp;</span>
-						<span>{{endDate}}</span>
+						<div style="color: #464c5b;"><span>领取时间:</span></div>
+						<div>
+							<span>{{beginDate}}</span>
+							<span>&nbsp;至&nbsp;</span>
+							<span>{{endDate}}</span>
+						</div>
 					</div>
+
 				</div>
 				<div class="limit-use-day" v-if="coupon != null && coupon.appointType == 2">
 					<span style="text-decoration: underline;color: #008000;">限 {{appointDate}} 当天使用</span>
@@ -90,7 +100,7 @@
 			return {
 				title: '优惠券详情',
 				showCodeFlag: false,
-				code: '000000000',
+				code: '000000000000000',
 				screenHeight: 0,
 				barcodeOption: {
 					displayValue: true, //是否默认显示条形码数据 //textPosition  :'top', //条形码数据显示的位置
@@ -102,20 +112,6 @@
 					height: '55px',
 					fontSize: '16px', //字体大小
 					fontOptions: 'bold'
-					// format: "CODE39",//选择要使用的条形码类型
-					//  width:3,//设置条之间的宽度
-					//  height:100,//高度
-					//  displayValue:true,//是否在条形码下方显示文字
-					//  text:"456",//覆盖显示的文本
-					//  fontOptions:"bold italic",//使文字加粗体或变斜体
-					//  font:"fantasy",//设置文本的字体
-					//  textAlign:"left",//设置文本的水平对齐方式
-					//  textPosition:"top",//设置文本的垂直位置
-					//  textMargin:5,//设置条形码和文本之间的间距
-					//  fontSize:15,//设置文本的大小
-					//  background:"#eee",//设置条形码的背景
-					//  lineColor:"#2196f3",//设置条和文本的颜色。
-					//  margin:15//设置条形码周围的空白边距
 				},
 				coupon: null,
 				shop: null,
@@ -124,7 +120,9 @@
 				beginDate: '',
 				endDate: '',
 				appointDate: '',
-				qrId: -1
+				qrId: -1,
+				changeCodeOutTime:'',
+				nowUseDate:0
 			};
 		},
 		created() {
@@ -140,7 +138,6 @@
 			this.$nextTick(function() {
 				vm.findData();
 			});
-
 		},
 		methods: {
 			qrcode() {
@@ -169,6 +166,7 @@
 						vm.beginDate = res.data.beginDate;
 						vm.endDate = res.data.endDate;
 						vm.appointDate = res.data.appointDate;
+						vm.nowUseDate = res.data.nowUseDate;
 						vm.qrId = res.data.qrId;
 						//
 					} else {
@@ -178,10 +176,48 @@
 			},
 			downQr() {
 				let vm = this;
-				vm.code = "999999999";
-				vm.showCodeFlag = true;
-				vm.$nextTick(function() {
-					vm.qrcode(); //调用二维码生成的方法
+				let params = {
+					req_type: 'down_qr_coupon',
+					data: {
+						couponId: vm.couponId,
+						recodeState:1
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.code = res.data.changeCode;
+						vm.qrId = res.data.qrId;
+						vm.changeCodeOutTime = res.data.changeCodeOutTime;
+						if(vm.coupon.appointType == 2 && vm.nowUseDate == 0){
+							// 指定使用日期  且不是当天
+							return;
+						}
+						vm.showCodeFlag = true;
+						vm.$nextTick(function() {
+							vm.qrcode(); //调用二维码生成的方法
+						});
+					} else {
+						Toast(res.resp_desc);
+					}
+				});
+			},
+			toQrDetailPage(url) {
+				this.$router.push(url + "?qrId=" + this.qrId);
+			},
+			refreshQr() {
+				let vm = this;
+				let params = {
+					req_type: 'refresh_qr_time',
+					data: {
+						qrId: vm.qrId
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.changeCodeOutTime = res.data.time;
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			}
 
@@ -346,12 +382,6 @@
 		padding-top: 3px;
 	}
 
-	.coupon-effect,
-	.coupon-use-condition {
-		padding: 0 10px;
-		padding-bottom: 20px;
-	}
-
 	.coupon-detail {
 		padding: 0 10px 18px 10px;
 		font-size: 14px;
@@ -368,6 +398,12 @@
 	.coupon-use-condition>div:first-child {
 		color: #464c5b;
 		padding-bottom: 8px;
+	}
+	
+	.coupon-effect,
+	.coupon-use-condition {
+		padding: 0 10px;
+		padding-bottom: 20px;
 	}
 
 	.coupon-effect>div:last-child,
@@ -399,5 +435,18 @@
 		height: 25px;
 		line-height: 25px;
 		margin-bottom: 20px;
+
+	}
+
+	.dowm-qr>div>span {
+		position: relative;
+	}
+
+	.to-coupon {
+		display: block;
+		width: 10px;
+		position: absolute;
+		top: -2px;
+		right: -10px;
 	}
 </style>

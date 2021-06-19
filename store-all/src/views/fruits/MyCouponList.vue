@@ -13,18 +13,24 @@
 		</div>
 		<div style="clear: both;height: 43px;width: 100%;"></div>
 		<div class="coupon">
-			<div class="coupon-list" v-for="(item, index) in couponList" :key="item.couponId">
+			<div class="coupon-list" v-for="(item, index) in qrList" :key="index">
 				<div class="coupon-content">
-					<div class="coupon-img"><img :src="item.couponImg" /></div>
+					<div class="coupon-img"><img :src="item.coupon_img" /></div>
 					<div class="coupon-title">
-						<span>{{ item.couponName }}</span>
-						<span>{{ item.couponBegin }}-{{ item.couponEnd }}</span>
+						<span>{{ item.coupon_name }}</span>
+						<span v-if="item.appoint_type == 2">限当日使用：{{item.change_out_date}}</span>
+						<span v-if="item.appoint_type != 2">有效期至：{{item.change_out_date}}</span>
 					</div>
 				</div>
-				<div class="coupon-use" @click="toPage('myCouponDetail')">
-					<div><span :style="{ color: onClickStatus == 0 ? '#008000' : '#9ea7b4' }">立即使用</span></div>
+				<div class="coupon-use" @click="toQRDetailPage(item.id)">
+					<div v-if="onClickStatus == 1"><span style="color:#008000;">立即使用</span></div>
+					<div v-if="onClickStatus == 2"><span style="color:#9ea7b4;">已使用</span></div>
+					<div v-if="onClickStatus == 4"><span style="color:#9ea7b4;">已失效</span></div>
 				</div>
 			</div>
+		</div>
+		<div v-if="qrList.length == 0 && onClickStatus == 1" class="no-data">
+			<span style="text-decoration: underline;" @click="toPage('couponList')">空空如也 &gt;&gt;</span>
 		</div>
 	</div>
 </template>
@@ -43,49 +49,70 @@
 			return {
 				title: '我的优惠券',
 				tabList: [],
-				couponList: [],
-				onClickStatus: 0,
-				active: 0,
-				testId: 0
+				list: [],
+				qrList: [],
+				onClickStatus: 1,
+				active: 0
 			};
 		},
 		created() {
 			this.tabList = [{
 					tabId: 1,
-					status: 0,
+					status: 1,
 					tabName: '未使用'
 				},
 				{
 					tabId: 2,
-					status: 1,
+					status: 2,
 					tabName: '已使用'
 				},
 				{
 					tabId: 3,
-					status: 2,
+					status: 4,
 					tabName: '已失效'
 				}
 			];
-
-			for (let i = 0; i < 10; i++) {
-				this.testId = this.testId + 1;
-				var obj = {
-					couponId: this.testId,
-					couponName: this.testId + '莎莎SUISSE 产品满700立减250优惠券',
-					couponImg: 'https://img.yzcdn.cn/vant/apple-2.jpg',
-					couponGet: 563253,
-					couponBegin: '2020.01.01',
-					couponEnd: '2020.02.02'
-				};
-				this.couponList.push(obj);
-			}
+		},
+		mounted: function() {
+			this.$nextTick(function() {
+				this.findData();
+			});
 		},
 		methods: {
 			onChange(index) {
 				this.onClickStatus = this.tabList[index].status;
+				this.initData()
+			},
+			findData() {
+				let vm = this;
+				let params = {
+					req_type: 'query_user_qr_list',
+					data: {}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.list = res.data.list;
+						vm.initData()
+					} else {
+						Toast(res.resp_desc);
+					}
+				});
+			},
+			initData() {
+				let vm = this;
+				vm.qrList = [];
+				for (var i = 0; i < vm.list.length; i++) {
+					var status = vm.list[i].recode_state;
+					if (status == vm.onClickStatus) {
+						vm.qrList.push(vm.list[i]);
+					}
+				}
 			},
 			toPage(path) {
 				this.$router.push(path);
+			},
+			toQRDetailPage(id) {
+				this.$router.push("myCouponDetail?qrId=" + id);
 			}
 		}
 	};
@@ -141,6 +168,7 @@
 		border: 1px solid #c3cbd6;
 		border-radius: 5px 10px 10px 5px;
 		border-right: 1px dashed #e1e1e1;
+		width: 100%;
 	}
 
 	.coupon-img,
@@ -162,6 +190,7 @@
 		font-weight: bold;
 		padding: 5px 5px 0 5px;
 		font-size: 14px;
+		line-height: 17px;
 	}
 
 	.coupon-title>span:last-child {
@@ -194,5 +223,9 @@
 		text-align: center;
 		color: #008000;
 		line-height: 5rem;
+	}
+	
+	.no-data{
+		text-align: center;
 	}
 </style>

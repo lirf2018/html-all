@@ -179,6 +179,7 @@
 		font-weight: bold;
 		padding: 5px 5px 0 5px;
 		font-size: 12px;
+		line-height: 17px;
 	}
 
 	.coupon-title>span:last-child {

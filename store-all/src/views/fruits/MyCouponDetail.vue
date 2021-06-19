@@ -3,61 +3,43 @@
 		<div>
 			<Head :title="title" />
 		</div>
-		<div class="coupon">
+		<div class="coupon" v-if="qr != null">
 			<div>
 				<div class="coupon-img">
-					<div><img src="https://img.yzcdn.cn/vant/cat.jpeg" /></div>
+					<div><img :src="imgPath+qr.couponImg" /></div>
 				</div>
 				<div class="coupon-title">
-					<span>莎莎SUISSE 产品满700立减250优惠券优惠券</span>
-					<span>有效期：2019.09.03-2022.03.03</span>
-					<span>状态：已使用</span>
+					<span>{{qr.couponName}}</span>
+					<span v-if="qr.appointType == 2 && qr.recodeState != 4">当日有效：{{changeOutDate}}</span>
+					<span v-if="qr.appointType != 2 && qr.recodeState != 4">有效期至：{{changeOutDate}}</span>
+					<span>状态：{{recodeStateName}}</span>
 				</div>
 			</div>
 		</div>
-		<div class="coupon-code">
+		<div class="coupon-code" v-show="qr != null && qr.recodeState == 1">
 			<div class="barcode">
 				<barcode :value="code" :options="barcodeOption" tag="svg"></barcode>
 			</div>
 			<div class="qrcode">
 				<div id="qrcode"></div>
 			</div>
-			<div class="qrcode-desc"><span>长按优惠码复制或出示二维码给店员核销</span></div>
+			<div class="qrcode-desc">
+				<span>出示二维码给店员核销</span>&nbsp;
+				<span style="color: #008000;text-decoration: underline;">
+					<van-icon name="replay" @click="refreshQr" />刷新
+				</span>
+			</div>
+			<div class="qrcode-desc">
+				<span>{{changeCodeOutTime}}</span>&nbsp;
+			</div>
 		</div>
-		<div class="coupon-content">
+		<div class="coupon-use-condition" v-if="qr != null && qr.needKnow != ''">
+			<div><span>使用须知:</span></div>
+			<div><span>{{qr.needKnow}}</span></div>
+		</div>
+		<div class="coupon-content" v-if="qr != null">
 			<div>
-				<article class="html_1XgRZFOt">
-					<p><span style="font-size: 0.14rem">【港澳地区】莎莎Suisse Programme银联卡消费满港币/澳门币700立减港币/澳门币250</span></p>
-					<p><span style="font-size: 0.14rem">【活动范围】所有银联卡（卡号以62开头）</span></p>
-					<p><span style="font-size: 0.14rem">【活动地点】莎莎香港及澳门所有门店</span></p>
-					<p>
-						<span style="font-size: 0.14rem">
-							【活动内容】优惠活动期内，银联持卡人在莎莎香港或澳门门店以银联卡购买单件或同一系列的Suisse
-							Programme产品，购买单一产品或单组产品每笔消费金额满港币或澳门币700元及经验证莎莎专属优惠二维码/条形码后，单笔消费金额立减港币或澳门币250元。
-						</span>
-					</p>
-					<p><span style="font-size: 0.14rem">【活动细则】&nbsp;</span></p>
-					<p>
-						<span style="font-size: 0.14rem">
-							1.活动时间：
-							<span style="font-size: 0.14rem">即日起至2020年05月31日</span>
-						</span>
-					</p>
-					<p><span style="font-size: 0.14rem">2.具体电子优惠券可使用时间以券显示有效期为准，单笔交易仅可使用一张电子优惠券。</span></p>
-					<p><span style="font-size: 0.14rem">3.电子优惠券数量有限，先到先得。</span></p>
-					<p><span style="font-size: 0.14rem">4.此优惠只适用于购买Suisse Programme系列产品。</span></p>
-					<p><span style="font-size: 0.14rem">5.每一62银联卡持卡人于同一交易日内最多只可用1张莎莎专属优惠劵。</span></p>
-					<p><span style="font-size: 0.14rem">6.每张莎莎电子优惠券仅可使用一次，不可拆分，不能提现。</span></p>
-					<p><span style="font-size: 0.14rem">7.必须于付款前声明使用且主动出示电子优惠券。</span></p>
-					<p><span style="font-size: 0.14rem">8.该优惠不适用于购买礼券、联合推广换购产品、美容疗程，发型服务，餐饮服务，批发产品以及指定正价货品。</span></p>
-					<p><span style="font-size: 0.14rem">9.该优惠不可与莎莎贵宾卡会员折扣优惠、其他银联优惠、其他信用卡之额外折扣、现金券或其他推广优惠同时使用。</span></p>
-					<p><span style="font-size: 0.14rem">10.如交易发生退款或退货，仅退还持卡人实际支付的金额，并不包含优惠金额。</span></p>
-					<p><span style="font-size: 0.14rem">11.如退货后适用商品金额未达到活动指定金额，将不能享用此电子优惠券。</span></p>
-					<p><span style="font-size: 0.14rem">12.已使用的电子优惠券即时失效，如发生退货交易，电子优惠券将不获返还。</span></p>
-					<p><span style="font-size: 0.14rem">13.可兑换券数量有限，按实际交易发生顺序计算，额满活动即止。</span></p>
-					<p><span style="font-size: 0.14rem">14.活动详情以店内信息为准。</span></p>
-					<p><br /></p>
-				</article>
+				<article class="html_1XgRZFOt" v-html="qr.intro"></article>
 			</div>
 		</div>
 		<div style="height: 15px;"></div>
@@ -78,37 +60,39 @@
 		data() {
 			return {
 				title: '我的优惠券详情', //我的优惠券详情
-				code: '622812550451042645',
+				code: '000000000000000',
 				barcodeOption: {
 					displayValue: true, //是否默认显示条形码数据 //textPosition  :'top', //条形码数据显示的位置
 					background: '#fff', //条形码背景颜色
 					valid: function(valid) {
-						console.log(valid);
+
 					},
 					width: '2px', //单个条形码的宽度
 					height: '55px',
 					fontSize: '16px', //字体大小
 					fontOptions: 'bold'
-					// format: "CODE39",//选择要使用的条形码类型
-					//  width:3,//设置条之间的宽度
-					//  height:100,//高度
-					//  displayValue:true,//是否在条形码下方显示文字
-					//  text:"456",//覆盖显示的文本
-					//  fontOptions:"bold italic",//使文字加粗体或变斜体
-					//  font:"fantasy",//设置文本的字体
-					//  textAlign:"left",//设置文本的水平对齐方式
-					//  textPosition:"top",//设置文本的垂直位置
-					//  textMargin:5,//设置条形码和文本之间的间距
-					//  fontSize:15,//设置文本的大小
-					//  background:"#eee",//设置条形码的背景
-					//  lineColor:"#2196f3",//设置条和文本的颜色。
-					//  margin:15//设置条形码周围的空白边距
-				}
+				},
+				qrId: -1,
+				qr: null,
+				imgPath: '',
+				changeCodeOutTime: '', // 卡券码有刷新有效时间
+				changeOutDate: '',
+				nowUseDate: 0,
+				recodeStateName:''
 			};
 		},
 		created() {},
 		mounted() {
-			this.qrcode(); //调用二维码生成的方法
+			let vm = this;
+			let {
+				qrId
+			} = this.$route.query;
+			vm.qrId = qrId;
+			if (qrId > 0) {
+				this.$nextTick(function() {
+					vm.findData();
+				});
+			}
 		},
 		methods: {
 			qrcode() {
@@ -119,6 +103,48 @@
 					height: 150,
 					text: this.code,
 					colorDark: '#000000'
+				});
+			},
+			findData() {
+				let vm = this;
+				let params = {
+					req_type: 'query_qr_detail',
+					data: {
+						qrId: vm.qrId
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.qr = res.data.couponDownQr;
+						vm.imgPath = res.data.imgPath;
+						vm.changeOutDate = res.data.changeOutDate;
+						vm.changeCodeOutTime = res.data.time;
+						vm.nowUseDate = res.data.nowUseDate;
+						vm.recodeStateName = res.data.recodeStateName;
+						vm.code = vm.qr.changeCode;
+						//
+						vm.$nextTick(function() {
+							vm.qrcode();
+						});
+					} else {
+						Toast(res.resp_desc);
+					}
+				});
+			},
+			refreshQr() {
+				let vm = this;
+				let params = {
+					req_type: 'refresh_qr_time',
+					data: {
+						qrId: vm.qrId
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.changeCodeOutTime = res.data.time;
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			}
 		}
@@ -166,7 +192,7 @@
 
 	.coupon-img img {
 		width: 100%;
-		height: auto;
+		height: 75px;
 		display: block;
 	}
 
@@ -183,7 +209,7 @@
 
 	.coupon-title>span:first-child {
 		font-size: 14px;
-		color: #464c5b;
+		color: #000000;
 		display: -webkit-box;
 		/* -webkit-box-orient: vertical; */
 		/*! autoprefixer: off */
@@ -191,7 +217,8 @@
 		/* autoprefixer: on */
 		-webkit-line-clamp: 2;
 		overflow: hidden;
-		line-height: 20px;
+		line-height: 18px;
+		margin-bottom: 3px;
 	}
 
 	.coupon-title>span:last-child {
@@ -224,7 +251,7 @@
 	}
 
 	.qrcode-desc {
-		color: #464c5b;
+		color: #9ea7b4;
 		font-size: 12px;
 	}
 
@@ -232,5 +259,23 @@
 		color: #464c5b;
 		font-size: 14px;
 		line-height: 20px;
+	}
+	
+	.coupon-effect>div:first-child,
+	.coupon-use-condition>div:first-child {
+		color: #464c5b;
+		padding-bottom: 8px;
+	}
+	
+	.coupon-effect,
+	.coupon-use-condition {
+		padding: 0 10px;
+		padding-bottom: 20px;
+	}
+	
+	.coupon-effect>div:last-child,
+	.coupon-use-condition>div:last-child {
+		color: #9ea7b4;
+		font-size: 12px;
 	}
 </style>

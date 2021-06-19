@@ -20,13 +20,13 @@
 						<div>
 							<span>优惠券</span>
 							<!-- <span>敬请期待</span> -->
-							<span>3张</span>
+							<span>{{qrCount}}张</span>
 						</div>
 					</div>
 					<div class="cost-div">
 						<div>
-							<span>累计消费</span>
-							<span>{{data.order_price_all}}</span>
+							<span>余额</span>
+							<span>{{data.user_money}}</span>
 						</div>
 					</div>
 				</div>
@@ -46,15 +46,15 @@
 					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc" />
 				</van-grid>
 			</div>
-			<div @click="toPage('bangMemberNum')">
-				<van-cell-group>
-					<van-cell title="我的会员卡" is-link />
-				</van-cell-group>
-			</div>
 			<div @click="toPage('myFruits')">
 				<!-- 对固定会员一次下单，多次不同时间配送场景 -->
 				<van-cell-group>
 					<van-cell title="定制套餐" is-link />
+				</van-cell-group>
+			</div>
+			<div @click="toPage('bangMemberNum')">
+				<van-cell-group>
+					<van-cell title="我的会员卡" is-link />
 				</van-cell-group>
 			</div>
 			<div @click="toPage('tuiGuang')">
@@ -132,12 +132,14 @@
 				tbActive: 3,
 				memberCode: '',
 				show: false,
-				data: null
+				data: null,
+				qrCount: 0
 			};
 		},
 		mounted: function() {
 			this.$nextTick(function() {
 				this.findUserCenter();
+				this.findData();
 			});
 		},
 		methods: {
@@ -189,6 +191,26 @@
 					height: 25,
 					text: '0000',
 					colorDark: '#969799'
+				});
+			},
+			findData() {
+				let vm = this;
+				let params = {
+					req_type: 'query_user_qr_list',
+					data: {}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						let list = res.data.list;
+						for (var i = 0; i < list.length; i++) {
+							var status = list[i].recode_state;
+							if (status == 1) {
+								vm.qrCount++;
+							}
+						}
+					} else {
+						Toast(res.resp_desc);
+					}
 				});
 			}
 		}
