@@ -11,7 +11,7 @@
 		</div>
 		<div class="goods-info" v-if="goodsInfo != null">
 			<div class="goods-name">
-				<span>{{ goodsInfo.goodsName }}</span>
+				<span>{{ goodsInfo.goodsName }}{{goodsInfo.goodsType == 6?'(预约商品)':''}}</span>
 			</div>
 			<div class="goods-prop">
 				<div>
@@ -44,6 +44,15 @@
 				<van-collapse-item title="订购须知">
 					<div>
 						<OrderRead></OrderRead>
+					</div>
+				</van-collapse-item>
+			</van-collapse>
+		</div>
+		<div class="beforeBuy" v-if="null!= goodsInfo && goodsInfo.addGoodsDesc != ''">
+			<van-collapse v-model="activeNames">
+				<van-collapse-item title="商品说明" name='1'>
+					<div style="font-size: 12px;">
+						<span v-html="goodsInfo.addGoodsDesc"></span>
 					</div>
 				</van-collapse-item>
 			</van-collapse>
@@ -88,6 +97,9 @@
 				<!-- <van-goods-action-icon icon="chat-o" text="客服" color="#008000" />
 					<van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
 					<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
+				<van-goods-action-icon
+					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2" icon="cart-o" 
+					text="购物车" :badge="cartCount" @click="toPage('shopCart')"/>
 				<van-goods-action-button
 					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
 					color="#53FF53" text="加入购物车" @click="showNext(0)" />
@@ -181,12 +193,15 @@
 				goodsBannelList: [],
 				goodsInfoList: [],
 				goodsId: null,
-				timeGoodsId: 0
+				timeGoodsId: 0,
+				activeNames: ['1'],
+				cartCount: 0
 			};
 		},
 		mounted: function() {
 			this.$nextTick(function() {
 				this.findGoodsInfo();
+				this.findOrderCartCount();
 			});
 		},
 		methods: {
@@ -285,11 +300,27 @@
 				}; // 参数
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
+						vm.findOrderCartCount();
 						Toast('添加成功');
 					} else {
 						Toast(res.resp_desc);
 					}
 				});
+			},
+			findOrderCartCount() {
+				let vm = this;
+				let params = {
+					req_type: 'find_order_cart_count',
+					data: { userId: 0 }
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.cartCount = res.data.count;
+					}
+				});
+			},
+			toPage(url){
+				this.$router.push(url);
 			}
 		}
 	};
@@ -573,5 +604,9 @@
 		font-weight: normal;
 		padding: 0 15px;
 		padding-top: 5px;
+	}
+
+	>>>.van-tabs__line {
+		z-index: 0;
 	}
 </style>

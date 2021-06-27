@@ -101,6 +101,16 @@
 					<div class="user-remark">
 						<div><input placeholder="用户备注" readonly="readonly" v-model="order.user_remark" /></div>
 					</div>
+					<div class="vant-div">
+						<van-collapse v-model="activeNames">
+							<van-collapse-item title="商品说明" name='1'>
+								<div style="font-size: 12px;">
+									对于预约商品,请从我的 》定制套餐 ，查看和预约取货时间；
+									如果查询不到记录，请联系客服处理。
+								</div>
+							</van-collapse-item>
+						</van-collapse>
+					</div>
 					<div class="vant-div vant-read">
 						<van-collapse v-model="activeName" accordion>
 							<van-collapse-item title="下单必看" name="1">
@@ -155,7 +165,8 @@
 				goodsList: [],
 				orderId: 0,
 				orderNo:'',
-				closeTime: 0
+				closeTime: 0,
+				activeNames: ['1']
 			};
 		},
 		mounted: function() {

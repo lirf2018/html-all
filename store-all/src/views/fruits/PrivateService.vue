@@ -8,34 +8,47 @@
 				<van-tab title="待使用">
 					<van-list v-model="loadingA" :finished="finishedA" finished-text="没有更多了" @load="onLoadA">
 						<div class="item-div">
-							<div style="height: 20px;">
-							</div>
 							<!-- <div class="title">
 								<span>下午15:00 后预约，将安排第二天配送或者自取。</span>
 							</div> -->
 							<div class="items-list items-list-effect-color" v-for=" (item,index) in listTab0"
 								:key="index">
 								<div class="items-title">
-									<span style="text-decoration: underline;">{{item.private_code}}</span>
-									<span>{{item.status == 0?'未预约':'已预约'}}</span>
+									<span class="items-info-name-title" style="text-decoration: underline;">{{item.private_code}}</span>
+									<span class="items-info-value-title">{{item.status == 0?'未预约':'已预约'}}</span>
 								</div>
 								<div class="items-title items-info">
-									<span>付款时间</span>
-									<span>{{item.pay_time}}</span>
+									<span class="items-info-name">商品名称</span>
+									<span class="items-info-value">{{item.goods_name}}</span>
+								</div>
+								<div class="items-title items-info">
+									<span class="items-info-name">付款时间</span>
+									<span class="items-info-value">{{item.pay_time}}</span>
 								</div>
 								<div class="items-title items-info" v-if="item.status == 1">
-									<span>预约时间</span>
-									<span>{{item.reservation_time}}</span>
+									<span class="items-info-name">预约时间</span>
+									<span class="items-info-value">{{item.reservation_time}}</span>
 								</div>
 								<div class="items-title items-info" v-if="item.status == 1">
-									<span>配送时间</span>
-									<span>{{item.get_time}}</span>
+									<span class="items-info-name">配送时间</span>
+									<span class="items-info-value">{{item.get_time}}
+									<span v-if="item.get_time_flag == 1 && item.out_time_flag == 1" style="color: #008000;font-weight: 900;">({{item.flow_status_name}})</span>
+									<span v-if="item.get_time_flag == 0 && item.out_time_flag == 1" >({{item.flow_status_name}})</span>
+									<span v-if="item.out_time_flag == 0" style="color: red;">(已过期)</span></span>
+								</div>
+								<div class="desc">
+									<van-collapse v-model="item.activeName" accordion>
+										<van-collapse-item title="内容">
+											<div class="item-contents" v-html="item.contents">
+											</div>
+										</van-collapse-item>
+									</van-collapse>
 								</div>
 								<div style="text-align: right;margin:10px 15px;">
 									<van-button size="small" color="#008000" v-if="item.status == 0"
 										@click="showPickerPopup(item.id)">预约</van-button>
 									<van-button size="small" color="#008000" v-if="item.status == 1"
-										@click="cancelYuding(item.id)">取消预约</van-button>
+										@click="cancelYuding(item.id,item.get_time)">取消预约</van-button>
 								</div>
 							</div>
 						</div>
@@ -43,24 +56,34 @@
 				</van-tab>
 				<van-tab title="已完成">
 					<van-list v-model="loadingB" :finished="finishedB" finished-text="没有更多了" @load="onLoadB">
-						<div style="height: 40px;">
-						</div>
 						<div class="items-list items-uneffect-color" v-for="(item,index) in listTab1">
 							<div class="items-title">
-								<span>{{item.private_code}}</span>
-								<span>已完成</span>
+								<span class="items-info-name-title" style="text-decoration: underline;">{{item.private_code}}</span>
+								<span class="items-info-value-title">已完成</span>
 							</div>
 							<div class="items-title items-info">
-								<span>付款时间</span>
-								<span>{{item.pay_time}}</span>
+								<span class="items-info-name">商品名称</span>
+								<span class="items-info-value">{{item.goods_name}}</span>
 							</div>
 							<div class="items-title items-info">
-								<span>预约时间</span>
-								<span>{{item.reservation_time}}</span>
+								<span class="items-info-name">付款时间</span>
+								<span class="items-info-value">{{item.pay_time}}</span>
 							</div>
 							<div class="items-title items-info">
-								<span>完成时间</span>
-								<span>{{item.update_time}}</span>
+								<span class="items-info-name">预约时间</span>
+								<span class="items-info-value">{{item.reservation_time}}</span>
+							</div>
+							<div class="items-title items-info">
+								<span class="items-info-name">完成时间</span>
+								<span class="items-info-value">{{item.update_time}}</span>
+							</div>
+							<div class="desc">
+								<van-collapse v-model="item.activeName" accordion>
+									<van-collapse-item title="内容">
+										<div class="item-contents" v-html="item.contents">
+										</div>
+									</van-collapse-item>
+								</van-collapse>
 							</div>
 							<div style="text-align: right;margin:10px 15px;">
 							</div>
@@ -70,8 +93,7 @@
 			</van-tabs>
 		</div>
 		<van-popup v-model="showPicker" round position="bottom">
-			<van-picker show-toolbar title="选择日期" :columns="columns" @cancel="showPicker = false"
-				@confirm="onConfirm" />
+			<ChoseDate :onConfirm="onConfirm" :onCancel="onCancel" />
 		</van-popup>
 
 	</div>
@@ -80,12 +102,14 @@
 <script>
 	import Head from '@/components/Head.vue';
 	import axios from '@/network/request.js';
+	import ChoseDate from '@/components/ChoseDate.vue'
 	import {
 		Toast
 	} from 'vant';
 	export default {
 		components: {
-			Head: Head
+			Head: Head,
+			ChoseDate: ChoseDate
 		},
 		data() {
 			return {
@@ -105,7 +129,8 @@
 				hasNextA: false,
 				currePageB: 1,
 				hasNextB: false,
-				showPicker: false
+				showPicker: false,
+				statusName:''
 			};
 		},
 		mounted() {
@@ -198,6 +223,7 @@
 			initList(list, hasNext) {
 				let vm = this;
 				for (let i = 0; i < list.length; i++) {
+					list[i].activeName=1
 					vm.listTab0.push(list[i]);
 				}
 				vm.loadingA = false;
@@ -205,6 +231,40 @@
 					vm.finishedA = true;
 				}
 			},
+			showPickerPopup(id) {
+				this.showPicker = true;
+				this.getDateList();
+				this.id = id;
+			},
+			cancelYuding(id, time) {
+				let vm = this;
+				this.$dialog
+					.confirm({
+						title: '提示',
+						message: '确认取消预约吗？<br/>取消预约时间：' + time
+					})
+					.then(() => {
+						let params = {
+							req_type: 'cancel_user_private',
+							data: {
+								id: id
+							}
+						}; // 参数
+						axios.post('', params).then(function(res) {
+							if (res.resp_code == 1) {
+								Toast("取消成功");
+								vm.listTab0 = [];
+								vm.currePageA = 1;
+								vm.onLoadA();
+							} else {
+								Toast(res.resp_desc);
+							}
+						}).catch(err => {
+							// this.error = true;
+						})
+					}).catch((e) => {})
+			},
+			// 日期选择
 			onConfirm(value) {
 				let vm = this;
 				this.value = value;
@@ -229,38 +289,8 @@
 					// this.error = true;
 				})
 			},
-			showPickerPopup(id) {
-				this.showPicker = true;
-				this.getDateList();
-				this.id = id;
-			},
-			cancelYuding(id) {
-				let vm = this;
-				this.$dialog
-					.confirm({
-						title: '提示',
-						message: '确认取消预约吗？'
-					})
-					.then(() => {
-						let params = {
-							req_type: 'cancel_user_private',
-							data: {
-								id: id
-							}
-						}; // 参数
-						axios.post('', params).then(function(res) {
-							if (res.resp_code == 1) {
-								Toast("取消成功");
-								vm.listTab0 = [];
-								vm.currePageA = 1;
-								vm.onLoadA();
-							} else {
-								Toast(res.resp_desc);
-							}
-						}).catch(err => {
-							// this.error = true;
-						})
-					})
+			onCancel() {
+				this.showPicker = false;
 			}
 		}
 	};
@@ -278,7 +308,7 @@
 	}
 
 	.item-div {
-		margin-top: 30px;
+		margin-top: 10px;
 	}
 
 	.items-list-effect-color {
@@ -308,28 +338,45 @@
 		padding-top: 10px;
 	}
 
-	.items-title>span:first-child {
+	.items-info-name-title ,.items-info-name {
 		display: block;
 		float: left;
-		width: 50%;
+		width: 30%;
 	}
 
-	.items-title>span:last-child {
+	.items-info-value-title ,.items-info-value {
 		display: block;
 		float: right;
-		width: 50%;
+		width:70%;
 		text-align: right;
 	}
 
 	.items-info {
 		color: grey;
 	}
+	
+	.desc{
+		overflow: auto;
+		position: relative;
+		clear: both;
+		
+	}
+	
+	.item-contents{
+		font-size: 12px;
+		border: 1px solid #ebedf0;
+		padding: 0 5px;
+	}
+	
+	.desc>>>.van-cell{
+		color: grey;
+	}
 
-	>>>.van-tabs__wrap,
+	/* >>>.van-tabs__wrap,
 	.van-hairline--top-bottom {
 		position: fixed !important;
 		width: 100%;
 		z-index: 2000;
 		top: 40px;
-	}
+	} */
 </style>

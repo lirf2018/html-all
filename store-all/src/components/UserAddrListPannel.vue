@@ -4,7 +4,7 @@
 			<div class="close-x"><van-icon name="close" @click="closeShowAddrListAddPannelFlag"/></div>
 		</div>
 		<div class="addrs-list">
-			<div style="height: 0px;"></div>
+			<div style="height: 20px;"></div>
 			<div v-for="(item, index) in list" :key="index">
 				<div class="first-name" @click="setParentUserChoseAddr(item.id)">
 					<span>{{ item.first_name }}</span>
@@ -108,9 +108,6 @@
 			},
 			onAdd() {
 				Toast('新增地址');
-			},
-			onEdit(item, index) {
-				Toast('编辑地址:' + index);
 			},
 			toPage(path) {
 				this.$router.push(path);

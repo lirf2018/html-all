@@ -46,7 +46,7 @@
 					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc" />
 				</van-grid>
 			</div>
-			<div @click="toPage('myFruits')">
+			<div @click="toPage('privateService')">
 				<!-- 对固定会员一次下单，多次不同时间配送场景 -->
 				<van-cell-group>
 					<van-cell title="定制套餐" is-link />

@@ -56,7 +56,7 @@ import ShowMain from '@/views/ShowMain.vue';
 import ShopInfo from '@/views/fruits/ShopInfo.vue';
 
 
-import MyFruits from '@/views/fruits/MyFruits.vue';
+import PrivateService from '@/views/fruits/PrivateService.vue';
 
 import test from '@/views/testMenu.vue';
 
@@ -244,8 +244,8 @@ export const pageLink = [
 		path: "/shopInfo",
 		component: ShopInfo
 	}, {
-		path: "/myFruits",
-		component: MyFruits
+		path: "/privateService",
+		component: PrivateService
 	}
 ]
 
