@@ -4,6 +4,7 @@
 			<Head :title="title" />
 		</div>
 		<van-popup v-model="show" position="top" :style="{ height: '25%' }">
+			<div style="height: 45px;"></div>
 			<div class="desc">
 				<p>累计奖励积分：推广人推广的用户，完成特定规则或者任务后，推广人得到的奖励总和，包括已用的和未用的奖励积分。</p>
 			</div>

@@ -14,7 +14,8 @@
 							<div class="items-list items-list-effect-color" v-for=" (item,index) in listTab0"
 								:key="index">
 								<div class="items-title">
-									<span class="items-info-name-title" style="text-decoration: underline;">{{item.private_code}}</span>
+									<span @click="toPage(item.private_code)" class="items-info-name-title"
+										style="text-decoration: underline;">{{item.private_code}}</span>
 									<span class="items-info-value-title">{{item.status == 0?'未预约':'已预约'}}</span>
 								</div>
 								<div class="items-title items-info">
@@ -32,9 +33,11 @@
 								<div class="items-title items-info" v-if="item.status == 1">
 									<span class="items-info-name">配送时间</span>
 									<span class="items-info-value">{{item.get_time}}
-									<span v-if="item.get_time_flag == 1 && item.out_time_flag == 1" style="color: #008000;font-weight: 900;">({{item.flow_status_name}})</span>
-									<span v-if="item.get_time_flag == 0 && item.out_time_flag == 1" >({{item.flow_status_name}})</span>
-									<span v-if="item.out_time_flag == 0" style="color: red;">(已过期)</span></span>
+										<span v-if="item.get_time_flag == 1 && item.out_time_flag == 1"
+											style="color: #008000;font-weight: 900;">({{item.flow_status_name}})</span>
+										<span
+											v-if="item.get_time_flag == 0 && item.out_time_flag == 1">({{item.flow_status_name}})</span>
+										<span v-if="item.out_time_flag == 0" style="color: red;">(已过期)</span></span>
 								</div>
 								<div class="desc">
 									<van-collapse v-model="item.activeName" accordion>
@@ -58,7 +61,8 @@
 					<van-list v-model="loadingB" :finished="finishedB" finished-text="没有更多了" @load="onLoadB">
 						<div class="items-list items-uneffect-color" v-for="(item,index) in listTab1">
 							<div class="items-title">
-								<span class="items-info-name-title" style="text-decoration: underline;">{{item.private_code}}</span>
+								<span class="items-info-name-title" @click="toPage(item.private_code)"
+									style="text-decoration: underline;">{{item.private_code}}</span>
 								<span class="items-info-value-title">已完成</span>
 							</div>
 							<div class="items-title items-info">
@@ -130,7 +134,7 @@
 				currePageB: 1,
 				hasNextB: false,
 				showPicker: false,
-				statusName:''
+				statusName: ''
 			};
 		},
 		mounted() {
@@ -223,7 +227,7 @@
 			initList(list, hasNext) {
 				let vm = this;
 				for (let i = 0; i < list.length; i++) {
-					list[i].activeName=1
+					list[i].activeName = 1
 					vm.listTab0.push(list[i]);
 				}
 				vm.loadingA = false;
@@ -338,37 +342,39 @@
 		padding-top: 10px;
 	}
 
-	.items-info-name-title ,.items-info-name {
+	.items-info-name-title,
+	.items-info-name {
 		display: block;
 		float: left;
 		width: 30%;
 	}
 
-	.items-info-value-title ,.items-info-value {
+	.items-info-value-title,
+	.items-info-value {
 		display: block;
 		float: right;
-		width:70%;
+		width: 70%;
 		text-align: right;
 	}
 
 	.items-info {
 		color: grey;
 	}
-	
-	.desc{
+
+	.desc {
 		overflow: auto;
 		position: relative;
 		clear: both;
-		
+
 	}
-	
-	.item-contents{
+
+	.item-contents {
 		font-size: 12px;
 		border: 1px solid #ebedf0;
 		padding: 0 5px;
 	}
-	
-	.desc>>>.van-cell{
+
+	.desc>>>.van-cell {
 		color: grey;
 	}
 

@@ -43,14 +43,15 @@
 												<div v-if="g.userGoodsCount > 0">
 													<van-stepper input-width="20px" button-size="12px"
 														v-model="g.userGoodsCount" disable-input
+														@overlimit = "overlimit(item.menuId, g.goodsId, g.userGoodsCount)"
 														@change="onChangeGoods(item.menuId, g.goodsId, g.userGoodsCount)" />
 												</div>
 											</div>
 											<div class="click-div" @click="toGoodsDetailPage(g.goodsId,1,g)">
-												
+
 											</div>
 											<div class="click-div2" @click="toGoodsDetailPage(g.goodsId,1,g)">
-												
+
 											</div>
 										</div>
 									</div>
@@ -61,6 +62,12 @@
 				</div>
 			</div>
 		</section>
+		<div class="cart-div">
+			<div @click="toPage('shopCart')">
+				<div class="cart-count"><span>{{cartCount}}</span></div>
+				<van-icon name="shopping-cart-o" />
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -88,7 +95,9 @@
 				scrollY: 0, //实时获取当前y轴的高度
 				clickEvent: false,
 				clickIndex: -1,
-				index: 0
+				index: 0,
+				cartCount: 0,
+				tbActive: '0'
 			}
 		},
 		methods: {
@@ -167,17 +176,17 @@
 						for (var i = 0; i < this.listLeftHeight.length; i++) {
 							// console.log("----h * i * leftHeigth - scrollHeight-----" + (i * leftHeigth - scrollHeight))
 							if (scrollHeight < h) {
-								if(this.index == 0){
+								if (this.index == 0) {
 									let el = leftItems[0]
 									this.lefts.scrollToElement(el, 300)
-									
-								}else{
+
+								} else {
 									let el = leftItems[1]
 									this.lefts.scrollToElement(el, 300)
 								}
 								return
 							} else {
-								let el = leftItems[this.index-1]
+								let el = leftItems[this.index - 1]
 								this.lefts.scrollToElement(el, 300)
 							}
 						}
@@ -233,6 +242,7 @@
 				}; // 参数
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
+						vm.findOrderCartCount();
 						Toast('添加成功');
 					} else {
 						Toast(res.resp_desc);
@@ -253,11 +263,59 @@
 					}
 				});
 			},
+			findOrderCartCount() {
+				let vm = this;
+				let params = {
+					req_type: 'find_order_cart_count',
+					data: { userId: 0 }
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.cartCount = res.data.count;
+					}
+				});
+			},
+			toPage(url){
+				this.$router.push(url);
+			},
+			overlimit(menuId, goodsId, userGoodsCount){
+				let vm = this;
+				let params = {
+					req_type: 'add_order_cart',
+					data: {
+						goods_id: goodsId,
+						goods_count: 0,
+						del_mark: 1
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.findOrderCartCount();
+						vm.initMenuData(menuId, goodsId);
+						Toast('删除成功');
+					} else {
+						Toast(res.resp_desc);
+					}
+				});
+			},
+			initMenuData(menuId, goodsId){
+				let vm = this;
+				this.right.forEach(function(e) {
+					if (menuId == e.menuId) {
+						e.goodsList.forEach(function(e) {
+							if (e.goodsId == goodsId) {
+								e.userGoodsCount = 0;
+							}
+						});
+					}
+				});
+			}
 		},
 		created: function() {},
 		mounted() {
 			this.$nextTick(() => {
 				this.searchGoodsList();
+				this.findOrderCartCount();
 			})
 		},
 		computed: {
@@ -391,7 +449,7 @@
 
 	.goods-contents {
 		/* overflow: hidden; */
-		
+
 	}
 
 	.goods-name-div {
@@ -444,14 +502,41 @@
 	.shop-cart {
 		font-weight: bold;
 	}
-	
+
 	/*  */
-	.click-div{
+	.click-div {
 		height: 60px;
 		width: 55%;
 	}
-	.click-div2{
+
+	.click-div2 {
 		height: 50px;
 		margin-top: 15px;
 	}
+
+	.cart-div {
+		position: fixed;
+		font-weight: bold;
+		bottom: 100px;
+		right: 8px;
+		font-size: 1.8rem;
+		color: #008000;
+	}
+
+	.cart-count {
+		font-size: 0.8rem;
+		position: absolute;
+		right: -3px;
+		top: -10px;
+		color: white;
+		background-color: #008000;
+		border-radius: 50% 50%;
+		-moz-border-radius: 50%;
+		-webkit-border-radius: 50%;
+		width: 18px;
+		height: 18px;
+		line-height: 18px;
+		text-align: center;
+	}
+
 </style>

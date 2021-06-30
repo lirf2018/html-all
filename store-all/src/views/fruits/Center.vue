@@ -10,7 +10,8 @@
 				</div>
 				<div class="user-ql">
 					<div class="jifen-div">
-						<div @click="toPage('/myJifen')">
+						<!-- <div @click="toPage('/myJifen')"> -->
+						<div>
 							<span>积分</span>
 							<!-- <span>敬请期待</span> -->
 							<span>{{data.user_jifen}}</span>
@@ -41,7 +42,7 @@
 				<van-grid>
 					<van-grid-item icon="pending-payment" text="待付款" @click="toOrderListOne(0)"
 						:badge="data.order_dfk" />
-					<van-grid-item icon="send-gift-o" text="确认中" @click="toOrderListOne(2)" :badge="data.order_qrz" />
+					<van-grid-item icon="send-gift-o" text="已付款" @click="toOrderListOne(1)" :badge="data.order_yfk" />
 					<van-grid-item icon="send-gift-o" text="待收货" @click="toOrderListOne(5)" :badge="data.order_dsh" />
 					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc" />
 				</van-grid>
