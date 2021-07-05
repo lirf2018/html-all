@@ -30,7 +30,9 @@
 				let vm = this;
 				let params = {
 					req_type: 'get_date_list',
-					data: {}
+					data: {
+					
+					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {

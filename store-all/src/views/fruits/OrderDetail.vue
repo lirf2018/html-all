@@ -8,6 +8,9 @@
 				<div class="status"><span>待付款</span></div>
 				<div class="status-remark"><span>{{closeTime}}分钟后内未支付，订单将自动消失</span></div>
 			</div>
+			<div class="yuyue" v-if="null!=order && order.order_status != 0 && order.order_status != 7 && order.is_yuding_flag" @click="toPage('privateService')">
+				<span>当前订单含预约商品,请点击查看和预约具体取货时间</span>
+			</div>
 			<div class="user-addr-div" v-if="null!=order">
 				<div>
 					<div><span>订单状态</span></div>
@@ -181,7 +184,7 @@
 					orderId,
 					orderNo
 				} = this.$route.query;
-				if (null == orderId && (orderNo ==null || orderNo == '')) {
+				if (null == orderId && (orderNo == null || orderNo == '')) {
 					return;
 				}
 				vm.orderId = orderId;
@@ -202,6 +205,9 @@
 						Toast(res.resp_desc);
 					}
 				});
+			},
+			toPage(url){
+				this.$router.push(url);
 			}
 		}
 	};
@@ -545,6 +551,15 @@
 	.vant-read>>>.van-cell__title {
 		color: #000000 !important;
 	}
+
+	.yuyue {
+		text-align: center;
+		padding-top: 10px;
+		padding-bottom: 5px;
+		text-decoration: underline;
+		color: #008000;
+	}
+
 
 	>>>.van-cell {
 		padding: 0 0;

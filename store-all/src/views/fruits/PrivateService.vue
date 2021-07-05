@@ -8,13 +8,16 @@
 				<van-tab title="待使用">
 					<van-list v-model="loadingA" :finished="finishedA" finished-text="没有更多了" @load="onLoadA">
 						<div class="item-div">
-							<!-- <div class="title">
-								<span>下午15:00 后预约，将安排第二天配送或者自取。</span>
-							</div> -->
+							<div class="title">
+								<span>温馨提示：</span>
+							</div>
+							<div class="title">
+								<span>预约后请耐心等待,店家备货完成后会通过电话再次确认配送时间,请留意电话。</span>
+							</div>
 							<div class="items-list items-list-effect-color" v-for=" (item,index) in listTab0"
 								:key="index">
-								<div class="items-title">
-									<span @click="toPage(item.private_code)" class="items-info-name-title"
+								<div class="items-title" @click="toPage(item.private_code)" >
+									<span class="items-info-name-title"
 										style="text-decoration: underline;">{{item.private_code}}</span>
 									<span class="items-info-value-title">{{item.status == 0?'未预约':'已预约'}}</span>
 								</div>
@@ -32,12 +35,22 @@
 								</div>
 								<div class="items-title items-info" v-if="item.status == 1">
 									<span class="items-info-name">配送时间</span>
-									<span class="items-info-value">{{item.get_time}}
+									<span class="items-info-value">
+										<span>{{item.get_time}}</span>
 										<span v-if="item.get_time_flag == 1 && item.out_time_flag == 1"
 											style="color: #008000;font-weight: 900;">({{item.flow_status_name}})</span>
 										<span
 											v-if="item.get_time_flag == 0 && item.out_time_flag == 1">({{item.flow_status_name}})</span>
-										<span v-if="item.out_time_flag == 0" style="color: red;">(已过期)</span></span>
+										<span v-if="item.out_time_flag == 0" style="color: red;">(已过期)</span>
+									</span>
+								</div>
+								<div class="items-title items-info" v-if="item.status == 1">
+									<span class="items-info-name">配送时间</span>
+									<span class="items-info-value">{{item.get_time_str}}</span>
+								</div>
+								<div class="items-title items-info" v-if="item.status == 1">
+									<span class="items-info-name">取货地址</span>
+									<span class="items-info-value" style="text-align: left;">{{item.get_addr}}</span>
 								</div>
 								<div class="desc">
 									<van-collapse v-model="item.activeName" accordion>
@@ -49,9 +62,12 @@
 								</div>
 								<div style="text-align: right;margin:10px 15px;">
 									<van-button size="small" color="#008000" v-if="item.status == 0"
-										@click="showPickerPopup(item.id)">预约</van-button>
+										@click="showPickerPopup(item.id)">
+										预约
+									</van-button>
 									<van-button size="small" color="#008000" v-if="item.status == 1"
-										@click="cancelYuding(item.id,item.get_time)">取消预约</van-button>
+										@click="cancelYuding(item.id,item.get_time_str)">取消预约
+									</van-button>
 								</div>
 							</div>
 						</div>
@@ -78,14 +94,21 @@
 								<span class="items-info-value">{{item.reservation_time}}</span>
 							</div>
 							<div class="items-title items-info">
+								<span class="items-info-name">配送时间</span>
+								<span class="items-info-value">{{item.get_time_str}}</span>
+							</div>
+							<div class="items-title items-info">
 								<span class="items-info-name">完成时间</span>
 								<span class="items-info-value">{{item.update_time}}</span>
+							</div>
+							<div class="items-title items-info">
+								<span class="items-info-name">取货地址</span>
+								<span class="items-info-value" style="text-align: left;">{{item.get_addr}}</span>
 							</div>
 							<div class="desc">
 								<van-collapse v-model="item.activeName" accordion>
 									<van-collapse-item title="内容">
-										<div class="item-contents" v-html="item.contents">
-										</div>
+										<div class="item-contents" v-html="item.contents"> </div>
 									</van-collapse-item>
 								</van-collapse>
 							</div>
@@ -245,7 +268,7 @@
 				this.$dialog
 					.confirm({
 						title: '提示',
-						message: '确认取消预约吗？<br/>取消预约时间：' + time
+						message: '确认取消预约吗？<br/>取消预约时间：<br/>' + time
 					})
 					.then(() => {
 						let params = {
@@ -310,6 +333,13 @@
 		color: #323233;
 		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
 	}
+
+	.title {
+		text-align: left;
+		padding: 0 20px;
+		font-size: 12px;
+	}
+	
 
 	.item-div {
 		margin-top: 10px;

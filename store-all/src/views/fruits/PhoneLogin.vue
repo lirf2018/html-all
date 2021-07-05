@@ -12,7 +12,7 @@
 				<van-field v-model="smsCode" center clearable label="验证码" placeholder="请输入短信验证码" :error-message="smsMsg"
 					maxlength='4'>
 					<template #button>
-						<van-button size="small" type="primary" @click="show = true" :disabled="smsDisabled">{{sms}}
+						<van-button size="small" type="primary" @click="showImgVerify" :disabled="smsDisabled">{{sms}}
 						</van-button>
 					</template>
 				</van-field>
@@ -26,27 +26,42 @@
 		<div class="login-btn">
 			<div @click="login"><span>登录/注册</span></div>
 		</div>
-		<van-dialog v-model="show" title="" show-cancel-button @confirm="imgConfirm" @cancel="imgCancel()">
+		<van-dialog :beforeClose="beforeClose" v-model="show" title="" show-cancel-button @confirm="imgConfirm"
+			@cancel="imgCancel()">
 			<div class="verify-img-title">
 				<span>{{verifyImgTitle}}</span>
-				<span style="color: #008000;text-decoration: underline;">
-					<van-icon name="replay" @click="refresh" />刷新
+				<span style="color: #008000;text-decoration: underline;" @click="initVerifyIimg">
+					<van-icon name="replay" />刷新
 				</span>
 			</div>
 			<div style="clear: both;height: 10px;"></div>
 			<div class="verify-img">
 				<div class="img-var">
-					<div class="img-var-div" v-for="(item,index) in verifyIimg" :key="index" @click="choseImg(item.id)">
+					<div class="img-var-div" v-for="(item,index) in verifyIimg" :key="index"
+						@click="choseImg(item.img_uuid)">
 						<div class="overlay-div">
 							<van-overlay :show="item.overlayShow" />
 						</div>
 						<div class="chose-div" v-show="item.overlayShow">
 							<van-icon name="checked" />
 						</div>
-						<img class="item-img" :src="item.img" />
+						<img class="item-img" :src="item.verify_img_path" v-if="item.verify_type == 0" />
+						<!-- 			<div class="item-div" v-if="item.verify_type != 0">
+							<div class="item-word" :style="item.backImg">
+								<span>{{item.word}}</span>
+							</div>
+						</div> -->
+						<div class="item-div" v-if="item.verify_type != 0">
+							<div class="item-img-div">
+								<img class="item-img" :src="item.backImg" />
+							</div>
+							<div class="item-word" v-if="item.verify_type != 0">
+								<span>{{item.word}}</span>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div style="clear: both;"></div>
+				<div style="clear: both;height: 10px;"></div>
 			</div>
 		</van-dialog>
 		<EG />
@@ -77,14 +92,15 @@
 				smsCode: '1111',
 				smsMsg: '', //验证码错误
 				smsDisabled: false,
-				times: 5, // 倒计时时间
+				times: 3, // 倒计时时间
+				timesBack: 3,
 				memberNum: '',
 				timer: null,
-				show: true,
+				show: false,
 				verifyIimg: [],
-				verifyImgTitle: '请选择包含汽车项',
-				verifyIimgChoseStrs: ''
-
+				verifyImgTitle: '',
+				verifyIimgChoseStrs: '',
+				uuidMark: ''
 			};
 		},
 		mounted: function() {
@@ -92,42 +108,95 @@
 				member
 			} = this.$route.query;
 			this.memberNum = member;
-
-			this.initVerifyIimg();
 		},
 		methods: {
 			initVerifyIimg() {
 				let vm = this;
+				vm.initVerifyIimgShow();
+				vm.uuidMark = '';
+				vm.verifyImgTitle = '加载选项......';
 				vm.verifyIimg = [];
-				for (var i = 1; i < 10; i++) {
-					let obj = {
-						id: i,
-						img: 'https://img01.yzcdn.cn/vant/apple-3.jpg',
-						overlayShow: false
+				let params = {
+					req_type: 'get_verify_img_list',
+					data: {}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.uuidMark = res.data.uuidImgVerifyMark;
+						vm.verifyImgTitle = res.data.title;
+						let list = res.data.list;
+						for (var i = 0; i < list.length; i++) {
+							let obj = {
+								verify_type: list[i].verify_type,
+								img_uuid: list[i].img_uuid,
+								word: list[i].word,
+								verify_img_path: list[i].verify_img_path,
+								// backImg: "background: url(" + list[i].back_img + ") no-repeat",
+								backImg: list[i].back_img,
+								overlayShow: false
+							}
+							vm.verifyIimg.push(obj);
+						}
+						vm.$nextTick(function() {
+							vm.show = true;
+						});
+
+					} else {
+						Toast(res.resp_desc);
 					}
-					vm.verifyIimg.push(obj);
-				}
+				});
 			},
-			choseImg(id) {
+			choseImg(imgUuid) {
 				let vm = this;
 				for (var i = 0; i < vm.verifyIimg.length; i++) {
-					if (id == vm.verifyIimg[i].id) {
+					if (imgUuid == vm.verifyIimg[i].img_uuid) {
 						vm.verifyIimg[i].overlayShow = vm.verifyIimg[i].overlayShow ? false : true;
 					}
 				}
 			},
-			imgConfirm() {
+			beforeClose(action, done) {
+				if (action == 'cancel') {
+					done();
+					return
+				}
+				done(false);
+				this.beforeCloseEnd(action, done);
+			},
+			beforeCloseEnd(action, done) {
 				let vm = this;
 				vm.verifyIimgChoseStrs = '';
 				for (var i = 0; i < vm.verifyIimg.length; i++) {
 					if (vm.verifyIimg[i].overlayShow) {
-						vm.verifyIimgChoseStrs = vm.verifyIimgChoseStrs + vm.verifyIimg[i].id + ';';
+						vm.verifyIimgChoseStrs = vm.verifyIimgChoseStrs + vm.verifyIimg[i].img_uuid + ',';
 					}
 				}
-				console.log("===============选中的图片vm.verifyIimgChoseStrs=" + vm.verifyIimgChoseStrs)
-				// 图片校验通过
-				vm.sendToMsg();
-				vm.initVerifyIimgShow();
+				if (this.verifyIimgChoseStrs == '') {
+					Toast("请选择图片");
+					done(false);
+					return
+				}
+				let params = {
+					req_type: 'check_verify_img',
+					data: {
+						uuidMark: vm.uuidMark,
+						imgUuidStrs: vm.verifyIimgChoseStrs
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						// 图片校验通过
+						vm.sendToMsg();
+						done();
+						vm.show = false;
+						console.log("=============ok==========")
+					} else {
+						vm.initVerifyIimg();
+						Toast(res.resp_desc);
+					}
+				});
+			},
+			imgConfirm() {
+
 			},
 			imgCancel() {
 				let vm = this;
@@ -195,7 +264,7 @@
 					if (vm.times <= 0) {
 						vm.sms = "发送验证码";
 						vm.smsDisabled = false;
-						vm.times = 10;
+						vm.times = vm.timesBack;
 						clearInterval(this.timer);
 					}
 				}, 1000)
@@ -224,8 +293,8 @@
 					vm.verifyIimg[i].overlayShow = false;
 				}
 			},
-			refresh() {
-
+			showImgVerify() {
+				this.initVerifyIimg();
 			}
 		}
 	};
@@ -316,6 +385,10 @@
 		height: 100%;
 	}
 
+	.item-word {
+		line-height: 80px;
+	}
+
 	.img-var>>>.van-overlay {
 		position: absolute;
 		width: 80px;
@@ -353,7 +426,25 @@
 		font-size: 14px;
 		float: right;
 		width: 20%;
-		
+
+	}
+
+	.item-div>div {
+		width: 80px;
+		height: 80px;
+		font-weight: bold;
+		color: white;
+		text-align: center;
+	}
+
+	.item-img {
+		height: 100%;
+		width: 100%;
+	}
+
+	.item-word {
+		position: absolute;
+		top: 3px;
 	}
 
 	>>>.van-field__label {

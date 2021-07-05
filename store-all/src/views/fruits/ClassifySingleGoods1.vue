@@ -62,7 +62,7 @@
 				</div>
 			</div>
 		</section>
-		<div class="cart-div">
+		<div class="cart-div" v-show="right.length > 0">
 			<div @click="toPage('shopCart')">
 				<div class="cart-count"><span>{{cartCount}}</span></div>
 				<van-icon name="shopping-cart-o" />
@@ -521,6 +521,7 @@
 		right: 8px;
 		font-size: 1.8rem;
 		color: #008000;
+		background-color: #FFFFFF;
 	}
 
 	.cart-count {
