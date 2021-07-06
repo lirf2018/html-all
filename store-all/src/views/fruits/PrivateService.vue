@@ -12,7 +12,7 @@
 								<span>温馨提示：</span>
 							</div>
 							<div class="title">
-								<span>预约后请耐心等待,店家备货完成后会通过电话再次确认配送时间,请留意电话。</span>
+								<span>预约后请耐心等待,店家备货完成后会通过电话再次确认取货时间,请留意电话。</span>
 							</div>
 							<div class="items-list items-list-effect-color" v-for=" (item,index) in listTab0"
 								:key="index">

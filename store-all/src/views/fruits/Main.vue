@@ -33,12 +33,18 @@
 			</div>
 		</div> -->
 		<div class="volume" v-if="newsInfo != null">
-			<van-notice-bar text="通知内容" left-icon="volume-o" color="#008080" />
+		<!-- <div class="volume"> -->
+			<van-notice-bar :text="newsInfo" left-icon="volume-o" color="#008080" />
 		</div>
-		<div class="main-menu">
+		<div class="">
 			<div>
 				<van-grid>
-					<!-- <van-grid-item icon="home-o" text="所有水果" /> -->
+					<!-- <van-grid-item icon="home-o" text="所有水果" />
+					<van-grid-item icon="home-o" text="所有水果" />
+					<van-grid-item icon="home-o" text="所有水果" />
+					<van-grid-item icon="home-o" text="所有水果" />
+					<van-grid-item icon="home-o" text="所有水果" />
+					<van-grid-item icon="home-o" text="所有水果" /> -->
 					<van-grid-item :icon="item.menuImg" :text="item.menuName" v-for="(item, index) in mainMenu"
 						:to="item.menuUrl" :key="index" />
 				</van-grid>
@@ -228,6 +234,8 @@
 						vm.hotGoodsList = res.data.hot_goods_list;
 						//限时商品
 						vm.timeGoodsList = res.data.time_goods_list;
+						// 通知
+						vm.newsInfo = res.data.news_info;
 					} else {
 						Toast(res.resp_desc);
 					}
