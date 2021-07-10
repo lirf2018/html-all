@@ -102,6 +102,7 @@
 						</div>
 					</div>
 					<div class="user-remark">
+						<div>用户备注</div>
 						<div><input placeholder="用户备注" readonly="readonly" v-model="order.user_remark" /></div>
 					</div>
 					<div class="vant-div">

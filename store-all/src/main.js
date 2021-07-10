@@ -13,6 +13,9 @@ import QRCode from 'qrcodejs2';
 import Vant from 'vant';
 import 'vant/lib/index.css';
 
+import BaiduMap from 'vue-baidu-map'
+Vue.use(BaiduMap,{ak:'95m8N6oiCfdvu77diATENOcfrWxL0Wh4'})
+
 Vue.config.productionTip = false
 Vue.use(Vant);
 Vue.use(Vuex);

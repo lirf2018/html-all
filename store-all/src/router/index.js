@@ -58,7 +58,7 @@ import ShopInfo from '@/views/fruits/ShopInfo.vue';
 
 import PrivateService from '@/views/fruits/PrivateService.vue';
 
-import test from '@/views/testMenu.vue';
+import test from '@/views/test.vue';
 
 export const pageLink = [
 	{

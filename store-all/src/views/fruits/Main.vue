@@ -32,7 +32,7 @@
 				</span>
 			</div>
 		</div> -->
-		<div class="volume" v-if="newsInfo != null">
+		<div class="volume" v-if="newsInfo && newsInfo != null">
 		<!-- <div class="volume"> -->
 			<van-notice-bar :text="newsInfo" left-icon="volume-o" color="#008080" />
 		</div>
