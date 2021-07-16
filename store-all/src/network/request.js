@@ -7,7 +7,7 @@ import {
 	Toast
 } from 'vant';
 
-let root = "http://192.168.1.100:8082/"
+let root = "http://127.0.0.1:8082"
 
 // 创建axios实例
 const httpService = axios.create({

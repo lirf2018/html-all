@@ -3,6 +3,13 @@
 		<div>
 			<Head :title="title" />
 		</div>
+		<div class="shop-info">
+			<div class="shop-info-div" v-if="shop != null">
+				<span class="img"><img :src="shop.shopLogo"></span>
+				<span class="shop-name">{{shop.shopName}}</span>
+				<span class="shopTel">电话：{{shop.shopTel1}}</span>
+			</div>
+		</div>
 		<div class="activity-contnets" v-if="null != shop">
 			<div class="div-c" v-html="introduce" ref="divImg"></div>
 			<div>
@@ -15,7 +22,7 @@
 					<div><span>{{shop.toway}}</span></div>
 				</div>
 				<div class="img-div">
-					<div v-for="(item,index) in imgList" :key="index"><img :src="item.imgUrl"/></div>
+					<div v-for="(item,index) in imgList" :key="index"><img :src="item.imgUrl" /></div>
 				</div>
 			</div>
 		</div>
@@ -38,7 +45,7 @@
 				title: '店铺介绍',
 				shop: null,
 				introduce: '',
-				imgList:[]
+				imgList: []
 			};
 		},
 		created() {},
@@ -81,6 +88,43 @@
 		font-family: Avenir, PingFang SC, Arial, Helvetica, STHeiti STXihei, Microsoft YaHei, Tohoma, sans-serif;
 	}
 
+	.shop-info-div {
+		height: 50px;
+		background-color: white;
+		padding: 15px 20px;
+		font-weight: bold;
+		position: relative;
+	}
+
+	.shop-info-div img {
+		height: 100%;
+		width: 100%;
+	}
+
+	.img {
+		float: left;
+		height: 50px;
+		width: 50px;
+	}
+
+	.shop-name {
+		height: 50px;
+		line-height: 50px;
+		font-size: 15px;
+		float: left;
+		padding-left: 5px;
+	}
+
+	.shopTel {
+		position: absolute;
+		bottom: 12px;
+		right: 20px;
+	}
+
+	.shop-info-div>span {
+		display: block;
+	}
+
 	.activity-contnets {
 		margin: 10px 10px;
 		background-color: #ffffff;
@@ -107,11 +151,12 @@
 		color: gray;
 		font-size: 12px;
 	}
-	.toway{
+
+	.toway {
 		margin-bottom: 15px;
 	}
-	
-	.img-div img{
+
+	.img-div img {
 		width: 100%;
 		/* display: block; */
 	}

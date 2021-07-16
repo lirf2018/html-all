@@ -13,8 +13,18 @@ import QRCode from 'qrcodejs2';
 import Vant from 'vant';
 import 'vant/lib/index.css';
 
-import BaiduMap from 'vue-baidu-map'
-Vue.use(BaiduMap,{ak:'95m8N6oiCfdvu77diATENOcfrWxL0Wh4'})
+// import BaiduMap from 'vue-baidu-map'
+// Vue.use(BaiduMap,{ak:'95m8N6oiCfdvu77diATENOcfrWxL0Wh4'})
+
+/* // 引入vue-bmap-gl
+import VueBMap from 'vue-bmap-gl';
+
+Vue.use(VueBMap);
+VueBMap.initBMapApiLoader({
+  ak: '95m8N6oiCfdvu77diATENOcfrWxL0Wh4',
+  v: '1.0'
+}); */
+
 
 Vue.config.productionTip = false
 Vue.use(Vant);

@@ -62,7 +62,7 @@ import test from '@/views/test.vue';
 
 export const pageLink = [
 	{
-		path: "/test",
+		path: "/test1",
 		component: test
 	},
 	{
