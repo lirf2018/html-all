@@ -625,6 +625,7 @@
 
 	.addr-detail2 {
 		text-align: center;
+		margin-right: 50px;
 	}
 
 	/* goods */

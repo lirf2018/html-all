@@ -215,11 +215,19 @@
 		font-size: 12px;
 	}
 
+	.add-btn{
+		position: fixed;
+		bottom: 0px;
+		height: 65px;
+		width: 100%;
+		background-color: #ffffff;
+	}
+
 	.add-btn>div {
 		color: #ffffff;
 		text-align: center;
 		position: fixed;
-		bottom: 0px;
+		bottom: 10px;
 		margin: 0 auto;
 		width: 100%;
 		background-color: #ffffff;

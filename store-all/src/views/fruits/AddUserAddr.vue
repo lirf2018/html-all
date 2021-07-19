@@ -6,7 +6,7 @@
 		<div class="addrs-list">
 			<div class="user-info">
 				<div>
-					<van-field v-model="username" placeholder="用户名1" :rules="[{ required: true, message: '请填写用户名' }]" />
+					<van-field v-model="username" placeholder="用户名" :rules="[{ required: true, message: '请填写用户名' }]" />
 				</div>
 				<div>
 					<van-field v-model="phone" placeholder="手机号码" :rules="[{ required: true, message: '请填写手机号码' }]" />
@@ -242,7 +242,7 @@
 		color: #ffffff;
 		text-align: center;
 		position: fixed;
-		bottom: 0px;
+		bottom: 10px;
 		margin: 0 auto;
 		width: 100%;
 		background-color: #ffffff;

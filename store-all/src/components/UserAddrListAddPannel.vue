@@ -58,6 +58,7 @@
 		<div class="add-btn" @click="saveData">
 			<div><span>保存地址</span></div>
 		</div>
+		<div style="height: 15px;"></div>
 		<div class="addrs">
 			<AddrPanel :showp="show" @closeAddrDivS="closeAddrDiv" @setAddrDataS="setAddrData"></AddrPanel>
 		</div>
@@ -265,7 +266,7 @@
 		color: #ffffff;
 		text-align: center;
 		position: fixed;
-		bottom: 0px;
+		bottom: 10px;
 		margin: 0 auto;
 		width: 100%;
 		background-color: #ffffff;

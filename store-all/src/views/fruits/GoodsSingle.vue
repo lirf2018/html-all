@@ -98,8 +98,8 @@
 					<van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
 					<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
 				<van-goods-action-icon
-					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2" icon="cart-o" 
-					text="购物车" :badge="cartCount" @click="toPage('shopCart')"/>
+					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2" icon="cart-o"
+					text="购物车" :badge="cartCount" @click="toPage('shopCart')" />
 				<van-goods-action-button
 					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
 					color="#53FF53" text="加入购物车" @click="showNext(0)" />
@@ -114,25 +114,31 @@
 		<!-- 弹出选择商品数量 -->
 		<div v-if="goodsInfo != null">
 			<van-popup v-model="showGoods" closeable close-icon="close" position="bottom">
-				<div class="goods-show-info">
-					<div class="goods-show-img"><img :src="goodsInfo.goodsImg" @click="showImg" /></div>
-					<div class="goods-show-goods">
-						<div class="goods-show-goods-name">{{ goodsInfo.goodsName }}</div>
-						<div class="goods-show-price">
-							<span>￥</span>
-							<span>{{ goodsInfo.nowMoney }}</span>
-							<span>
-								<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney"
-									style="font-size: 10px;color: gray;font-weight: 100;">
-									<span> 价格 ￥</span>
-									<span
-										style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
+				<div class="goods-show">
+					<div class="goods-show-info">
+						<div class="img-top">
+							
+						</div>
+						<div class="goods-show-img"><img :src="goodsInfo.goodsImg" @click="showImg" /></div>
+						<div class="goods-show-goods">
+							<div class="goods-show-goods-name">{{ goodsInfo.goodsName }}</div>
+							<!-- <div class="goods-show-goods-name">{{ goodsInfo.goodsName }}择商品数择商品数择商品数择商品数商品数择商品数商品数择商品数商品数择商品数商品数择商品数商品数择商品数商品数择商品数商品数择商品数商品数择商品数择商品数</div> -->
+							<div class="goods-show-price">
+								<span>￥</span>
+								<span>{{ goodsInfo.nowMoney }}</span>
+								<span>
+									<span v-if="goodsInfo.nowMoney < goodsInfo.trueMoney"
+										style="font-size: 10px;color: gray;font-weight: 100;">
+										<span> 价格 ￥</span>
+										<span
+											style="text-decoration:line-through;font-weight: 300;">{{ goodsInfo.trueMoney }}</span>
+									</span>
 								</span>
-							</span>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div style="clear: both;"></div>
+				<!-- <div style="clear: both;"></div> -->
 				<div class="goods-show-buy">
 					<div class="goods-show-buy-info">
 						<span>购买数量</span>
@@ -311,7 +317,9 @@
 				let vm = this;
 				let params = {
 					req_type: 'find_order_cart_count',
-					data: { userId: 0 }
+					data: {
+						userId: 0
+					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
@@ -319,7 +327,7 @@
 					}
 				});
 			},
-			toPage(url){
+			toPage(url) {
 				this.$router.push(url);
 			}
 		}
@@ -445,11 +453,9 @@
 	}
 
 	.goods-show-info {
-		padding-bottom: 10px;
 		overflow: visible;
-		position: relative;
 	}
-
+	
 	.beforeBuy {
 		margin-bottom: 10px;
 	}
@@ -462,24 +468,45 @@
 	.van-popup {
 		overflow-y: visible !important;
 	}
+	
+	.img-top {
+		height: 20px;
+		/* position: absolute; */
+		/* top: 0px; */
+		width: 80%;
+		background:transparent;
+	}
+	
+	>>>.van-popup{
+		background:transparent;
+	}
+	
+	.goods-show{
+		/* border: 1px solid black; */
+		overflow: hidden;
+		position: relative;
+		/* height: 120px; */
+	}
 
 	.goods-show-img {
-		float: left;
-		width: 30%;
+		width: 100px;
+		height: 110px;
 		position: absolute;
-		top: -20px;
+		top: 0px;
 		padding-left: 10px;
+		/* border: 1px solid red; */
 	}
 
 	.goods-show-img img {
 		width: 100% !important;
 		border-radius: 15px;
+		height: 100% !important;
+		background-color: white;
 	}
 
 	.img-detail {
 		overflow: auto;
 		width: 100%;
-		border: 1px solid red;
 	}
 
 	.img-detail img {
@@ -487,19 +514,27 @@
 	}
 
 	.goods-show-goods {
-		float: left;
-		width: 54%;
+		/* width: 100%; */
 		color: #464c5b;
-		padding-left: 18px;
-		padding-top: 10px;
+		height: 100px;
+		padding: 10px 25px 10px 120px;
 		word-break: break-all;
-		margin-left: 30%;
+		background-color: white;
+	}
+	
+	.goods-show-goods-name{
+		height: 60px;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3; 
+		overflow: hidden;
 	}
 
 	.goods-show-price {
 		color: #008000;
 		font-weight: bold;
 		padding-top: 5px;
+		background-color: white;
 	}
 
 	.goods-show-price>span:first-child {
@@ -512,11 +547,12 @@
 
 	.goods-show-buy {
 		padding: 10px 0;
-		margin-top: 1.8rem;
+		/* margin-top: 1.8rem; */
 		color: #464c5b;
 		overflow: auto;
 		border-top: 1px solid #f0f0f0;
 		border-bottom: 1px solid #f0f0f0;
+		background-color: white;
 	}
 
 	.goods-show-buy-info {
@@ -537,7 +573,7 @@
 	.goods-show-buy-info>span:last-child {
 		color: #9ea7b4;
 		font-size: 12px;
-		padding-top: 2px;
+		/* padding-top: 2px; */
 	}
 
 	.goods-show-btn {
@@ -608,5 +644,10 @@
 
 	>>>.van-tabs__line {
 		z-index: 0;
+	}
+	
+	>>>.van-popup__close-icon--top-right{
+		right: 8px;
+		top: 25px;
 	}
 </style>

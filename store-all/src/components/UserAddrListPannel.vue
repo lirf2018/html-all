@@ -29,6 +29,7 @@
 		<div class="add-btn" @click="showUserAddrAddFlag">
 			<div><span>新增加地址</span></div>
 		</div>
+		<div style="height: 15px;"></div>
 		<van-popup
 		  v-model="showAddrListAddPannelFlag"
 		  position="bottom"
@@ -247,11 +248,19 @@
 		font-size: 12px;
 	}
 
+    .add-btn{
+		position: fixed;
+		bottom: 0px;
+		width: 100%;
+		background-color: #ffffff;
+		height: 65px;
+	}
+
 	.add-btn>div {
 		color: #ffffff;
 		text-align: center;
 		position: fixed;
-		bottom: 0px;
+		bottom: 10px;
 		margin: 0 auto;
 		width: 100%;
 		background-color: #ffffff;

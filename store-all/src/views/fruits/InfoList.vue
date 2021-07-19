@@ -47,7 +47,7 @@
 		},
 		data() {
 			return {
-				title: '活动资讯',
+				title: '资讯',
 				infoList: [],
 				loading: false,
 				finished: false,

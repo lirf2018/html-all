@@ -21,7 +21,7 @@
 		},
 		data() {
 			return {
-				title: '资讯活动详情',
+				title: '资讯详情',
 				contents: '',
 				info: null
 			};
