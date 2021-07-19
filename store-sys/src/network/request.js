@@ -1,11 +1,14 @@
 // 引入axios
 import axios from 'axios';
 
+let root = "http://lrf-13418915218.6655.la"
+// let root = "http://localhost:8085";
+
 // 创建axios实例
 const httpService = axios.create({
 	// url前缀-'http:xxx.xxx'
-	// baseURL: 'http://localhost:8082/store-info/info/test', // 需自定义
-	baseURL: 'http://localhost:9909/api/store-info/info/test', // 需自定义
+	baseURL: root+'/store-kc/info/kc', // 需自定义
+	// baseURL: 'http://localhost:9909/api/store-kc/info/kc', // 需自定义
 	// 请求超时时间
 	timeout: 3000 // 需自定义
 });

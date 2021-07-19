@@ -1,5 +1,5 @@
 <template>
-	<div class="page" :style="clientHeightPage">
+	<div class="page" :style="widthStyle">
 		<div style="position: absolute;top: 0px;left: 15px;z-index: 999;">
 			<Navigation />
 		</div>
@@ -28,56 +28,54 @@
 				</div>
 			</div>
 			<div class="div2">
-				<div style="height: 8px;"></div>
-				<div>
-					<div class="div2-left">
-						<div class="div2-left-text">
-							<span><input readonly="readonly" disabled="disabled" value="订单号：" /></span>
-							<span><input readonly="readonly" disabled="disabled" value="店铺/商品码：" /></span>
-						</div>
-						<div class="div2-left-value">
-							<span>
-								<input value="" v-model="searchOrderForm.order_no" />
-							</span>
-							<span><input ref="myFocus" value="" v-model="searchOrderForm.goods_code"
-									@keyup="searchOrderGoodsData" /></span>
-						</div>
+				<div class="div2-left">
+					<div class="div2-left-text">
+						<span><input readonly="readonly" disabled="disabled" value="订单号：" /></span>
+						<span><input readonly="readonly" disabled="disabled" value="店铺/商品码：" /></span>
 					</div>
-					<div class="div2-right">
-						<div class="div2-right-text">
-							<span><input readonly="readonly" disabled="disabled" value="桌号：" /></span>
-							<span><input readonly="readonly" disabled="disabled" value="手机号：" /></span>
-						</div>
-						<div class="div2-right-value">
-							<span><input value="" v-model="searchOrderForm.table_name" /></span>
-							<span>
-								<input value="" v-model="searchOrderForm.user_phone" />
-							</span>
-						</div>
+					<div class="div2-left-value">
+						<span>
+							<input value="" v-model="searchOrderForm.order_no" />
+							<!-- <strong class="order-msg" v-if="searchOrderFlag">订单不存在</strong> -->
+						</span>
+						<span><input ref="myFocus" value="" v-model="searchOrderForm.goods_code" @keyup="searchOrderGoodsData" /></span>
 					</div>
-					<div class="div2-right-2">
-						<div class="div2-right-text">
-							<span><input readonly="readonly" disabled="disabled" value="秘钥：" /></span>
-							<span><input readonly="readonly" disabled="disabled" value="优惠码：" /></span>
-						</div>
-						<div class="div2-right-value">
-							<span><input value="" type="password" v-model="orderPass" /></span>
-							<span><input value="" /></span>
-						</div>
+				</div>
+				<div class="div2-right">
+					<div class="div2-right-text">
+						<span><input readonly="readonly" disabled="disabled" value="桌号：" /></span>
+						<span><input readonly="readonly" disabled="disabled" value="手机号：" /></span>
 					</div>
-					<div style="clear: both;"></div>
+					<div class="div2-right-value">
+						<span><input value="" v-model="searchOrderForm.table_name" /></span>
+						<span>
+							<input value="" v-model="searchOrderForm.user_phone" />
+							<!-- <strong class="order-msg" v-if="searchPhoneOrderFlag">订单不存在</strong> -->
+						</span>
+					</div>
+				</div>
+				<div class="div2-right-2">
+					<div class="div2-right-text">
+						<span><input readonly="readonly" disabled="disabled" value="秘钥：" /></span>
+						<span><input readonly="readonly" disabled="disabled" value="优惠码：" /></span>
+					</div>
+					<div class="div2-right-value">
+						<span><input value="" type="password" v-model="orderPass" /></span>
+						<span><input value="" /></span>
+					</div>
+				</div>
 
-					<div class="chose-goods">
-						<button @click="createNewOrder">重新开单</button>
-						<button v-if="orderInfo.order_status != 0">
-							订单状态：{{ orderInfo.order_status_name }}
-							<span>({{ orderInfo.pay_method_name }})</span>
-						</button>
-						<button @click="resetOrderStatus" v-if="orderInfo.order_status != 0">重置付款状态</button>
-						<button @click="showAddOrderInfoView" v-if="orderInfo.order_status == 0">添加订单信息</button>
-						<button @click="searchOrderList">查询订单</button>
-						<button @click="showAddGoodsView" v-if="orderInfo.order_status == 0">添加商品</button>
-					</div>
+				<div class="chose-goods">
+					<button @click="createNewOrder">重新开单</button>
+					<button v-if="orderInfo.order_status != 0">
+						订单状态：{{ orderInfo.order_status_name }}
+						<span>({{ orderInfo.pay_method_name }})</span>
+					</button>
+					<button @click="resetOrderStatus" v-if="orderInfo.order_status != 0">重置付款状态</button>
+					<!-- <button @click="searchOrderGoodsData">查询商品</button> -->
+					<button @click="showAddOrderInfoView" v-if="orderInfo.order_status == 0">添加订单信息</button>
+					<button @click="searchOrderList">查询订单</button>
+					<button @click="showAddGoodsView" v-if="orderInfo.order_status == 0">添加商品</button>
 				</div>
 			</div>
 			<div class="div3-0">
@@ -98,10 +96,11 @@
 					</ul>
 				</div>
 			</div>
-			<div class="div3" :style="div3Height">
+			<div class="div3-1"></div>
+			<div class="div3">
 				<div class="goods-contents-value">
-					<ul v-for="(g, index) in orderGoodsList" :key="index" :class="g.style"
-						@mouseover="mouseInGoodsUl(g.id, 0)" @mouseout="mouseOutGoodsUl(g.id, 0)">
+					<ul v-for="(g, index) in orderGoodsList" :key="index" :class="g.style" @mouseover="mouseInGoodsUl(g.id, 0)"
+					 @mouseout="mouseOutGoodsUl(g.id, 0)">
 						<li class="class-detail-id">{{ g.id }}</li>
 						<li class="class-goods-code">{{ g.goodsCode }}</li>
 						<li class="class-goods-name">{{ g.goodsName }}</li>
@@ -119,14 +118,15 @@
 						<li class="class-unit-count">{{ g.unitCount }}</li>
 						<li class="class-do">
 							<div class="handler-btn" v-if="orderInfo.order_status == 0">
-								<span @click="delOrderGoods(g)">删除</span>
-								<span @click="addGoodsFromOrder(g)">添加(+1)</span>
+								<button @click="delOrderGoods(g)">删除</button>
+								<button @click="addGoodsFromOrder(g)">添加(+1)</button>
 							</div>
 						</li>
 					</ul>
 				</div>
 			</div>
-			<div class="div4" :style="clientWidth">
+			<div style="height: 250px;background-color: white;"></div>
+			<div class="div4">
 				<div class="count-other">
 					<div class="count-other-text">
 						<span>优惠券折扣：</span>
@@ -171,6 +171,7 @@
 				</div>
 			</div>
 		</div>
+		<!-- 添加 订单信息 -->
 		<Modal width="600" v-model="addOrderInfoFlag" title="添加订单信息" @on-ok="addOrderTitle">
 			<div class="input-show-div add-order-info">
 				<div class="input-show-div-text add-order-info-text">
@@ -185,6 +186,7 @@
 				</div>
 			</div>
 		</Modal>
+		<!-- 添加商品信息 -->
 		<Modal :fullscreen="fullscreen" v-model="addGoodsFlag" title="添加商品信息">
 			<div class="append-goods">
 				<div class="div2 div2-1">
@@ -194,10 +196,8 @@
 							<span><input readonly="readonly" disabled="disabled" value="商品店铺码：" /></span>
 						</div>
 						<div class="div2-left-value">
-							<span><input value="" v-model="searchGoodsForm.goods_code" @keydown="searchGoodsData"
-									@keyup="searchGoodsData" /></span>
-							<span><input value="" v-model="searchGoodsForm.shop_code" @keydown="searchGoodsData"
-									@keyup="searchGoodsData" /></span>
+							<span><input value="" v-model="searchGoodsForm.goods_code" @keydown="searchGoodsData" @keyup="searchGoodsData" /></span>
+							<span><input value="" v-model="searchGoodsForm.shop_code" @keydown="searchGoodsData" @keyup="searchGoodsData" /></span>
 						</div>
 					</div>
 					<div class="div2-right">
@@ -209,13 +209,10 @@
 							<span>
 								<select v-model="searchGoodsForm.classify_code" @change="searchGoodsData">
 									<option value="">全部</option>
-									<option :key="index" :value="item.classify_code" v-for="(item, index) in classifys">
-										{{ item.classify_name }}
-									</option>
+									<option :key="index" :value="item.classify_code" v-for="(item, index) in classifys">{{ item.classify_name }}</option>
 								</select>
 							</span>
-							<span><input v-model="searchGoodsForm.goods_py" @keydown="searchGoodsData"
-									@keyup="searchGoodsData" /></span>
+							<span><input v-model="searchGoodsForm.goods_py" @keydown="searchGoodsData" @keyup="searchGoodsData" /></span>
 						</div>
 					</div>
 					<div class="div2-right-2">
@@ -224,11 +221,10 @@
 							<span><input readonly="readonly" disabled="disabled" value="是否促销：" /></span>
 						</div>
 						<div class="div2-right-value">
-							<span><input v-model="searchGoodsForm.goods_name" @keydown="searchGoodsData"
-									@keyup="searchGoodsData" /></span>
+							<span><input v-model="searchGoodsForm.goods_name" @keydown="searchGoodsData" @keyup="searchGoodsData" /></span>
 							<span>
 								<select v-model="searchGoodsForm.is_discounts" @change="searchGoodsData">
-									<option value="" selected="">全部</option>
+									<option value="">全部</option>
 									<option value="0">否</option>
 									<option value="1">是</option>
 								</select>
@@ -243,7 +239,7 @@
 				</div>
 				<div class="div3-0 div3-0-1">
 					<div class="div-contents">商品信息</div>
-					<div class="goods-contents-value goods-contents-value-1">
+					<div class="goods-contents-title goods-contents-title-1">
 						<ul>
 							<li>序号</li>
 							<li>商品编码</li>
@@ -260,32 +256,30 @@
 				</div>
 				<div class="div3">
 					<div class="goods-contents-value goods-contents-value-1">
-						<ul v-for="(g, index) in goodsSearchList" :key="index" :class="g.style"
-							@mouseover="mouseInGoodsUl(g.id, 1)" @mouseout="mouseOutGoodsUl(g.id, 1)">
-							<li class="value-li">{{ g.id }}</li>
-							<li class="value-li">{{ g.goodsCode }}</li>
-							<li class="value-li">{{ g.goodsName }}</li>
-							<li class="value-li">{{ g.goodsSalePrice | numFilter }}</li>
-							<li class="value-li">{{ g.memberPrice | numFilter }}</li>
-							<li class="value-li">{{ g.goodsDiscountsPrice | numFilter }}</li>
-							<li class="value-li">{{ g.goodsUnitName }}</li>
-							<li class="value-li">{{ g.unitCount }}</li>
-							<li class="value-li">
-								<div class="handler-btn">
-									<span @click="addGoodsFromSearchGoods(g)">添加(+1)</span>
-								</div>
+						<ul v-for="(g, index) in goodsSearchList" :key="index" :class="g.style" @mouseover="mouseInGoodsUl(g.id, 1)"
+						 @mouseout="mouseOutGoodsUl(g.id, 1)">
+							<li>{{ g.id }}</li>
+							<li>{{ g.goodsCode }}</li>
+							<li>{{ g.goodsName }}</li>
+							<li>{{ g.goodsSalePrice | numFilter }}</li>
+							<li>{{ g.memberPrice | numFilter }}</li>
+							<li>{{ g.goodsDiscountsPrice | numFilter }}</li>
+							<li>{{ g.goodsUnitName }}</li>
+							<li>{{ g.unitCount }}</li>
+							<li>
+								<div class="handler-btn"><button @click="addGoodsFromSearchGoods(g)">添加(+1)</button></div>
 							</li>
 							<li>{{ g.buyCount }}</li>
 						</ul>
 					</div>
 					<div class="page-next">
-						<Page :current="searchGoodsForm.curre_page" show-total :page-size="searchGoodsForm.page_size"
-							:total="total" show-sizer prev-text="上一页" next-text="下一页" @on-change="changePage"
-							@on-page-size-change="changePageSize" />
+						<Page :current="searchGoodsForm.curre_page" show-total :page-size="searchGoodsForm.page_size" :total="total"
+						 show-sizer prev-text="上一页" next-text="下一页" @on-change="changePage" @on-page-size-change="changePageSize" />
 					</div>
 				</div>
 			</div>
 		</Modal>
+		<!-- 收钱 -->
 		<Modal width="600" v-model="payCashPriceFlag" title="现金付款" @on-ok="showCashPayOk">
 			<div class="input-show-div add-order-info pay-info">
 				<div class="input-show-div-text  pay-info-text">
@@ -296,6 +290,7 @@
 				</div>
 			</div>
 		</Modal>
+		<!-- 多个订单结果 -->
 		<Modal width="950" v-model="moreOrdreFlag" title="订单列表">
 			<div class="">
 				<div class="more-order-title">
@@ -308,9 +303,8 @@
 				</div>
 				<div style="clear: both;"></div>
 				<div class="more-order-content">
-					<div @click="clickOrderItem(item)" v-for="(item, index) in orderGoodsLists" :key="index"
-						:class="item.style" @mouseover="mouseInGoodsUl(item.orderNum, 2)"
-						@mouseout="mouseOutGoodsUl(item.orderNum, 2)">
+					<div @click="clickOrderItem(item)" v-for="(item, index) in orderGoodsLists" :key="index" :class="item.style"
+					 @mouseover="mouseInGoodsUl(item.orderNum, 2)" @mouseout="mouseOutGoodsUl(item.orderNum, 2)">
 						<div>{{ item.orderNum }}</div>
 						<div>{{ item.tableName }}</div>
 						<div>{{ item.userPhone }}</div>
@@ -406,16 +400,14 @@
 				searchOrderForm: {
 					curre_page: 1,
 					page_size: 10,
-					order_no: '',
+					order_no: null,
 					goods_code: null,
 					table_name: null,
 					user_phone: null,
 					search_absolute: 1
 				},
 				classifys: [],
-				clientWidth: '',
-				clientHeightPage: '',
-				div3Height: ''
+				widthStyle:0
 			};
 		},
 		filters: {
@@ -453,12 +445,9 @@
 		created() {},
 		mounted() {
 			let vm = this; // 声明一个变量指向Vue实例this，保证作用域一致
-			let width = document.documentElement.clientWidth;
-			let height = document.documentElement.clientHeight;
-			// this.clientWidth = "width: "+width+"px";
-			this.clientHeightPage = "height:" + height + "px;";
-			this.div3Height = "height:" + (height - 62 - 140 - 280) + "px;";
-			// //
+			let width  = document.documentElement.clientWidth;
+			this.widthStyle = "width: "+width+"px;";
+			//
 			vm.$nextTick(() => {
 				vm.findClassify();
 				vm.$refs.myFocus.focus();
@@ -1102,21 +1091,21 @@
 	}
 
 	/* 桌号信息层 */
-	/* .div1,
+	.div1,
 	.div2 {
 		overflow: auto;
 		border-bottom: 2px solid #d0d0d0;
 		position: relative;
 		background-color: #f0f0f0;
-	} */
+	}
 
-	/* 	.title-name {
+	.title-name {
 		position: absolute;
 		left: 120px;
 		top:20px;
 		font-size: 3.5rem;
 		font-weight: bold;
-	} */
+	}
 
 	.table-div {
 		float: left;
@@ -1139,11 +1128,11 @@
 	}
 
 	/* 查询录入层 */
-	/* .div2 {
+	.div2 {
 		padding: 15px 0;
 		position: relative;
 		overflow: auto;
-	} */
+	}
 
 	.div2-left,
 	.div2-right,
@@ -1233,17 +1222,16 @@
 	}
 
 	/* 内容层 */
-	/* 	.div3 {
+	.div3 {
 		overflow: auto;
 		text-align: center;
 		width: 100%;
 		background-color: #f0f0f0;
-	} */
+	}
 
 	.goods-contents-title>ul>li,
 	.goods-contents-value>ul>li {
 		float: left;
-		text-align: center;
 	}
 
 	.goods-contents-title {
@@ -1255,8 +1243,11 @@
 		text-align: center;
 	}
 
+	.goods-contents-value {
+	}
 
 	.goods-contents-value>ul>li {
+		padding: 8px 0;
 		cursor: pointer;
 	}
 
@@ -1268,11 +1259,6 @@
 	.mouse-in-goods-ul {
 		background-color: #272727;
 		color: white;
-	}
-
-	.goods-contents-value>ul>li {
-		height: 50px;
-		line-height: 50px;
 	}
 
 	.goods-contents-title,
@@ -1326,17 +1312,18 @@
 	}
 
 	/* 价格汇总层 */
-	/* 	.div4 {
+	.div4 {
 		position: fixed;
+		width: 100%;
 		bottom: 0px;
 		height: 240px;
 		border-top: 2px solid #d0d0d0;
 		background-color: #f0f0f0;
-	} */
+	}
 
 	.count-other {
 		position: absolute;
-		top: 55px;
+		bottom: 15px;
 		text-align: center;
 		width: 40%;
 	}
@@ -1440,51 +1427,48 @@
 	}
 
 	/* 操作按钮 */
-	.handler-btn>span {
-		padding: 5px 15px;
-		margin: 10px 5px;
+	.handler-btn>button {
+		padding: 3px 15px;
 		cursor: pointer;
-		height: 30px;
-		border-radius: 5px 5px;
-		border: 1px solid grey;
 	}
 
 	.handler-btn>button:nth-child(2) {
-		/* margin: 0px 15px; */
+		margin: 0px 15px;
 	}
 
 	/* 布局 */
-	/* 	.div1,
+	.div1,
 	.div2,
 	.div3-0 {
+		width: 100%;
 		background-color: #f0f0f0;
 		overflow: hidden;
 		position: fixed;
-	} */
+	}
 
-	/* 	.div1 {
+	.div1 {
 		height: 90px;
 		top: 0px;
 		z-index: 100;
-	} */
+	}
 
-	/* 	.div2 {
+	.div2 {
 		height: 180px;
 		top: 90px;
 		z-index: 90;
-	} */
+	}
 
-	/* 	.div3-0 {
+	.div3-0 {
 		height: 120px;
 		top: 270px;
 		z-index: 80;
-	} */
+	}
 
-	/* 	.div3-1 {
+	.div3-1 {
 		width: 100%;
 		height: 390px;
 		background-color: #f0f0f0;
-	} */
+	}
 
 	/* 添加订单信息 */
 	.input-show-div {
@@ -1558,31 +1542,24 @@
 		border: none;
 	}
 
-	/* 	.div3-0-1 {
+	.div3-0-1 {
 		top: 2px;
 		z-index: 6666;
-	} */
+	}
 
-	/* .div3-1-1 {
+	.div3-1-1 {
 		height: 30px;
-	} */
+	}
 
 	.goods-contents-value {
 		background-color: #f0f0f0;
-		overflow: hidden;
-		overflow-x: hidden;
-
+		overflow: auto;
 	}
 
 	.goods-contents-title-1,
 	.goods-contents-value-1>ul {
 		clear: both;
 		overflow: hidden;
-		text-align: center;
-	}
-
-	.goods-contents-value-1 li {
-		text-align: center;
 	}
 
 	.goods-contents-title-1>ul>li:first-child,
@@ -1654,7 +1631,8 @@
 	.page-next {
 		background-color: #f0f0f0;
 		text-align: right;
-		padding: 15px 0;
+		margin-right: 30px;
+		padding: 50px 0;
 	}
 
 	/* 多个订单列表 */
@@ -1721,7 +1699,6 @@
 	.more-order-content span {
 		cursor: pointer;
 	}
-
 	input {
 		border: 1px solid grey;
 		margin-top: 2px;
@@ -1743,62 +1720,9 @@
 	>>>.ivu-modal-close .ivu-icon-ios-close {
 		font-size: 33px;
 	}
-
-	/* ====================================================================================== */
-
-	/* div1 第1层 */
-	.div1 {
-		height: 62px;
-		position: relative;
-		border-bottom: 2px solid #d0d0d0;
-	}
-
-	.title-name {
-		font-size: 3.5rem;
-		font-weight: bold;
-		color: black;
-		line-height: 70px;
-		left: 90px;
-		position: absolute;
-		top: 0px;
-
-	}
-
-
-	/* div2 第2层  查询条件 */
-	.div2 {
-		height: 140px;
-		/* border: 1px solid red; */
-		position: relative;
-	}
-
-
-	/* div3-0 第3层  标题 */
-	.div3-0 {
-		margin: 0 0;
-		padding: 0 0;
-	}
-
-	/* div3 第3层  内容 */
-	.div3 {
-		overflow: auto;
+	
+	.div3, .body,.goods-contents-value{
 		overflow-x: hidden;
-		border-bottom: 2px solid #d0d0d0;
 	}
-
-
-	/* div4 第4层  结算 */
-	.div4 {
-		position: relative;
-		display: flex;
-		bottom: 0px;
-		left: 0px;
-		/* overflow: auto; */
-		height: 280px;
-	}
-
-	.page {
-		position: relative;
-		overflow: hidden;
-	}
+	
 </style>
