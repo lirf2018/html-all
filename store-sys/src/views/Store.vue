@@ -6,49 +6,49 @@
 		<div>
 			<div class="search-form">
 				<Form :model="searchForm" :label-width="100" :inline="true">
-					<FormItem label="商品名称"><Input placeholder="商品名称" v-model="searchForm.goods_name" @keyup.native="searchList()" /></FormItem>
+					<FormItem label="商品名称"><Input placeholder="商品名称" v-model="searchForm.goods_name" @keyup.native="clickSearch()" /></FormItem>
 					<FormItem label="编号日期">
 						<DatePicker type="date" :editable="false" placeholder="编号日期" v-model="searchForm.shop_code_date" @on-change="searchDateList"></DatePicker>
 					</FormItem>
-					<FormItem label="商品"><Input placeholder="商品条形码/商品编号" v-model="searchForm.goods_code" @keyup.native="searchList()" /></FormItem>
+					<FormItem label="商品"><Input placeholder="商品条形码/商品编号" v-model="searchForm.goods_code" @keyup.native="clickSearch()" /></FormItem>
 					<FormItem label="商品规格">
-						<Select v-model="searchForm.goods_unit" @on-change="searchList">
+						<Select v-model="searchForm.goods_unit" @on-change="clickSearch">
 							<Option v-bind:key="index" :value="item.param_key" v-if="item.param_code == 'goods_unit'" v-for="(item, index) in listParam">
 								{{ item.param_value }}
 							</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="规格数">
-						<Select v-model="searchForm.unit_count" @on-change="searchList">
+						<Select v-model="searchForm.unit_count" @on-change="clickSearch">
 							<Option v-bind:key="index" :value="item.param_key" v-if="item.param_code == 'unit_count'" v-for="(item, index) in listParam">
 								{{ item.param_value }}
 							</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="商品类别">
-						<Select placeholder="选择商品类别" v-model="searchForm.classify_code" @on-change="searchList">
+						<Select placeholder="选择商品类别" v-model="searchForm.classify_code" @on-change="clickSearch">
 							<Option v-bind:key="index" :value="item.classify_code" v-for="(item, index) in listClassify">{{ item.classify_name }}</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="入库类型">
-						<Select placeholder="入库类型" v-model="searchForm.income_type" @on-change="searchList">
+						<Select placeholder="入库类型" v-model="searchForm.income_type" @on-change="clickSearch">
 							<Option value="2">待入库</Option>
 							<Option value="1">已入库</Option>
 							<Option value="0">已出库</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="供应商">
-						<Select placeholder="选择供应商" v-model="searchForm.supplier_code" @on-change="searchList">
+						<Select placeholder="选择供应商" v-model="searchForm.supplier_code" @on-change="clickSearch">
 							<Option v-bind:key="index" :value="item.supplier_code" v-for="(item, index) in listSupplier">{{ item.supplier_name }}</Option>
 						</Select>
 					</FormItem>
 					<Button @click="clearSearch">清空</Button>
 					&nbsp;
-					<Button @click="searchList">搜索</Button>
+					<Button @click="clickSearch">搜索</Button>
 				</Form>
 			</div>
 			<div class="in-btn">
-				<Checkbox v-model="searchForm.search_type" value="1" size="large" @on-change="searchList">&nbsp;数据汇总模式显示库存&nbsp;&nbsp;</Checkbox>
+				<Checkbox v-model="searchForm.search_type" value="1" size="large" @on-change="clickSearch">&nbsp;数据汇总模式显示库存&nbsp;&nbsp;</Checkbox>
 				<Button style="margin-right: 20px" @click="showAddView">添加入库商品</Button>
 				<Button style="margin-right: 20px" @click="batchSureStore(0)">批量确认出库</Button>
 				<Button style="margin-right: 20px" @click="batchSureStore(1)">批量确认入库</Button>
@@ -71,7 +71,7 @@
 				</Table>
 			</div>
 			<div class="page-next">
-				<Page :total="total" :current="searchForm.curre_page" :page-size="searchForm.page_size" show-sizer prev-text="上一页"
+				<Page show-total :total="total" :current="searchForm.curre_page" :page-size="searchForm.page_size" show-sizer prev-text="上一页"
 				 next-text="下一页" @on-change="changePage" @on-page-size-change="changePageSize" />
 			</div>
 		</div>
@@ -90,6 +90,7 @@
 						<Button @click="clearSearch">清空</Button>
 					</Form>
 				</div>
+				<div><span>提示：(1)修改库存商品信息，需要重新添加到商品信息表 (2)修改库商品,同一个商品码的商品名称，商品规格，规格数相应同步更新</span></div>
 				<div style="width: 100%;border-bottom: 1px solid gray;margin-bottom: 20px;"></div>
 				<Form ref="formValidate" :model="addFormData" :label-width="250" :rules="ruleValidate">
 					<div class="item">
@@ -110,7 +111,7 @@
 						<FormItem label="商品名称" prop="goodsName"><Input placeholder="商品名称" v-model="addFormData.goodsName" /></FormItem>
 					</div>
 					<div class="item">
-						<FormItem label="商品条形码" prop="goodsCode"><Input placeholder="商品条形码" v-model="addFormData.goodsCode" /></FormItem>
+						<FormItem label="商品条形码" prop="goodsCode"><Input placeholder="商品条形码" v-model="addFormData.goodsCode" :readonly="readonlyGoodsCode" /></FormItem>
 					</div>
 					<div class="item">
 						<FormItem label="商品店铺码" prop="shopCode"><Input :readonly="shopCodeRead" string placeholder="商品编号" v-model="addFormData.shopCode" /></FormItem>
@@ -209,6 +210,7 @@
 				modal2: false,
 				addGoodsFlag: false,
 				shopCodeRead: true,
+				readonlyGoodsCode:true,
 				showAddBtn: false,
 				incomIdsFlag: false,
 				searchForm: {
@@ -250,7 +252,7 @@
 					warning: null,
 					year: null,
 					month: null,
-					endTimeType: null
+					endTimeType: 0
 				},
 				ruleValidate: {
 					classifyCode: [{
@@ -452,6 +454,10 @@
 			});
 		},
 		methods: {
+			clickSearch(){
+				this.searchForm.curre_page = 1;
+				this.searchList();
+			},
 			searchList() {
 				const vm = this;
 				if (vm.searchForm.goods_code && !(vm.searchForm.goods_code.length == 13 || vm.searchForm.goods_code.length == 23)) {
@@ -475,8 +481,8 @@
 			handleSelectAll(status) {
 				this.$refs.selection.selectAll(status);
 			},
-			changePage(current) {
-				this.searchForm.curre_page = current;
+			changePage(currePage) {
+				this.searchForm.curre_page = currePage;
 				this.searchList();
 			},
 			changePageSize(pageSize) {
@@ -523,20 +529,22 @@
 				this.addFormData.effectToTime = null;
 				this.addFormData.year = null;
 				this.addFormData.month = null;
-				this.addFormData.endTimeType = null;
+				this.addFormData.endTimeType = 0;
 				this.addFormData.createTime = null;
 				this.addFormData.classifyCode = null;
 				this.addFormData.remark = null;
 				this.addFormData.inTime = null;
 				this.addFormData.outTime = null;
 				this.showAddBtn = true;
+				this.readonlyGoodsCode = false;
 
-				if (row && row.income_id) {
+				if (row && row.income_id>0) {
 					// let vm =  this;
 					// Object.keys(this.addFormData).map(i=>{
 					// 	vm.addFormData[i] = row[i];
 					// })
 					this.showAddBtn = false;
+					this.readonlyGoodsCode = true;
 					this.addFormData.incomeId = row.income_id;
 					this.addFormData.supplierCode = row.supplier_code;
 					this.addFormData.goodsCode = row.goods_code;
@@ -653,7 +661,6 @@
 				this.searchList();
 			},
 			searchGoodsData() {
-				debugger;
 				const vm = this;
 				const params = {
 					req_type: 'kc_page_store',
@@ -677,6 +684,7 @@
 							vm.addFormData.store = 1;
 							vm.addFormData.classifyCode = row.classify_code;
 							vm.addFormData.remark = row.remark;
+							vm.addFormData.endTimeType = 0;
 						}
 					} else {}
 				});

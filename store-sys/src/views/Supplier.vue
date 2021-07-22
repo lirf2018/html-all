@@ -4,10 +4,10 @@
 		<div>
 			<div class="search-form">
 				<Form :model="searchForm" :label-width="120" :inline="true">
-					<FormItem label="供应商名称"><Input placeholder="供应商名称" v-model="searchForm.supplier_name" @keyup.native="searchList()" /></FormItem>
-					<FormItem label="供应商编码"><Input placeholder="供应商编码" v-model="searchForm.supplier_code" @keyup.native="searchList()" /></FormItem>
-					<FormItem label="供应商电话"><Input placeholder="供应商编码" v-model="searchForm.supplier_phone" @keyup.native="searchList()" /></FormItem>
-					<FormItem label="供应商地址"><Input placeholder="供应商编码" v-model="searchForm.supplier_addr" @keyup.native="searchList()" /></FormItem>
+					<FormItem label="供应商名称"><Input placeholder="供应商名称" v-model="searchForm.supplier_name" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="供应商编码"><Input placeholder="供应商编码" v-model="searchForm.supplier_code" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="供应商电话"><Input placeholder="供应商编码" v-model="searchForm.supplier_phone" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="供应商地址"><Input placeholder="供应商编码" v-model="searchForm.supplier_addr" @keyup.native="clickSearch()" /></FormItem>
 					<Button @click="clearSearch">清空</Button>
 				</Form>
 			</div>
@@ -132,6 +132,10 @@ export default {
 		});
 	},
 	methods: {
+		clickSearch(){
+			this.searchForm.curre_page = 1;
+			this.searchList();
+		},
 		searchList() {
 			const vm = this;
 			const params = {
@@ -150,8 +154,8 @@ export default {
 		handleSelectAll(status) {
 			this.$refs.selection.selectAll(status);
 		},
-		changePage(current) {
-			this.searchForm.curre_page = current;
+		changePage(currePage) {
+			this.searchForm.curre_page = currePage;
 			this.searchList();
 		},
 		changePageSize(pageSize) {

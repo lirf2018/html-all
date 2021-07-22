@@ -4,23 +4,23 @@
 		<div>
 			<div class="search-form">
 				<Form :model="searchForm" :label-width="120" :inline="true">
-					<FormItem label="商品名称"><Input placeholder="商品名称" v-model="searchForm.goods_name" @keyup.native="searchList()" /></FormItem>
-					<FormItem label="商品条形码"><Input placeholder="商品条形码" v-model="searchForm.goods_code" @keyup.native="searchList()" /></FormItem>
+					<FormItem label="商品名称"><Input placeholder="商品名称" v-model="searchForm.goods_name" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="商品条形码"><Input placeholder="商品条形码" v-model="searchForm.goods_code" @keyup.native="clickSearch()" /></FormItem>
 					<FormItem label="状态">
-						<Select placeholder="选择状态" v-model="searchForm.status" @on-change="searchList">
+						<Select placeholder="选择状态" v-model="searchForm.status" @on-change="clickSearch">
 							<Option :value="1">销售中</Option>
 							<Option :value="2">已下架</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="是否促销">
-						<Select placeholder="选择是否促销" v-model="searchForm.is_discounts" @on-change="searchList">
+						<Select placeholder="选择是否促销" v-model="searchForm.is_discounts" @on-change="clickSearch">
 							<Option :value="0">否</Option>
 							<Option :value="1">是</Option>
 						</Select>
 					</FormItem>
 					<Button @click="clearSearch">清空</Button>
 					&nbsp;
-					<Button @click="searchList">搜索</Button>
+					<Button @click="clickSearch">搜索</Button>
 				</Form>
 			</div>
 			<div class="in-btn">
@@ -117,8 +117,8 @@
 						</div>
 							<Form  :label-width="120" :inline="true">
 							<div class="submitBtn">
-								<FormItem><Input placeholder="商品条形码" v-model="searchForm2.goods_code"  @keyup.native="searchList2()" /></FormItem>
-								<Button @click="searchList2">搜索</Button>
+								<FormItem><Input placeholder="商品条形码" v-model="searchForm2.goods_code"  @keyup.native="clickSearch2()" /></FormItem>
+								<Button @click="clickSearch2()">搜索</Button>
 								<Button style="margin:0px 10px" type="primary" @click="save(0)">保存</Button>
 								<Button style="margin:0px 10px" @click="save(1)">保存并继续添加</Button>
 								<Button style="margin:0px 10px" @click="addGoodsFlag = false">取消</Button>
@@ -136,7 +136,7 @@
 							</template>
 							<template slot-scope="{ row, index }" slot="action">
 								<Button style="margin-right: 15px" @click="showStoreDetail(row)">查看进货价</Button>
-								<Button style="margin-right: 15px" @click="addStoreDetail(row)" type="primary">添加商品</Button>
+								<Button style="margin-right: 15px" @click="addStoreDetail(row)" type="primary">复制商品信息</Button>
 							</template>
 						</Table>
 					</div>
@@ -353,6 +353,10 @@ export default {
 		});
 	},
 	methods: {
+		clickSearch(){
+			this.searchForm.curre_page = 1;
+			this.searchList();
+		},
 		searchList() {
 			let vm = this;
 			if(vm.searchForm.goods_code && !(vm.searchForm.goods_code.length ==13 || vm.searchForm.goods_code.length==23)){
@@ -371,8 +375,8 @@ export default {
 				}
 			});
 		},
-		changePage(current) {
-			this.searchForm.curre_page = current;
+		changePage(currePage) {
+			this.searchForm.curre_page = currePage;
 			this.searchList();
 		},
 		changePageSize(pageSize) {
@@ -430,6 +434,10 @@ export default {
 			vm.addFormData.goodsUnit = row.goods_unit;
 			vm.addFormData.goodsUnitName = row.goods_unit_name;
 			vm.addFormData.unitCount = row.unit_count;
+		},
+		clickSearch2(){
+			this.searchForm2.curre_page = 1;
+			this.searchList2();
 		},
 		//查询未添加的入库商品
 		searchList2() {

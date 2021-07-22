@@ -4,9 +4,9 @@
 		<div>
 			<div class="search-form">
 				<Form :model="searchForm" :label-width="120" :inline="true">
-					<FormItem label="参数名称"><Input placeholder="参数名称" v-model="searchForm.param_name" @keyup.native="searchList()" /></FormItem>
-					<FormItem label="参数编码"><Input placeholder="参数编码" v-model="searchForm.param_code" @keyup.native="searchList()" /></FormItem>
-					<FormItem label="参数key"><Input placeholder="参数key" v-model="searchForm.param_key" @keyup.native="searchList()" /></FormItem>
+					<FormItem label="参数名称"><Input placeholder="参数名称" v-model="searchForm.param_name" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="参数编码"><Input placeholder="参数编码" v-model="searchForm.param_code" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="参数key"><Input placeholder="参数key" v-model="searchForm.param_key" @keyup.native="clickSearch()" /></FormItem>
 					<Button @click="clearSearch">清空</Button>
 				</Form>
 			</div>
@@ -131,6 +131,10 @@ export default {
 		});
 	},
 	methods: {
+		clickSearch(){
+			this.searchForm.curre_page = 1;
+			this.searchList();
+		},
 		searchList() {
 			const vm = this;
 			const params = {
@@ -149,8 +153,8 @@ export default {
 		handleSelectAll(status) {
 			this.$refs.selection.selectAll(status);
 		},
-		changePage(current) {
-			this.searchForm.curre_page = current;
+		changePage(currePage) {
+			this.searchForm.curre_page = currePage;
 			this.searchList();
 		},
 		changePageSize(pageSize) {

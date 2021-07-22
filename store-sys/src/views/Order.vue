@@ -3,15 +3,15 @@
 		<div style="position: absolute;top: 0px;left: 15px;z-index: 999;"><Navigation /></div>
 		<div class="search-form">
 			<Form :model="searchForm" :label-width="120" :inline="true">
-				<FormItem label="订单号"><Input placeholder="订单号" v-model="searchForm.order_no" @keyup.native="searchList()" /></FormItem>
-				<FormItem label="手机号"><Input placeholder="手机号" v-model="searchForm.user_phone" @keyup.native="searchList()" /></FormItem>
-				<FormItem label="桌号"><Input placeholder="桌号" v-model="searchForm.table_name" @keyup.native="searchList()" /></FormItem>
+				<FormItem label="订单号"><Input placeholder="订单号" v-model="searchForm.order_no" @keyup.native="clickSearch()" /></FormItem>
+				<FormItem label="手机号"><Input placeholder="手机号" v-model="searchForm.user_phone" @keyup.native="clickSearch()" /></FormItem>
+				<FormItem label="桌号"><Input placeholder="桌号" v-model="searchForm.table_name" @keyup.native="clickSearch()" /></FormItem>
 				<FormItem label="状态">
-					<Select placeholder="选择状态" v-model="searchForm.order_status" @on-change="searchList">
+					<Select placeholder="选择状态" v-model="searchForm.order_status" @on-change="clickSearch">
 						<Option :value="item.param_key" v-for="(item, index) in orderStatus" :key="index">{{ item.param_value }}</Option>
 					</Select>
 				</FormItem>
-				<Button style="margin:0px 10px" @click="searchList">搜索</Button>
+				<Button style="margin:0px 10px" @click="clickSearch">搜索</Button>
 				<Button @click="clearSearch">清空</Button>
 				&nbsp;&nbsp;&nbsp;
 				<!-- <Checkbox v-model="searchForm.search_type" value="1" size="large" @on-change="searchList">&nbsp;详情汇总模式显示&nbsp;&nbsp;</Checkbox> -->
@@ -106,9 +106,15 @@ export default {
 				align: 'center'
 			},
 			{
-				title: '订单实付价',
-				key: 'real_price',
-				align: 'center'
+				title: '订单应付总价(实付款)',
+				//key: 'real_price',
+				align: 'center',
+				render:(h,params) => {
+					let realPrice = params.row.real_price;
+					let realInPrice = params.row.real_inpay_price;
+					let str = realPrice + " ("+realInPrice +")";
+					return h("div",str)
+				}
 			},
 			{
 				title: '优惠券总价',
@@ -171,6 +177,10 @@ export default {
 				}
 			}
 		},
+		clickSearch(){
+			this.searchForm.curre_page = 1;
+			this.searchList();
+		},
 		searchList() {
 			const vm = this;
 			const params = {
@@ -210,10 +220,10 @@ export default {
 		},
 		resetOrderData(obj) {
 			let vm = this;
-			console.log('-------------------------------');
 			let goodsCount = obj.goods_count; //订单数量
 			let orderPrice = obj.order_price; //订单总价
-			let realPrice = obj.real_price; //实付总
+			let realPrice = obj.real_price; //应实付总价
+			let realInpayPrice = obj.realInpayPrice;//实付款
 			let discountsPriceOrder = obj.discounts_price_order; //促销优惠价格
 			let discountsMemberPrice = obj.discounts_member_price; //会员优惠价格
 			let discountsTicketPrice = obj.discounts_ticket_price; //优惠券优惠价格

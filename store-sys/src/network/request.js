@@ -1,8 +1,8 @@
 // 引入axios
 import axios from 'axios';
 
-let root = "http://lrf-13418915218.6655.la"
-// let root = "http://localhost:8085";
+// let root = "http://lrf-13418915218.6655.la"
+let root = "http://localhost:8085";
 
 // 创建axios实例
 const httpService = axios.create({

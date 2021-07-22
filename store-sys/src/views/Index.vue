@@ -243,7 +243,7 @@
 				</div>
 				<div class="div3-0 div3-0-1">
 					<div class="div-contents">商品信息</div>
-					<div class="goods-contents-value goods-contents-value-1">
+					<div class="goods-contents-value goods-contents-value-1 goods-contents-value-11">
 						<ul>
 							<li>序号</li>
 							<li>商品编码</li>
@@ -364,6 +364,7 @@
 				returnPrice: 0,
 				returnPriceText: '找零',
 				goodsCount: 0,
+				realInpayPrice:0,//实付款
 				// 折扣
 				discountsCouponPriceCount: 0, //优惠券折扣
 				discountsMemberPriceCount: 0, //会员折扣
@@ -546,7 +547,7 @@
 			countPrice() {
 				let vm = this;
 				if (vm.orderInfo.order_status && vm.orderInfo.order_status != 0) {
-					vm.payPrice = vm.realPrice;
+					vm.payPrice = vm.realInpayPrice;
 				}
 				//优惠合计
 				vm.returnPrice = vm.payPrice - vm.realPrice;
@@ -622,6 +623,7 @@
 				vm.discountsPriceCountAll = 0;
 				vm.realPrice = 0;
 				vm.payPrice = 0;
+				vm.realInpayPrice = 0;
 				vm.returnPrice = 0;
 				vm.goodsCount = 0;
 				//
@@ -674,6 +676,8 @@
 							vm.discountsPriceCount = orderList[0].discountsPrice;
 							vm.orderPrice = orderList[0].orderPrice;
 							vm.realPrice = orderList[0].realPrice;
+							vm.realInpayPrice = orderList[0].realInpayPrice
+							
 							vm.discountsPriceCountAll = orderList[0].discountsPriceCountAll;
 							vm.goodsCount = orderList[0].goodsCount;
 							vm.orderInfo.order_id = orderList[0].orderId;
@@ -1006,7 +1010,8 @@
 				const data = {
 					order_id: vm.orderInfo.order_id,
 					order_status: 1,
-					pay_method: 0
+					pay_method: 0,
+					pay_price: vm.payPrice
 				};
 				const params = {
 					req_type: 'kc_update_order_status',
@@ -1100,23 +1105,6 @@
 	input {
 		border-radius: 1px;
 	}
-
-	/* 桌号信息层 */
-	/* .div1,
-	.div2 {
-		overflow: auto;
-		border-bottom: 2px solid #d0d0d0;
-		position: relative;
-		background-color: #f0f0f0;
-	} */
-
-	/* 	.title-name {
-		position: absolute;
-		left: 120px;
-		top:20px;
-		font-size: 3.5rem;
-		font-weight: bold;
-	} */
 
 	.table-div {
 		float: left;
@@ -1232,14 +1220,6 @@
 		background-color: #272727;
 	}
 
-	/* 内容层 */
-	/* 	.div3 {
-		overflow: auto;
-		text-align: center;
-		width: 100%;
-		background-color: #f0f0f0;
-	} */
-
 	.goods-contents-title>ul>li,
 	.goods-contents-value>ul>li {
 		float: left;
@@ -1249,6 +1229,14 @@
 	.goods-contents-title {
 		font-weight: 900;
 		padding: 10px 0;
+		background-color: #f0f0f0;
+		border-bottom: 1px solid #6c6c6c;
+		overflow: auto;
+		text-align: center;
+	}
+	
+	.goods-contents-value-11{
+		font-weight: 900;
 		background-color: #f0f0f0;
 		border-bottom: 1px solid #6c6c6c;
 		overflow: auto;
@@ -1452,39 +1440,6 @@
 	.handler-btn>button:nth-child(2) {
 		/* margin: 0px 15px; */
 	}
-
-	/* 布局 */
-	/* 	.div1,
-	.div2,
-	.div3-0 {
-		background-color: #f0f0f0;
-		overflow: hidden;
-		position: fixed;
-	} */
-
-	/* 	.div1 {
-		height: 90px;
-		top: 0px;
-		z-index: 100;
-	} */
-
-	/* 	.div2 {
-		height: 180px;
-		top: 90px;
-		z-index: 90;
-	} */
-
-	/* 	.div3-0 {
-		height: 120px;
-		top: 270px;
-		z-index: 80;
-	} */
-
-	/* 	.div3-1 {
-		width: 100%;
-		height: 390px;
-		background-color: #f0f0f0;
-	} */
 
 	/* 添加订单信息 */
 	.input-show-div {
@@ -1785,7 +1740,7 @@
 		overflow-x: hidden;
 		border-bottom: 2px solid #d0d0d0;
 	}
-
+	
 
 	/* div4 第4层  结算 */
 	.div4 {

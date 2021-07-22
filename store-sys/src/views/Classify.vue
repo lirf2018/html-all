@@ -4,8 +4,8 @@
 		<div>
 			<div class="search-form">
 				<Form :model="searchForm" :label-width="100" :inline="true">
-					<FormItem label="分类名称"><Input placeholder="分类名称" v-model="searchForm.classify_name" @keyup.native="searchList()" /></FormItem>
-					<FormItem label="分类编码"><Input placeholder="分类编码" v-model="searchForm.classify_code" @keyup.native="searchList()" /></FormItem>
+					<FormItem label="分类名称"><Input placeholder="分类名称" v-model="searchForm.classify_name" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="分类编码"><Input placeholder="分类编码" v-model="searchForm.classify_code" @keyup.native="clickSearch()" /></FormItem>
 					<Button @click="clearSearch">清空</Button>
 				</Form>
 			</div>
@@ -129,6 +129,10 @@ export default {
 		});
 	},
 	methods: {
+		clickSearch(){
+			this.searchForm.curre_page = 1;
+			this.searchList();
+		},
 		searchList() {
 			let vm = this;
 			let params = {
