@@ -338,5 +338,6 @@
 		position: fixed;
 		top: 20px;
 		right: 10px;
+		z-index: 9999999999999;
 	}
 </style>
