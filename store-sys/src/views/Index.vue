@@ -286,7 +286,7 @@
 				</div>
 			</div>
 		</Modal>
-		<Modal width="600" v-model="payCashPriceFlag" title="现金付款" @on-ok="showCashPayOk">
+		<Modal width="600" v-model="payCashPriceFlag" title="现金付款" @on-ok="showCashPayOk" @on-cancel=onCancel()>
 			<div class="input-show-div add-order-info pay-info">
 				<div class="input-show-div-text  pay-info-text">
 					<span><input readonly="readonly" disabled="disabled" value="付款金额：" /></span>
@@ -1001,6 +1001,9 @@
 				vm.$nextTick(() => {
 					vm.$refs.cashPayRef.focus();
 				});
+			},
+			onCancel(){
+				this.payPrice = 0;
 			},
 			showCashPayOk() {
 				let vm = this;
