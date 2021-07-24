@@ -3,31 +3,42 @@
 		<div style="position: absolute;top: 0px;left: 15px;z-index: 999;">
 			<Navigation />
 		</div>
+		<div class="title">
+			<div>
+				<h2>商品出入库</h2>
+			</div>
+		</div>
 		<div>
 			<div class="search-form">
 				<Form :model="searchForm" :label-width="100" :inline="true">
-					<FormItem label="商品名称"><Input placeholder="商品名称" v-model="searchForm.goods_name" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="商品名称"><Input placeholder="商品名称" v-model="searchForm.goods_name"
+							@keyup.native="clickSearch()" /></FormItem>
 					<FormItem label="编号日期">
-						<DatePicker type="date" :editable="false" placeholder="编号日期" v-model="searchForm.shop_code_date" @on-change="searchDateList"></DatePicker>
+						<DatePicker type="date" :editable="false" placeholder="编号日期" v-model="searchForm.shop_code_date"
+							@on-change="searchDateList"></DatePicker>
 					</FormItem>
-					<FormItem label="商品"><Input placeholder="商品条形码/商品编号" v-model="searchForm.goods_code" @keyup.native="clickSearch()" /></FormItem>
+					<FormItem label="商品"><Input placeholder="商品条形码/商品编号" v-model="searchForm.goods_code"
+							@keyup.native="clickSearch()" /></FormItem>
 					<FormItem label="商品规格">
 						<Select v-model="searchForm.goods_unit" @on-change="clickSearch">
-							<Option v-bind:key="index" :value="item.param_key" v-if="item.param_code == 'goods_unit'" v-for="(item, index) in listParam">
+							<Option v-bind:key="index" :value="item.param_key" v-if="item.param_code == 'goods_unit'"
+								v-for="(item, index) in listParam">
 								{{ item.param_value }}
 							</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="规格数">
 						<Select v-model="searchForm.unit_count" @on-change="clickSearch">
-							<Option v-bind:key="index" :value="item.param_key" v-if="item.param_code == 'unit_count'" v-for="(item, index) in listParam">
+							<Option v-bind:key="index" :value="item.param_key" v-if="item.param_code == 'unit_count'"
+								v-for="(item, index) in listParam">
 								{{ item.param_value }}
 							</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="商品类别">
 						<Select placeholder="选择商品类别" v-model="searchForm.classify_code" @on-change="clickSearch">
-							<Option v-bind:key="index" :value="item.classify_code" v-for="(item, index) in listClassify">{{ item.classify_name }}</Option>
+							<Option v-bind:key="index" :value="item.classify_code"
+								v-for="(item, index) in listClassify">{{ item.classify_name }}</Option>
 						</Select>
 					</FormItem>
 					<FormItem label="入库类型">
@@ -39,7 +50,8 @@
 					</FormItem>
 					<FormItem label="供应商">
 						<Select placeholder="选择供应商" v-model="searchForm.supplier_code" @on-change="clickSearch">
-							<Option v-bind:key="index" :value="item.supplier_code" v-for="(item, index) in listSupplier">{{ item.supplier_name }}</Option>
+							<Option v-bind:key="index" :value="item.supplier_code"
+								v-for="(item, index) in listSupplier">{{ item.supplier_name }}</Option>
 						</Select>
 					</FormItem>
 					<Button @click="clearSearch">清空</Button>
@@ -48,31 +60,37 @@
 				</Form>
 			</div>
 			<div class="in-btn">
-				<Checkbox v-model="searchForm.search_type" value="1" size="large" @on-change="clickSearch">&nbsp;数据汇总模式显示库存&nbsp;&nbsp;</Checkbox>
+				<Checkbox v-model="searchForm.search_type" value="1" size="large" @on-change="clickSearch">
+					&nbsp;数据汇总模式显示库存({{extName}}有效)&nbsp;&nbsp;</Checkbox>
 				<Button style="margin-right: 20px" @click="showAddView">添加入库商品</Button>
 				<Button style="margin-right: 20px" @click="batchSureStore(0)">批量确认出库</Button>
 				<Button style="margin-right: 20px" @click="batchSureStore(1)">批量确认入库</Button>
 			</div>
 			<div class="list">
 				<Table :stripe="true" size="large" border ref="selection" :columns="listTitle" :data="listContents"
-				 @on-selection-change="onSelectionChange">
+					@on-selection-change="onSelectionChange">
 					<template slot-scope="{ row }" slot="name">
 						<strong>操作</strong>
 					</template>
 					<template slot-scope="{ row, index }" slot="action">
-						<Button @click="deleteData(row)" style="margin-right: 15px" v-if="searchForm.search_type != 1 && row.income_type == 2">删除</Button>
-						<Button @click="postIncomeType(row, 0)" v-if="searchForm.search_type != 1 && row.income_type == 1">出库</Button>
-						<Button @click="postIncomeType(row, 1)" v-if="searchForm.search_type != 1 && (row.income_type == 0 || row.income_type == 2)"
-						 style="margin-right: 15px">
+						<Button @click="deleteData(row)" style="margin-right: 15px"
+							v-if="searchForm.search_type != 1 && row.income_type == 2">删除</Button>
+						<Button @click="postIncomeType(row, 0)"
+							v-if="searchForm.search_type != 1 && row.income_type == 1">出库</Button>
+						<Button @click="postIncomeType(row, 1)"
+							v-if="searchForm.search_type != 1 && (row.income_type == 0 || row.income_type == 2)"
+							style="margin-right: 15px">
 							入库
 						</Button>
-						<Button @click="showAddView(row)" v-if="searchForm.search_type != 1 && (row.income_type == 0 || row.income_type == 2)">修改</Button>
+						<Button @click="showAddView(row)"
+							v-if="searchForm.search_type != 1 && (row.income_type == 0 || row.income_type == 2)">修改</Button>
 					</template>
 				</Table>
 			</div>
 			<div class="page-next">
-				<Page show-total :total="total" :current="searchForm.curre_page" :page-size="searchForm.page_size" show-sizer prev-text="上一页"
-				 next-text="下一页" @on-change="changePage" @on-page-size-change="changePageSize" />
+				<Page show-total :total="total" :current="searchForm.curre_page" :page-size="searchForm.page_size"
+					show-sizer prev-text="上一页" next-text="下一页" @on-change="changePage"
+					@on-page-size-change="changePageSize" />
 			</div>
 		</div>
 		<div>
@@ -80,11 +98,12 @@
 				<div style="text-align: center;margin: 0 auto;">
 					<Form :model="searchForm" :label-width="300" :inline="true">
 						<FormItem label="编号日期">
-							<DatePicker type="date" :editable="false" placeholder="编号日期" v-model="searchForm.shop_code_date" @on-change="searchGoodsData"></DatePicker>
+							<DatePicker type="date" :editable="false" placeholder="编号日期"
+								v-model="searchForm.shop_code_date" @on-change="searchGoodsData"></DatePicker>
 						</FormItem>
 						<FormItem label="查询商品">
-							<Input style="width: 300px" placeholder="商品编号/商品条形码" v-model="searchForm.goods_code" @change.native="searchGoodsData"
-							 @keyup.native="searchGoodsData" />
+							<Input style="width: 300px" placeholder="商品编号/商品条形码" v-model="searchForm.goods_code"
+								@change.native="searchGoodsData" @keyup.native="searchGoodsData" />
 						</FormItem>
 						<Button @click="searchGoodsData">查询商品</Button>&nbsp;&nbsp;
 						<Button @click="clearSearch">清空</Button>
@@ -96,51 +115,59 @@
 					<div class="item">
 						<FormItem label="商品分类" prop="classifyCode">
 							<Select v-model="addFormData.classifyCode">
-								<Option v-bind:key="index" :value="item.classify_code" v-for="(item, index) in listClassify">{{ item.classify_name }}</Option>
+								<Option v-bind:key="index" :value="item.classify_code"
+									v-for="(item, index) in listClassify">{{ item.classify_name }}</Option>
 							</Select>
 						</FormItem>
 					</div>
 					<div class="item">
 						<FormItem label="供应商" prop="supplierCode">
 							<Select v-model="addFormData.supplierCode">
-								<Option v-bind:key="index" :value="item.supplier_code" v-for="(item, index) in listSupplier">{{ item.supplier_name }}</Option>
+								<Option v-bind:key="index" :value="item.supplier_code"
+									v-for="(item, index) in listSupplier">{{ item.supplier_name }}</Option>
 							</Select>
 						</FormItem>
 					</div>
 					<div class="item">
-						<FormItem label="商品名称" prop="goodsName"><Input placeholder="商品名称" v-model="addFormData.goodsName" /></FormItem>
+						<FormItem label="商品名称" prop="goodsName"><Input placeholder="商品名称"
+								v-model="addFormData.goodsName" /></FormItem>
 					</div>
 					<div class="item">
-						<FormItem label="商品条形码" prop="goodsCode"><Input placeholder="商品条形码" v-model="addFormData.goodsCode" :readonly="readonlyGoodsCode" /></FormItem>
+						<FormItem label="商品条形码" prop="goodsCode"><Input placeholder="商品条形码"
+								v-model="addFormData.goodsCode" :readonly="readonlyGoodsCode" /></FormItem>
 					</div>
 					<div class="item">
-						<FormItem label="商品店铺码" prop="shopCode"><Input :readonly="shopCodeRead" string placeholder="商品编号" v-model="addFormData.shopCode" /></FormItem>
+						<FormItem label="商品店铺码" prop="shopCode"><Input :readonly="shopCodeRead" string
+								placeholder="商品编号" v-model="addFormData.shopCode" /></FormItem>
 					</div>
 					<div class="item">
 						<FormItem label="商品规格" prop="goodsUnit">
 							<Select v-model="addFormData.goodsUnit">
-								<Option v-bind:key="index" :value="item.param_key" v-if="item.param_code == 'goods_unit'" v-for="(item, index) in listParam">
+								<Option v-bind:key="index" :value="item.param_key"
+									v-if="item.param_code == 'goods_unit'" v-for="(item, index) in listParam">
 									{{ item.param_value }}
 								</Option>
 							</Select>
 						</FormItem>
 					</div>
 					<div class="item">
-						<FormItem label="进货价" prop="incomePrice"><Input placeholder="进货价" number v-model="addFormData.incomePrice" /></FormItem>
+						<FormItem label="进货价" prop="incomePrice"><Input placeholder="进货价" number
+								v-model="addFormData.incomePrice" /></FormItem>
 					</div>
 					<div class="item">
-						<FormItem label="规格数" prop="unitCount"><Input placeholder="规格数" number v-model="addFormData.unitCount" /></FormItem>
+						<FormItem label="规格数" prop="unitCount"><Input placeholder="规格数" number
+								v-model="addFormData.unitCount" /></FormItem>
 					</div>
 					<div class="item">
 						<FormItem label="生产日期">
-							<DatePicker type="date" format="yyyy-MM-dd" :editable="false" placeholder="生产日期" v-model="addFormData.makeDay"
-							 prop="date"></DatePicker>
+							<DatePicker type="date" format="yyyy-MM-dd" :editable="false" placeholder="生产日期"
+								v-model="addFormData.makeDay" prop="date"></DatePicker>
 						</FormItem>
 					</div>
 					<div class="item">
 						<FormItem label="有效截止日期">
-							<DatePicker type="date" format="yyyy-MM-dd" :editable="false" placeholder="有效截止日期" v-model="addFormData.effectToTime"
-							 prop="date"></DatePicker>
+							<DatePicker type="date" format="yyyy-MM-dd" :editable="false" placeholder="有效截止日期"
+								v-model="addFormData.effectToTime" prop="date"></DatePicker>
 						</FormItem>
 					</div>
 					<div class="item">
@@ -154,19 +181,22 @@
 						</FormItem>
 					</div>
 					<div class="item">
-						<FormItem label="有效天"><Input placeholder="有效天" number v-model="addFormData.effectDay" /></FormItem>
+						<FormItem label="有效天"><Input placeholder="有效天" number v-model="addFormData.effectDay" />
+						</FormItem>
 					</div>
 					<div class="item">
 						<FormItem label="有效年"><Input placeholder="有效年" number v-model="addFormData.year" /></FormItem>
 					</div>
 					<div class="item" v-if="showAddBtn">
-						<FormItem label="库存"><Input placeholder="库存" number v-model="addFormData.store" @keyup.native="storeMoreThenOne" /></FormItem>
+						<FormItem label="库存"><Input placeholder="库存" number v-model="addFormData.store"
+								@keyup.native="storeMoreThenOne" /></FormItem>
 					</div>
 					<div class="item">
 						<FormItem label="有效月"><Input placeholder="有效月" number v-model="addFormData.month" /></FormItem>
 					</div>
 					<div class="item remark">
-						<FormItem label="备注"><Input type="textarea" :autosize="{ minRows: 4, maxRows: 9 }" placeholder="备注" v-model="addFormData.remark" /></FormItem>
+						<FormItem label="备注"><Input type="textarea" :autosize="{ minRows: 4, maxRows: 9 }"
+								placeholder="备注" v-model="addFormData.remark" /></FormItem>
 					</div>
 					<div class="submitBtn">
 						<Button style="margin:0px 10px" @click="saveData(0)" type="primary">保存</Button>
@@ -210,7 +240,7 @@
 				modal2: false,
 				addGoodsFlag: false,
 				shopCodeRead: true,
-				readonlyGoodsCode:true,
+				readonlyGoodsCode: true,
 				showAddBtn: false,
 				incomIdsFlag: false,
 				searchForm: {
@@ -323,7 +353,8 @@
 				listContents: [],
 				listClassify: [],
 				listSupplier: [],
-				listParam: []
+				listParam: [],
+				extName: "规格数" // '规格数/库存'
 			};
 		},
 		created() {
@@ -454,13 +485,19 @@
 			});
 		},
 		methods: {
-			clickSearch(){
+			clickSearch() {
 				this.searchForm.curre_page = 1;
 				this.searchList();
+				if (this.searchForm.search_type) {
+					this.extName = "库存";
+				} else {
+					this.extName = "规格数";
+				}
 			},
 			searchList() {
 				const vm = this;
-				if (vm.searchForm.goods_code && !(vm.searchForm.goods_code.length == 13 || vm.searchForm.goods_code.length == 23)) {
+				if (vm.searchForm.goods_code && !(vm.searchForm.goods_code.length == 13 || vm.searchForm.goods_code
+						.length == 23)) {
 					return;
 				}
 				const params = {
@@ -538,7 +575,7 @@
 				this.showAddBtn = true;
 				this.readonlyGoodsCode = false;
 
-				if (row && row.income_id>0) {
+				if (row && row.income_id > 0) {
 					// let vm =  this;
 					// Object.keys(this.addFormData).map(i=>{
 					// 	vm.addFormData[i] = row[i];
@@ -881,7 +918,8 @@
 					});
 					return true;
 				}
-				if (vm.addFormData.effectToTime == null && vm.addFormData.effectDay == null && vm.addFormData.year && vm.addFormData
+				if (vm.addFormData.effectToTime == null && vm.addFormData.effectDay == null && vm.addFormData.year && vm
+					.addFormData
 					.month) {
 					const msg = '截止日期/有效年/有效月/有效天数不能同时为空';
 					vm.$Message.warning({
@@ -890,7 +928,8 @@
 					});
 					return true;
 				}
-				if (vm.addFormData.makeDay != '' && vm.addFormData.makeDay != null && vm.addFormData.effectToTime != null && vm.addFormData
+				if (vm.addFormData.makeDay != '' && vm.addFormData.makeDay != null && vm.addFormData.effectToTime !=
+					null && vm.addFormData
 					.effectToTime != '') {
 					if (vm.addFormData.makeDay > vm.addFormData.effectToTime) {
 						const msg = '生产日期不能大于有效截止日期';
@@ -917,6 +956,12 @@
 		bottom: 0px;
 		left: 0px;
 	}
+
+	.title {
+		text-align: center;
+		padding-bottom: 10px;
+	}
+
 
 	.page-next {
 		background-color: white;

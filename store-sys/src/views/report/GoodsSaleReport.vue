@@ -18,27 +18,32 @@
 				</FormItem>
 				<Button @click="createReport">刷新报表</Button>
 			</Form>
+			<div style="text-align: right;">
+				<Form :inline="true">
+					<Button @click="updateGoodsStoreReport">刷新商品库存</Button>
+				</Form>
+			</div>
 		</div>
 		<div class="year-search">
 			<Form :inline="true">
-				<FormItem label="选择查询年" prop="city" :label-width="120">
+				<FormItem label="选择查询年" prop="city" :label-width="110">
 					<Select v-model="year" placeholder="选择查询年" @on-change="clickYear()">
 						<Option :value="item" v-for="(item, index) in yearList" :key="index">{{ item }}</Option>
 					</Select>
 				</FormItem>
-				<FormItem label="查询维度" :label-width="150">
+				<FormItem label="查询维度" :label-width="110">
 					<Select v-model="showSearchCondition" placeholder="查询维度" @on-change="clickWd()">
 						<Option value="month">按月</Option>
 						<Option value="season">按季度</Option>
 						<Option value="year">按年</Option>
 					</Select>
 				</FormItem>
-				<FormItem v-if="showSearchCondition == 'month'" label="选择查询月分" :label-width="150">
+				<FormItem v-if="showSearchCondition == 'month'" label="选择查询月分" :label-width="110">
 					<Select v-model="searchConditionValue" placeholder="选择查询月份" @on-change="clickMonth()">
 						<Option :value="item" v-for="(item, index) in defaultMonthList" :key="index">{{ item }}</Option>
 					</Select>
 				</FormItem>
-				<FormItem v-if="showSearchCondition == 'season'" label="选择查询季度" :label-width="150">
+				<FormItem v-if="showSearchCondition == 'season'" label="选择查询季度" :label-width="110">
 					<Select v-model="searchConditionValue" placeholder="选择查询季度" @on-change="clickJidu()">
 						<Option value="1">1季度</Option>
 						<Option value="2">2季度</Option>
@@ -106,6 +111,11 @@
 		mounted() {
 			this.getYear();
 			this.columns = [{
+					title: '商品编码',
+					key: 'goods_code',
+					align: 'center'
+				},
+				{
 					title: '商品名称',
 					key: 'goods_name',
 					align: 'center'
@@ -124,6 +134,60 @@
 					title: '净收入',
 					key: 'get_price',
 					align: 'center'
+				},
+				{
+					title: '总库存',
+					key: 'income_count',
+					align: 'center',
+					render: (h, params) => {
+						let incomeCount = params.row.income_count; // 不含当前查询条件下的数量
+						let storeAll = params.row.store_all; // 不含当前查询条件下的数量
+						let str = storeAll;
+						return h("div", str)
+					}
+				},
+				{
+					title: '已售出(当前条件)',
+					key: 'sale_count',
+					align: 'center',
+					render: (h, params) => {
+						let saleCount = params.row.sale_count; // 不含当前查询条件下的数量
+						let storeSaleAll = params.row.store_sale_all; // 不含当前查询条件下的数量
+						let str = storeSaleAll + " (" + saleCount + ")";
+						return h("div", str)
+					}
+				},
+				{
+					title: '剩余库存',
+					align: 'center',
+					render: (h, params) => {
+						let storeAll = params.row.store_all; // 不含当前查询条件下的数量
+						let storeSaleAll = params.row.store_sale_all; // 不含当前查询条件下的数量
+						let str = (storeAll - storeSaleAll);
+						return h("div", str)
+					}
+				},
+				{
+					title: '规格',
+					key: 'goods_unit_name',
+					align: 'center'
+				},
+				{
+					title: '规格数',
+					key: 'unit_count',
+					align: 'center'
+				},
+				{
+					title: '状态',
+					align: 'center',
+					render: (h, params) => {
+						let status = params.row.sale_status;
+						let str = "";
+						if (status == 1) {
+							str = "销售中";
+						}
+						return h("div", str)
+					}
 				}
 			];
 		},
@@ -352,44 +416,17 @@
 				}, 200);
 			},
 			intDataTitle() {
-				this.data = [{
-						goodsName: '商品8',
-						inprice: 10,
-						outprice: 15,
-						getprice: 0
-					},
-					{
-						goodsName: '商品9',
-						inprice: 10,
-						outprice: 10,
-						getprice: 0
-					},
-					{
-						goodsName: '商品10',
-						inprice: 10,
-						outprice: 10,
-						getprice: 0
-					},
-					{
-						goodsName: '商品11',
-						inprice: 10,
-						outprice: 10,
-						getprice: 0
-					},
-					{
-						goodsName: '商品12',
-						inprice: 10,
-						outprice: 10,
-						getprice: 0
-					}
-				];
+				this.data = [];
 			},
 			handleSummary({
 				columns,
 				data
 			}) {
 				let vm = this;
-				let count = [vm.countMap.sale_price_all, vm.countMap.income_price_all, vm.countMap.get_price_all];
+				let count = ['', vm.countMap.sale_price_all, vm.countMap.income_price_all, vm.countMap.get_price_all, '',
+					'',
+					'', '', ''
+				];
 				const sums = {};
 				columns.forEach((column, index) => {
 					const key = column.key;
@@ -403,11 +440,31 @@
 					let v = count[index - 1];
 					sums[key] = {
 						key,
-						value: vm.numFilter(v) + ' 元'
+						value: vm.numFilter(v) == '--' ? '' : vm.numFilter(v) + ' 元'
 					};
 				});
 
 				return sums;
+			},
+			updateGoodsStoreReport() {
+				let vm = this;
+				let params = {
+					req_type: 'update_goods_report_store',
+					data: {
+						year: vm.createYear,
+						month: vm.createMonth
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.myDialog('success', '请求成功,稍后刷新页面查看');
+					} else {
+						vm.$Message.warning({
+							content: res.resp_desc,
+							duration: 3
+						});
+					}
+				});
 			},
 			createReport() {
 				let vm = this;
