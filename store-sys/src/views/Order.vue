@@ -99,6 +99,16 @@
 					align: 'center'
 				},
 				{
+					title: '人数',
+					key: 'person_count',
+					align: 'center'
+				},
+				{
+					title: '服务员',
+					key: 'server_name',
+					align: 'center'
+				},
+				{
 					title: '用户手机号',
 					key: 'user_phone',
 					align: 'center',

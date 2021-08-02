@@ -40,7 +40,7 @@
 								<input value="" v-model="searchOrderForm.order_no" />
 							</span>
 							<span><input ref="myFocus" value="" v-model="searchOrderForm.goods_code"
-									@keyup="searchOrderGoodsData" /></span>
+									@keyup="addGoodsByCode" /></span>
 						</div>
 					</div>
 					<div class="div2-right">
@@ -286,8 +286,8 @@
 				</div>
 			</div>
 		</Modal>
-		<Modal width="600" v-model="payCashPriceFlag" title="现金付款" @on-ok="showCashPayOk" @on-cancel=onCancel()>
-			<div class="input-show-div add-order-info pay-info">
+		<Modal width="600" v-model="payCashPriceFlag" title="现金付款" @on-ok="showCashPayOk" @on-cancel="onCancel()">
+			<div class="pay-info-div">
 				<div class="input-show-div-text  pay-info-text">
 					<span><input readonly="readonly" disabled="disabled" value="付款金额：" /></span>
 				</div>
@@ -297,10 +297,11 @@
 			</div>
 		</Modal>
 		<Modal width="950" v-model="moreOrdreFlag" title="订单列表">
-			<div class="">
+			<div style="more-order-div">
 				<div class="more-order-title">
 					<div>订单号</div>
 					<div>桌号</div>
+					<div>人数</div>
 					<div>会员号</div>
 					<div>订单状态</div>
 					<div>订单更新时间</div>
@@ -311,11 +312,12 @@
 					<div @click="clickOrderItem(item)" v-for="(item, index) in orderGoodsLists" :key="index"
 						:class="item.style" @mouseover="mouseInGoodsUl(item.orderNum, 2)"
 						@mouseout="mouseOutGoodsUl(item.orderNum, 2)">
-						<div>{{ item.orderNum }}</div>
-						<div>{{ item.tableName }}</div>
-						<div>{{ item.userPhone }}</div>
-						<div>{{ item.orderStatusName }}</div>
-						<div>{{ item.lastUpdateTime }}</div>
+						<div>{{ item.orderNum }}&nbsp;</div>
+						<div>{{ item.tableName }}&nbsp;</div>
+						<div>{{ item.personCount }}&nbsp;</div>
+						<div>{{ item.userPhone }}&nbsp;</div>
+						<div>{{ item.orderStatusName }}&nbsp;</div>
+						<div>{{ item.lastUpdateTime }}&nbsp;</div>
 						<div><span>选择</span></div>
 					</div>
 				</div>
@@ -364,59 +366,59 @@
 				returnPrice: 0,
 				returnPriceText: '找零',
 				goodsCount: 0,
-				realInpayPrice:0,//实付款
+				realInpayPrice: 0, //实付款
 				// 折扣
 				discountsCouponPriceCount: 0, //优惠券折扣
 				discountsMemberPriceCount: 0, //会员折扣
 				discountsPriceCount: 0, //促销折扣
 				//
-				unique_key: null,
+				unique_key: '',
 				//
-				orderPass: null,
+				orderPass: '',
 				//head
-				tableName: null,
-				personCount: null,
-				serverName: null,
+				tableName: '',
+				personCount: '',
+				serverName: '',
 				//
 				orderInfo: {
-					order_id: null,
-					order_no: null,
+					order_no: '',
 					order_status: 0,
-					order_status_name: null,
-					pay_method: null,
-					pay_method_name: null
+					order_status_name: '',
+					pay_method: '',
+					pay_method_name: ''
 				},
 				addGoodsFormData: {},
 				searchGoodsForm: {
 					curre_page: 1,
 					page_size: 10,
-					goods_code: null,
-					shop_code: null,
-					classify_code: null,
-					goods_py: null,
-					goods_name: null,
-					is_discounts: null,
+					goods_code: '',
+					shop_code: '',
+					classify_code: '',
+					goods_py: '',
+					goods_name: '',
+					is_discounts: '',
 					search_absolute: 0,
-					order_no: null
+					order_no: ''
 				},
 				addOrderFormData: {
-					table_name: null,
-					person_count: null,
-					server_name: null
+					table_name: '',
+					person_count: 0,
+					server_name: ''
 				},
 				searchOrderForm: {
 					curre_page: 1,
 					page_size: 10,
 					order_no: '',
-					goods_code: null,
-					table_name: null,
-					user_phone: null,
+					goods_code: '',
+					table_name: '',
+					user_phone: '',
 					search_absolute: 1
 				},
 				classifys: [],
 				clientWidth: '',
 				clientHeightPage: '',
-				div3Height: ''
+				div3Height: '',
+				lock: false
 			};
 		},
 		filters: {
@@ -462,6 +464,7 @@
 			// //
 			vm.$nextTick(() => {
 				vm.findClassify();
+				vm.createNewOrder();
 				vm.$refs.myFocus.focus();
 			});
 			this.countPrice();
@@ -574,7 +577,7 @@
 				let params = {
 					req_type: 'kc_reset_order_status',
 					data: {
-						order_id: vm.orderInfo.order_id,
+						order_no: vm.searchOrderForm.order_no,
 						order_pass: vm.orderPass
 					}
 				}; // 参数
@@ -593,18 +596,22 @@
 					}
 				});
 			},
-			createNewOrder() {
+			// 重置订单
+			createNewOrder(mark) {
 				let vm = this;
+
 				vm.orderGoodsList = [];
 
 				Object.keys(vm.orderInfo).map(i => {
-					vm.orderInfo[i] = null;
+					vm.orderInfo[i] = '';
 				});
-				Object.keys(vm.searchOrderForm).map(i => {
-					vm.searchOrderForm[i] = null;
-				});
+				if (mark != 1) {
+					Object.keys(vm.searchOrderForm).map(i => {
+						vm.searchOrderForm[i] = '';
+					});
+				}
 				Object.keys(vm.addOrderFormData).map(i => {
-					vm.addOrderFormData[i] = null;
+					vm.addOrderFormData[i] = '';
 				});
 				//
 				vm.serverName = vm.addOrderFormData.server_name;
@@ -630,22 +637,44 @@
 				vm.$nextTick(() => {
 					vm.$refs.myFocus.focus();
 				});
+
+				if (mark != 1) {
+					let params = {
+						req_type: 'reset_open_order',
+						data: {}
+					}; // 参数
+					axios.post('', params).then(function(res) {
+						if (res.resp_code == 1) {
+							vm.searchOrderForm.order_no = res.data.order_no;
+							vm.orderInfo.order_no = res.data.order_no;
+							vm.searchGoodsForm.order_no = res.data.order_no;
+						} else {
+							vm.$Message.warning({
+								content: res.resp_desc,
+								duration: 5
+							});
+						}
+					});
+				}
 			},
 			showAddGoodsView() {
 				let vm = this;
-				if (vm.checkOpenNew()) {
+				//订单号不能为空,请重新开单
+				if (vm.checkOrderNo()) {
 					return;
 				}
-				if (vm.checkBeforeAddOrderGoods()) {
+				// 校验是否已付款
+				if (vm.checkOrderPayStatusIsPay()) {
 					return;
 				}
 				Object.keys(vm.searchGoodsForm).map(i => {
-					vm.searchGoodsForm[i] = null;
+					vm.searchGoodsForm[i] = '';
 				});
 				// 初始值
 				vm.searchGoodsForm.curre_page = 1;
 				vm.searchGoodsForm.page_size = 10;
 				vm.searchGoodsForm.search_absolute = 0;
+				vm.searchGoodsForm.order_no = vm.searchOrderForm.order_no;
 				vm.addGoodsFlag = true;
 				vm.searchGoodsData();
 			},
@@ -655,21 +684,32 @@
 					req_type: 'kc_open_order_list',
 					data: vm.searchOrderForm
 				}; // 参数
+				if ((vm.searchOrderForm.order_no == null || vm.searchOrderForm.order_no == '') &&
+					(vm.searchOrderForm.table_name == null || vm.searchOrderForm.table_name == '')) {
+					let msg = '订单号/桌号不能同时为空';
+					vm.$Message.warning({
+						content: msg,
+						duration: 5
+					});
+					return;
+				}
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						let orderList = res.data.order_list;
 						if (orderList.length == 0) {
-							let msg = '订单不存在, 订单号:' + vm.searchOrderForm.order_no;
+							let msg = "查询订单数据不存在";
 							vm.$Message.warning({
 								content: msg,
 								duration: 5
 							});
 							vm.searchOrderFlag = true;
+							vm.createNewOrder(1);
 							return;
 						}
 						vm.searchOrderFlag = false;
 						vm.moreOrdreFlag = false;
 						if (orderList.length == 1) {
+							// 如果存在多个订单，则需要选择订单
 							vm.orderGoodsList = orderList[0].detail_list;
 							vm.discountsCouponPriceCount = orderList[0].discountsTicketPrice;
 							vm.discountsMemberPriceCount = orderList[0].discountsMemberPrice;
@@ -677,10 +717,9 @@
 							vm.orderPrice = orderList[0].orderPrice;
 							vm.realPrice = orderList[0].realPrice;
 							vm.realInpayPrice = orderList[0].realInpayPrice
-							
+
 							vm.discountsPriceCountAll = orderList[0].discountsPriceCountAll;
 							vm.goodsCount = orderList[0].goodsCount;
-							vm.orderInfo.order_id = orderList[0].orderId;
 							vm.orderInfo.order_no = vm.searchOrderForm.order_no;
 							vm.orderInfo.order_status = orderList[0].orderStatus;
 							vm.orderInfo.pay_method = orderList[0].payMethod;
@@ -698,13 +737,14 @@
 							vm.payPrice = 0;
 							vm.orderPass = null;
 							//
+							vm.searchOrderForm.order_no = orderList[0].orderNum;
+							vm.orderInfo.order_no = orderList[0].orderNum;
+							vm.searchGoodsForm.order_no = orderList[0].orderNum;
+							//
 							vm.countPrice();
 						} else {
 							vm.orderGoodsLists = orderList;
 							vm.moreOrdreFlag = true;
-						}
-						if (!vm.unique_key) {
-							vm.unique_key = res.data.unique_key;
 						}
 					} else {
 						vm.$Message.warning({
@@ -716,7 +756,205 @@
 						vm.$refs.myFocus.focus();
 					});
 				});
+
 			},
+			addGoodsFromSearchGoods(goods) {
+				// 添加商品页面的  添加
+				let vm = this;
+				//订单号不能为空,请重新开单
+				if (vm.checkOrderNo()) {
+					return;
+				}
+				let data = {
+					goods_id: goods.id,
+					shop_no: vm.searchGoodsForm.shop_code,
+					user_phone: vm.searchOrderForm.user_phone,
+					goods_unit_name: goods.goodsUnitName,
+					order_no: vm.searchOrderForm.order_no,
+					discounts_remark: '',
+					unique_key: vm.unique_key,
+					server_name: vm.addOrderFormData.server_name,
+					person_count: vm.addOrderFormData.person_count,
+					table_name: vm.addOrderFormData.table_name
+				};
+				vm.addGoodsSubmit(data);
+				//
+				vm.searchGoodsForm.shop_code = '';
+			},
+			addGoodsFromOrder(detail) {
+				// 开单主界面，主界面的添加商品
+				let vm = this;
+				//订单号不能为空,请重新开单
+				if (vm.checkOrderNo()) {
+					return;
+				}
+				let data = {
+					goods_id: detail.goodsId,
+					shop_no: vm.searchGoodsForm.shop_code,
+					user_phone: vm.searchOrderForm.user_phone,
+					goods_unit_name: detail.goodsUnitName,
+					order_no: vm.searchOrderForm.order_no,
+					discounts_remark: '',
+					unique_key: vm.unique_key,
+					server_name: vm.addOrderFormData.server_name,
+					person_count: vm.addOrderFormData.person_count,
+					table_name: vm.addOrderFormData.table_name
+				};
+				vm.addGoodsSubmit(data);
+			},
+
+			addGoodsSubmit(data) {
+				let vm = this;
+				// 校验是否已付款
+				if (vm.checkOrderPayStatusIsPay()) {
+					return;
+				}
+				let params = {
+					req_type: 'kc_open_order_add',
+					data: data
+				}; // 参数
+				if (vm.lock) {
+					return;
+				}
+				vm.lock = true;
+				axios.post('', params).then(function(res) {
+						vm.searchOrderForm.goods_code = null;
+						if (res.resp_code == 1) {
+							vm.orderInfo.order_no = res.data.order_no;
+							vm.searchOrderForm.order_no = res.data.order_no;
+							//
+							vm.searchGoodsForm.shop_code = null;
+							vm.searchGoodsForm.curre_page = 1;
+							vm.searchGoodsForm.page_size = 10;
+							//
+							vm.searchGoodsData();
+							//
+							vm.searchOrderList();
+						} else {
+							if (res.resp_code == 10045) {
+								let msg = '订单不存在,添加失败, 订单号:' + vm.searchOrderForm.order_no;
+								vm.$Message.warning({
+									content: msg,
+									duration: 5
+								});
+								return;
+							} else if (50011 != res.resp_code) {
+								vm.$Message.warning({
+									content: res.resp_desc,
+									duration: 5
+								});
+							}
+						}
+						vm.$nextTick(() => {
+							vm.$refs.myFocus.focus();
+						});
+					}).catch(err => {
+						// this.error = true;
+					})
+					.finally(() => {
+						this.lock = false;
+					});
+			},
+			searchGoodsData() {
+				//添加 商品页面查询商品
+				let vm = this;
+				let params = {
+					req_type: 'kc_list_goods',
+					data: vm.searchGoodsForm
+				}; // 参数
+				axios.post('', params).then(function(res) {
+						if (res.resp_code == 1) {
+							vm.goodsSearchList = res.data.goods_list;
+							vm.total = res.data.total_num;
+							vm.hasNext = res.data.has_next;
+						} else {
+							vm.$Message.warning({
+								content: res.resp_desc,
+								duration: 5
+							});
+						}
+					}).catch(err => {
+						// this.error = true;
+					})
+					.finally(() => {
+						this.lock = false;
+					});
+			},
+			addGoodsByCode() {
+				let vm = this;
+				// 开单页面查询商品 扫码添加商品
+				if (vm.searchOrderForm.goods_code.length != 13) {
+					return;
+				}
+				vm.addGoodsSubmit(vm.searchOrderForm);
+			},
+			// searchGoodsData() {
+			// 	//添加 商品页面查询商品
+			// 	let vm = this;
+			// 	vm.searchGoodsForm.order_no = vm.searchOrderForm.order_no;
+			// 	let params = {
+			// 		req_type: 'kc_list_goods',
+			// 		data: vm.searchGoodsForm
+			// 	}; // 参数
+			// 	vm.searchGoodsDataSubmit(params, 1);
+			// },
+			// searchGoodsDataSubmit(params, type) {
+			// 	let vm = this;
+			// 	vm.lock = true;
+			// 	axios.post('', params).then(function(res) {
+			// 			if (res.resp_code == 1) {
+			// 				vm.goodsSearchList = res.data.goods_list;
+			// 				vm.total = res.data.total_num;
+			// 				vm.hasNext = res.data.has_next;
+			// 				if (!vm.unique_key) {
+			// 					vm.unique_key = res.data.unique_key;
+			// 				}
+			// 				if (res.data.goods_list.length > 0 && type == 0) {
+			// 					vm.searchGoodsForm.shop_code = vm.searchOrderForm.goods_code;
+			// 					vm.addGoodsFromSearchGoods(res.data.goods_list[0]);
+			// 				}
+			// 				if (vm.goodsSearchList.length == 0) {
+			// 					vm.$Message.warning({
+			// 						content: '商品不存在',
+			// 						duration: 5
+			// 					});
+			// 					vm.searchOrderForm.goods_code = '';
+			// 				}
+			// 			} else {
+			// 				vm.$Message.warning({
+			// 					content: res.resp_desc,
+			// 					duration: 5
+			// 				});
+			// 			}
+			// 			vm.$nextTick(() => {
+			// 				vm.$refs.myFocus.focus();
+			// 			});
+			// 		}).catch(err => {
+			// 			// this.error = true;
+			// 		})
+			// 		.finally(() => {
+			// 			this.lock = false;
+			// 		});
+			// },
+			// addGoodsByCode() {
+			// 	// 开单页面查询商品 扫码添加商品
+			// 	let vm = this;
+			// 	vm.searchOrderForm.shop_no = vm.searchOrderForm.goods_code;
+			// 	if (vm.orderGoodsList.length > 0) {
+			// 		if (!vm.searchOrderForm.shop_no || vm.searchOrderForm.shop_no == '') {
+			// 			return;
+			// 		}
+			// 	}
+			// 	if (!(vm.searchOrderForm.shop_no.length == 13 || vm.searchOrderForm.shop_no.length == 23)) {
+			// 		return;
+			// 	}
+			// 	let params = {
+			// 		req_type: 'kc_list_goods',
+			// 		data: vm.searchOrderForm
+			// 	}; // 参数
+			// 	vm.searchGoodsDataSubmit(params, 0);
+			// },
+
 			delOrderGoods(detail) {
 				let vm = this;
 				if (vm.checkOrderNo()) {
@@ -726,7 +964,7 @@
 					req_type: 'kc_open_delete_detail_goods',
 					data: {
 						detail_id: detail.id,
-						order_id: vm.orderInfo.order_id
+						order_no: vm.searchOrderForm.order_no
 					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
@@ -748,155 +986,6 @@
 					});
 				});
 			},
-			addGoodsFromSearchGoods(goods) {
-				let vm = this;
-				if (vm.checkOpenNew()) {
-					return;
-				}
-				let data = {
-					goods_id: goods.id,
-					shop_no: vm.searchGoodsForm.shop_code,
-					user_phone: vm.searchOrderForm.user_phone,
-					goods_unit_name: goods.goodsUnitName,
-					order_no: vm.searchOrderForm.order_no,
-					discounts_remark: '',
-					unique_key: vm.unique_key,
-					server_name: vm.addOrderFormData.server_name,
-					person_count: vm.addOrderFormData.person_count,
-					table_name: vm.addOrderFormData.table_name
-				};
-				vm.addGoodsSubmit(data);
-			},
-			addGoodsFromOrder(detail) {
-				let vm = this;
-				if (vm.checkOrderNo()) {
-					return;
-				}
-				if (vm.checkOpenNew()) {
-					return;
-				}
-				let data = {
-					goods_id: detail.goodsId,
-					shop_no: vm.searchGoodsForm.shop_code,
-					user_phone: vm.searchOrderForm.user_phone,
-					goods_unit_name: detail.goodsUnitName,
-					order_no: vm.searchOrderForm.order_no,
-					discounts_remark: '',
-					unique_key: vm.unique_key,
-					server_name: vm.addOrderFormData.server_name,
-					person_count: vm.addOrderFormData.person_count,
-					table_name: vm.addOrderFormData.table_name
-				};
-				vm.addGoodsSubmit(data);
-			},
-			addGoodsSubmit(data) {
-				let vm = this;
-				if (vm.checkBeforeAddOrderGoods()) {
-					return;
-				}
-				let params = {
-					req_type: 'kc_open_order_add',
-					data: data
-				}; // 参数
-				axios.post('', params).then(function(res) {
-					vm.searchOrderForm.goods_code = null;
-					if (res.resp_code == 1) {
-						vm.orderInfo.order_id = res.data.order_id;
-						vm.orderInfo.order_no = res.data.order_no;
-						vm.searchOrderForm.order_no = res.data.order_no;
-						//
-						vm.searchGoodsForm.shop_code = null;
-						vm.searchGoodsForm.curre_page = 1;
-						vm.searchGoodsForm.page_size = 10;
-						//
-						vm.searchGoodsData();
-						vm.searchOrderList();
-					} else {
-						if (res.resp_code == 10045) {
-							let msg = '订单不存在,添加失败, 订单号:' + vm.searchOrderForm.order_no;
-							vm.$Message.warning({
-								content: msg,
-								duration: 5
-							});
-							return;
-						} else if (50011 != res.resp_code) {
-							vm.$Message.warning({
-								content: res.resp_desc,
-								duration: 5
-							});
-						}
-					}
-					vm.$nextTick(() => {
-						vm.$refs.myFocus.focus();
-					});
-				});
-			},
-			searchGoodsData() {
-				//添加 商品页面查询商品
-				let vm = this;
-				vm.searchGoodsForm.order_no = vm.searchOrderForm.order_no;
-				let params = {
-					req_type: 'kc_list_goods',
-					data: vm.searchGoodsForm
-				}; // 参数
-				vm.searchGoodsDataSubmit(params, 1);
-			},
-			searchOrderGoodsData() {
-				// 开单页面查询商品
-				let vm = this;
-				vm.searchOrderForm.shop_no = vm.searchOrderForm.goods_code;
-				if (vm.orderGoodsList.length > 0) {
-					if (!vm.searchOrderForm.shop_no || vm.searchOrderForm.shop_no == '') {
-						return;
-					}
-				}
-				if (!(vm.searchOrderForm.shop_no.length == 13 || vm.searchOrderForm.shop_no.length == 23)) {
-					return;
-				}
-				let params = {
-					req_type: 'kc_list_goods',
-					data: vm.searchOrderForm
-				}; // 参数
-				vm.searchGoodsDataSubmit(params, 0);
-			},
-			searchGoodsDataSubmit(params, type) {
-				let vm = this;
-				vm.lock = true;
-				axios.post('', params).then(function(res) {
-						if (res.resp_code == 1) {
-							vm.goodsSearchList = res.data.goods_list;
-							vm.total = res.data.total_num;
-							vm.hasNext = res.data.has_next;
-							if (!vm.unique_key) {
-								vm.unique_key = res.data.unique_key;
-							}
-							if (res.data.goods_list.length > 0 && type == 0) {
-								vm.searchGoodsForm.shop_code = vm.searchOrderForm.goods_code;
-								vm.addGoodsFromSearchGoods(res.data.goods_list[0]);
-							}
-							if (vm.goodsSearchList.length == 0) {
-								vm.$Message.warning({
-									content: '商品不存在',
-									duration: 5
-								});
-								vm.searchOrderForm.goods_code = '';
-							}
-						} else {
-							vm.$Message.warning({
-								content: res.resp_desc,
-								duration: 5
-							});
-						}
-						vm.$nextTick(() => {
-							vm.$refs.myFocus.focus();
-						});
-					}).catch(err => {
-						// this.error = true;
-					})
-					.finally(() => {
-						this.lock = false;
-					});
-			},
 			findClassify() {
 				let vm = this;
 				let params = {
@@ -916,7 +1005,12 @@
 			},
 			showAddOrderInfoView() {
 				let vm = this;
-				if (vm.checkBeforeAddOrderGoods()) {
+				//订单号不能为空,请重新开单
+				if (vm.checkOrderNo()) {
+					return;
+				}
+				// 校验是否已付款
+				if (vm.checkOrderPayStatusIsPay()) {
 					return;
 				}
 				vm.addOrderFormData.server_name = vm.serverName;
@@ -926,19 +1020,20 @@
 			},
 			addOrderTitle() {
 				let vm = this;
-				if (vm.checkBeforeAddOrderGoods()) {
+				//订单号不能为空,请重新开单
+				if (vm.checkOrderNo()) {
 					return;
 				}
-				let orderId = vm.orderInfo.order_id;
-				if (!orderId) {
-					// 当前订单未生成(直接保存数据在页面)
-					vm.serverName = vm.addOrderFormData.server_name;
-					vm.personCount = vm.addOrderFormData.person_count;
-					vm.tableName = vm.addOrderFormData.table_name;
+				// 校验是否已付款
+				if (vm.checkOrderPayStatusIsPay()) {
 					return;
 				}
+				vm.tableName = vm.addOrderFormData.table_name;
+				vm.serverName = vm.addOrderFormData.server_name;
+				vm.personCount = vm.addOrderFormData.person_count;
+
 				let data = {
-					order_id: orderId,
+					order_no: vm.searchOrderForm.order_no,
 					person_count: vm.addOrderFormData.person_count,
 					table_name: vm.addOrderFormData.table_name,
 					server_name: vm.addOrderFormData.server_name
@@ -950,7 +1045,6 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						// vm.searchOrderForm.table_name = vm.addOrderFormData.table_name;
-						vm.searchOrderList();
 					} else {
 						vm.$Message.warning({
 							content: res.resp_desc,
@@ -1002,16 +1096,18 @@
 					vm.$refs.cashPayRef.focus();
 				});
 			},
-			onCancel(){
+			onCancel() {
 				this.payPrice = 0;
 			},
 			showCashPayOk() {
+				// 支付成功 
 				let vm = this;
+				//订单号不能为空,请重新开单
 				if (vm.checkOrderNo()) {
 					return;
 				}
 				const data = {
-					order_id: vm.orderInfo.order_id,
+					order_no: vm.searchOrderForm.order_no,
 					order_status: 1,
 					pay_method: 0,
 					pay_price: vm.payPrice
@@ -1035,7 +1131,7 @@
 			checkOrderNo() {
 				let vm = this;
 				if (!vm.searchOrderForm.order_no || vm.searchOrderForm.order_no == '') {
-					let msg = '订单号不能为空';
+					let msg = '订单号不能为空,请重新开单';
 					vm.$Message.warning({
 						content: msg,
 						duration: 5
@@ -1056,10 +1152,10 @@
 				}
 				return false;
 			},
-			checkOpenNew() {
+			checkOrderNoMust() {
 				let vm = this;
-				if ((!vm.searchOrderForm.order_no || vm.searchOrderForm.order_no == '') && vm.orderGoodsList.length > 0) {
-					let msg = '订单号不能为空,请重新开单';
+				if (!vm.searchOrderForm.order_no || vm.searchOrderForm.order_no == '') {
+					let msg = '订单号不能为空';
 					vm.$Message.warning({
 						content: msg,
 						duration: 5
@@ -1068,7 +1164,7 @@
 				}
 				return false;
 			},
-			checkBeforeAddOrderGoods() {
+			checkOrderPayStatusIsPay() {
 				let vm = this;
 				if (vm.orderInfo.order_status && vm.orderInfo.order_status != 0) {
 					let msg = '订单号已付款,请重新开单';
@@ -1091,7 +1187,7 @@
 					return true;
 				}
 				return false;
-			}
+			},
 		}
 	};
 </script>
@@ -1237,8 +1333,8 @@
 		overflow: auto;
 		text-align: center;
 	}
-	
-	.goods-contents-value-11{
+
+	.goods-contents-value-11 {
 		font-weight: 900;
 		background-color: #f0f0f0;
 		border-bottom: 1px solid #6c6c6c;
@@ -1448,6 +1544,7 @@
 	.input-show-div {
 		text-align: center;
 		overflow: auto;
+		margin: 0 auto;
 	}
 
 	.input-show-div-text,
@@ -1484,15 +1581,34 @@
 		font-size: 1.8rem;
 	}
 
+	.pay-info-div {
+		overflow: auto;
+	}
+
+	.pay-info-div>.input-show-div-text {
+		float: left;
+		width: 40%;
+	}
+
+	.pay-info-div>.input-show-div-value {
+		float: left;
+		width: 60%;
+	}
+
 	.pay-info-text>span>input {
-		width: 250px;
+		/* width: 250px; */
+		width: 100%;
 		background-color: white;
 		border: none;
+		font-size: 1.8rem;
 	}
 
 	.pay-info-value>span>input {
-		width: 250px;
+		/* width: 250px; */
+		width: 100%;
 		padding-left: 10px;
+		font-size: 1.8rem;
+		font-weight: bold;
 	}
 
 	/* 添加商品 */
@@ -1616,6 +1732,10 @@
 	}
 
 	/* 多个订单列表 */
+	.more-order-div {
+		height: 300px;
+	}
+
 	.more-order-title,
 	.more-order-content {
 		text-align: center;
@@ -1628,8 +1748,12 @@
 		padding: 5px 0;
 	}
 
+	.more-order-content {
+		height: 450px;
+		overflow-y: auto;
+	}
+
 	.more-order-content>div {
-		padding-bottom: 15px;
 		border-bottom: 2px solid #d0d0d0;
 		height: 40px;
 		line-height: 40px;
@@ -1649,31 +1773,32 @@
 
 	.more-order-title>div:nth-child(2),
 	.more-order-content>div :nth-child(2) {
-		width: 10%;
+		width: 5%;
 	}
 
 	.more-order-title>div:nth-child(3),
 	.more-order-content>div :nth-child(3) {
-		width: 15%;
+		width: 5%;
 	}
 
 	.more-order-title>div:nth-child(4),
 	.more-order-content>div :nth-child(4) {
-		width: 10%;
+		width: 15%;
 	}
 
 	.more-order-title>div:nth-child(5),
 	.more-order-content>div :nth-child(5) {
-		width: 25%;
+		width: 10%;
 	}
 
 	.more-order-title>div:nth-child(6),
 	.more-order-content>div :nth-child(6) {
-		width: 15%;
+		width: 25%;
 	}
 
-	.more-order-content>div :nth-child(6) {
-		position: relative;
+	.more-order-title>div:nth-child(7),
+	.more-order-content>div :nth-child(7) {
+		width: 15%;
 	}
 
 	.more-order-content span {
@@ -1743,7 +1868,7 @@
 		overflow-x: hidden;
 		border-bottom: 2px solid #d0d0d0;
 	}
-	
+
 
 	/* div4 第4层  结算 */
 	.div4 {

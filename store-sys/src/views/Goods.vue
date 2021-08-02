@@ -13,8 +13,10 @@
 				<Form :model="searchForm" :label-width="120" :inline="true">
 					<FormItem label="商品名称"><Input placeholder="商品名称" v-model="searchForm.goods_name"
 							@keyup.native="clickSearch()" /></FormItem>
-					<FormItem label="商品条形码"><Input placeholder="商品条形码" v-model="searchForm.goods_code"
+					<FormItem label="商品店铺码"><Input placeholder="商品店铺码" v-model="searchForm.shop_code"
 							@keyup.native="clickSearch()" /></FormItem>
+							<FormItem label="商品条形码"><Input placeholder="商品条形码" v-model="searchForm.goods_code"
+									@keyup.native="clickSearch()" /></FormItem>
 					<FormItem label="状态">
 						<Select placeholder="选择状态" v-model="searchForm.status" @on-change="clickSearch">
 							<Option :value="1">销售中</Option>
@@ -212,6 +214,7 @@
 					page_size: 10,
 					goods_name: '',
 					goods_code: '',
+					shop_code:'',
 					classify_code: '',
 					supplier_code: '',
 					is_discounts: null,
@@ -722,7 +725,7 @@
 				// });
 
 				axios.post('', params).then(function(res) {
-					vm.clearSearch();
+					//vm.clearSearch();
 					if (res.resp_code == 1) {
 						vm.myDialog('success', '操作成功');
 						vm.addGoodsFlag = type == 1 ? true : false;
