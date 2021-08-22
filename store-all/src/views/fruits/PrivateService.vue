@@ -11,12 +11,21 @@
 							<div class="title">
 								<span>温馨提示：</span>
 							</div>
+							<div class="title" v-if="timeSW != null && timeSW != ''">
+								<span>上午：{{timeSW}}</span>
+							</div>
+							<div class="title" v-if="timeXW != null && timeXW != ''">
+								<span>下午：{{timeXW}}</span>
+							</div>
+							<div class="title" v-if="timeWS != null && timeWS != ''">
+								<span>晚上：{{timeWS}}</span>
+							</div>
 							<div class="title">
 								<span>预约后请耐心等待,店家备货完成后会通过电话再次确认取货时间,请留意电话。</span>
 							</div>
 							<div class="items-list items-list-effect-color" v-for=" (item,index) in listTab0"
 								:key="index">
-								<div class="items-title" @click="toPage(item.private_code)" >
+								<div class="items-title" @click="toPage(item.private_code)">
 									<span class="items-info-name-title"
 										style="text-decoration: underline;">{{item.private_code}}</span>
 									<span class="items-info-value-title">{{item.status == 0?'未预约':'已预约'}}</span>
@@ -157,31 +166,20 @@
 				currePageB: 1,
 				hasNextB: false,
 				showPicker: false,
-				statusName: ''
+				statusName: '',
+				timeSW: '',
+				timeXW: '',
+				timeWS: ''
 			};
 		},
 		mounted() {
-
+			this.$nextTick(function() {
+				this.listChoseDate();
+			});
 		},
 		methods: {
 			toPage(orderNo) {
 				this.$router.push("orderDetail?orderNo=" + orderNo);
-			},
-			getDateList() {
-				let vm = this;
-				let params = {
-					req_type: 'get_date_list',
-					data: {}
-				}; // 参数
-				axios.post('', params).then(function(res) {
-					if (res.resp_code == 1) {
-						vm.columns = res.data.date_list;
-					} else {
-						Toast(res.resp_desc);
-					}
-				}).catch(err => {
-					// this.error = true;
-				})
 			},
 			onLoadB() {
 				let vm = this;
@@ -260,7 +258,6 @@
 			},
 			showPickerPopup(id) {
 				this.showPicker = true;
-				this.getDateList();
 				this.id = id;
 			},
 			cancelYuding(id, time) {
@@ -318,6 +315,27 @@
 			},
 			onCancel() {
 				this.showPicker = false;
+			},
+			listChoseDate() {
+				let vm = this;
+				let params = {
+					req_type: 'get_date_list',
+					data: {
+
+					}
+				}; // 参数
+				axios.post('', params).then(function(res) {
+					if (res.resp_code == 1) {
+						vm.timeSW = res.data.timeSW
+						vm.timeXW = res.data.timeXW;
+						vm.timeWS = res.data.timeWS;
+					} else {
+
+					}
+				}).catch(err => {
+					// this.error = true;
+				})
+
 			}
 		}
 	};
@@ -339,7 +357,7 @@
 		padding: 0 20px;
 		font-size: 12px;
 	}
-	
+
 
 	.item-div {
 		margin-top: 10px;
