@@ -127,19 +127,27 @@
 				</div>
 			</div>
 			<div class="div4" :style="clientWidth">
-				<div class="count-other">
-					<div class="count-other-text">
-						<span>优惠券折扣：</span>
-						<span>会员折扣：</span>
-						<span>促销折扣：</span>
+				<div class="panel-1">
+					<div class="sure-btn" v-if="orderInfo.order_status == 0">
+						<button>余额支付</button>
+						<button @click="showCashPay">现金付款</button>
+						<button>微信付款</button>
+						<button>支付宝付款</button>
 					</div>
-					<div class="count-other-value">
-						<span>{{ discountsCouponPriceCount | numFilter }}</span>
-						<span>{{ discountsMemberPriceCount | numFilter }}</span>
-						<span>{{ discountsPriceCount | numFilter }}</span>
+					<div class="count-other">
+						<div class="count-other-text">
+							<span>优惠券折扣：</span>
+							<span>会员折扣：</span>
+							<span>促销折扣：</span>
+						</div>
+						<div class="count-other-value">
+							<span>{{ discountsCouponPriceCount | numFilter }}</span>
+							<span>{{ discountsMemberPriceCount | numFilter }}</span>
+							<span>{{ discountsPriceCount | numFilter }}</span>
+						</div>
 					</div>
 				</div>
-				<div class="count-div count-div-gray">
+				<div class="count-div count-div-gray  panel-2">
 					<div class="count-text count-text-gray">
 						<span>商品总数 ：</span>
 						<span>消费合计 ：</span>
@@ -151,7 +159,7 @@
 						<span>{{ discountsPriceCountAll | numFilter }}</span>
 					</div>
 				</div>
-				<div class="count-div">
+				<div class="count-div panel-3">
 					<div class="count-text">
 						<span>实付合计：</span>
 						<span>收到金额 ：</span>
@@ -162,12 +170,6 @@
 						<span>{{ payPrice | numFilter }}</span>
 						<span>{{ returnPrice | numFilter }}</span>
 					</div>
-				</div>
-				<div class="sure-btn" v-if="orderInfo.order_status == 0">
-					<button>余额支付</button>
-					<button @click="showCashPay">现金付款</button>
-					<button>微信付款</button>
-					<button>支付宝付款</button>
 				</div>
 			</div>
 		</div>
@@ -1422,10 +1424,7 @@
 	} */
 
 	.count-other {
-		position: absolute;
-		top: 55px;
 		text-align: center;
-		width: 40%;
 	}
 
 	.count-other>div {
@@ -1437,7 +1436,7 @@
 	.count-other-value>span {
 		display: block;
 		float: left;
-		line-height: 45px;
+		line-height: 30px;
 		width: 100%;
 	}
 
@@ -1454,10 +1453,9 @@
 
 	.sure-btn {
 		cursor: pointer;
-		position: absolute;
-		top: 0px;
 		left: 15px;
-		text-align: center;
+		margin-left: 30px;
+		text-align: left;
 		padding: 15px 0;
 	}
 
@@ -1471,10 +1469,6 @@
 	}
 
 	.count-div {
-		position: absolute;
-		right: 0px;
-		height: 100%;
-		width: 750px;
 		text-align: center;
 	}
 
@@ -1482,7 +1476,6 @@
 		float: left;
 		display: block;
 		height: 100%;
-		width: 50%;
 		font-size: 1.5rem;
 		font-weight: normal;
 	}
@@ -1504,7 +1497,6 @@
 	.count-value {
 		width: 60%;
 		text-align: left;
-		padding-left: 30px;
 	}
 
 	.count-text>span,
@@ -1521,14 +1513,11 @@
 	}
 
 	.count-div-gray {
-		position: absolute;
-		right: 700px;
-		width: 500px;
 	}
 
 	/* 操作按钮 */
 	.handler-btn>span {
-		padding: 5px 15px;
+		padding: 5px 10px;
 		margin: 10px 5px;
 		cursor: pointer;
 		height: 30px;
@@ -1883,5 +1872,19 @@
 	.page {
 		position: relative;
 		overflow: hidden;
+	}
+
+	.panel-1 {
+		width: 40%;
+		float: left;
+	}
+
+	.panel-2 {
+		
+	}
+
+	.panel-3 {
+		width: 30%;
+		float: right;
 	}
 </style>
