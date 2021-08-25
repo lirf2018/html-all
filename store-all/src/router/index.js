@@ -56,6 +56,8 @@ import ShowMain from '@/views/ShowMain.vue';
 import ShopInfo from '@/views/fruits/ShopInfo.vue';
 
 
+import MyFuli from '@/views/fruits/MyFuli.vue';
+
 import PrivateService from '@/views/fruits/PrivateService.vue';
 
 import test from '@/views/test.vue';
@@ -246,6 +248,9 @@ export const pageLink = [
 	}, {
 		path: "/privateService",
 		component: PrivateService
+	}, {
+		path: "/myFuli",
+		component: MyFuli
 	}
 ]
 

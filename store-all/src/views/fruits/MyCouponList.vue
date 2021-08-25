@@ -169,6 +169,7 @@
 		border-radius: 5px 10px 10px 5px;
 		border-right: 1px dashed #e1e1e1;
 		width: 100%;
+		height: 5rem;
 	}
 
 	.coupon-img,

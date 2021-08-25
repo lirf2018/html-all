@@ -47,6 +47,12 @@
 					<van-grid-item icon="sign" text="退款/退货" @click="toOrderListOne(6)" :badge="data.order_ywc" />
 				</van-grid>
 			</div>
+			<div @click="toPage('myFuli')">
+				<van-cell-group>
+					<van-cell title="我的福利" is-link :value="giveCouponCount" />
+				</van-cell-group>
+			</div>
+
 			<div @click="toPage('privateService')">
 				<!-- 对固定会员一次下单，多次不同时间配送场景 -->
 				<van-cell-group>
@@ -134,7 +140,8 @@
 				memberCode: '',
 				show: false,
 				data: null,
-				qrCount: 0
+				qrCount: 0,
+				giveCouponCount: ''
 			};
 		},
 		mounted: function() {
@@ -173,6 +180,10 @@
 					if (res.resp_code == 1) {
 						vm.data = res.data;
 						vm.memberCode = res.data.member_id;
+						if (res.data.give_coupon_count > 0) {
+							vm.giveCouponCount = res.data.give_coupon_count;
+						}
+
 						if (vm.memberCode != null && vm.memberCode != '') {
 							vm.$nextTick(function() {
 								vm.qrcode();

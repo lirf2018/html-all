@@ -122,7 +122,8 @@
 				appointDate: '',
 				qrId: -1,
 				changeCodeOutTime:'',
-				nowUseDate:0
+				nowUseDate:0,
+				giveCouponId:null
 			};
 		},
 		created() {
@@ -132,9 +133,11 @@
 		mounted() {
 			let vm = this;
 			let {
-				couponId
+				couponId,
+				id
 			} = this.$route.query;
 			vm.couponId = couponId;
+			vm.giveCouponId = id;
 			this.$nextTick(function() {
 				vm.findData();
 			});
@@ -155,7 +158,8 @@
 				let params = {
 					req_type: 'query_coupon_detail',
 					data: {
-						couponId: vm.couponId
+						couponId: vm.couponId,
+						giveCouponId:vm.giveCouponId
 					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
@@ -180,6 +184,7 @@
 					req_type: 'down_qr_coupon',
 					data: {
 						couponId: vm.couponId,
+						giveCouponId:vm.giveCouponId,
 						recodeState:1
 					}
 				}; // 参数
