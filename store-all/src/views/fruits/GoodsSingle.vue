@@ -4,6 +4,9 @@
 			<Head :title="title" />
 		</div>
 		<div class="banner-list">
+			<div class="model">
+				<span>图片仅供参考</span>
+			</div>
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
 				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" />
 				</van-swipe-item>
@@ -360,6 +363,21 @@
 
 	.van-grid-item__icon {
 		font-size: 3.5rem !important;
+	}
+	
+	.banner-list {
+		position: relative;
+	}
+	
+	.model {
+		font-size: 13px;
+		position: absolute;
+		bottom: 15px;
+		right: 5px;
+		z-index: 9999999;
+		background-color: white;
+		padding: 2px 3px;
+		
 	}
 
 	.banner-list img {

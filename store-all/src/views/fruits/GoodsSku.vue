@@ -4,6 +4,9 @@
 			<Head :title="title" />
 		</div>
 		<div class="banner-list">
+			<div class="model">
+				<span>图片仅供参考</span>
+			</div>
 			<van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
 				<van-swipe-item v-for="(item, index) in goodsBannelList" :key="index"><img :src="item.imgUrl" />
 				</van-swipe-item>
@@ -97,7 +100,7 @@
 					<van-goods-action-icon icon="star" text="已收藏" color="#008000" /> -->
 				<van-goods-action-icon
 					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2" icon="cart-o"
-					text="购物车" :badge="cartCount" @click="toPage('shopCart')"/>
+					text="购物车" :badge="cartCount" @click="toPage('shopCart')" />
 				<van-goods-action-button
 					v-if="goodsInfo.allStatus == 1 && goodsInfo.goodsNum > 0 && goodsInfo.isPutaway == 2"
 					color="#53FF53" text="加入购物车" @click="showNext(0)" />
@@ -411,7 +414,7 @@
 					}
 				});
 			},
-			toPage(url){
+			toPage(url) {
 				this.$router.push(url);
 			}
 		},
@@ -444,6 +447,21 @@
 		top: 0;
 	}
 
+	.banner-list {
+		position: relative;
+	}
+
+	.model {
+		font-size: 13px;
+		position: absolute;
+		bottom: 15px;
+		right: 5px;
+		z-index: 9999999;
+		background-color: white;
+		padding: 2px 3px;
+		
+	}
+
 	.my-swipe .van-swipe-item {
 		text-align: center;
 	}
@@ -451,6 +469,7 @@
 	.van-grid-item__icon {
 		font-size: 3.5rem !important;
 	}
+
 
 	.banner-list img {
 		height: 13rem;
