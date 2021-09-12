@@ -33,7 +33,7 @@
 			</div>
 		</div> -->
 		<div class="volume" v-if="newsInfo && newsInfo != null">
-		<!-- <div class="volume"> -->
+			<!-- <div class="volume"> -->
 			<van-notice-bar :text="newsInfo" left-icon="volume-o" color="#008080" />
 		</div>
 		<div class="">
@@ -62,7 +62,9 @@
 					<div class="goods-item-info">
 						<!-- <div><span>优惠</span></div> -->
 						<div class="goods-item-name">
-							<span>{{ item.goods_name }}</span>
+							<span
+								v-if="item.goods_type == 3">【{{ item.rent_pay_type_name }}租赁】{{ item.goods_name }}</span>
+							<span v-if="item.goods_type != 3">{{ item.goods_name }}</span>
 						</div>
 					</div>
 					<div class="goods-item-price-div">
@@ -70,8 +72,7 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go"
-							@click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)">
+						<div class="goods-item-go" @click="toGoodsDetailPage(item)">
 							<span>去看看</span>
 						</div>
 					</div>
@@ -89,14 +90,16 @@
 				<span><img :src="item.goods_img" /></span>
 			</div>
 			<div class="goods-item2-info">
-				<div class="goods-item2-name">{{ item.goods_name }}</div>
+				<div class="goods-item2-name" v-if="item.goods_type == 3">
+					【{{ item.rent_pay_type_name }}租赁】{{ item.goods_name }}
+				</div>
+				<div class="goods-item2-name" v-if="item.goods_type != 3">{{ item.goods_name }}</div>
 				<div class="goods-item2-price-dev">
 					<div class="goods-item2-price">
 						<span>￥</span>
 						<span>{{ item.now_money }}</span>
 					</div>
-					<div class="goods-item2-buy"
-						@click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id,item.time_goods_id)">
+					<div class="goods-item2-buy" @click="toGoodsDetailPage(item)">
 						<span>去购买</span>
 					</div>
 				</div>
@@ -114,7 +117,9 @@
 					<div class="goods-item-info">
 						<!-- <div><span>优惠</span></div> -->
 						<div class="goods-item-name">
-							<span>{{ item.goods_name }}</span>
+							<span
+								v-if="item.goods_type == 3">【{{ item.rent_pay_type_name }}租赁】{{ item.goods_name }}</span>
+							<span v-if="item.goods_type != 3">{{ item.goods_name }}</span>
 						</div>
 					</div>
 					<div class="goods-item-price-div">
@@ -122,8 +127,7 @@
 							<span>￥</span>
 							<span>{{ item.now_money }}</span>
 						</div>
-						<div class="goods-item-go"
-							@click="toGoodsDetailPage(item.goods_id, item.is_single,item.time_goods_id)">
+						<div class="goods-item-go" @click="toGoodsDetailPage(item)">
 							<span>去看看</span>
 						</div>
 					</div>
@@ -201,7 +205,12 @@
 				let url = '/classifyAllGoodsList?goodsName=' + this.goodsName;
 				this.$router.push(url);
 			},
-			toGoodsDetailPage(goodsId, isSingle, timeGoodsId) {
+			toGoodsDetailPage(item) {
+
+				var goodsId = item.goods_id;
+				var isSingle = item.is_single;
+				var timeGoodsId = item.time_goods_id;
+
 				let url = '/goodsSku';
 				if (isSingle == 1) {
 					url = '/goodsSingle';

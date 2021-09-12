@@ -13,7 +13,8 @@
 			</van-swipe>
 		</div>
 		<div class="goods-info" v-if="goodsInfo != null">
-			<div class="goods-name"><span>{{goodsInfo.goodsName}}{{goodsInfo.goodsType == 6?'(预约商品)':''}}</span></div>
+			<div class="goods-name"  v-if="goodsInfo.goodsType != 3"><span>{{goodsInfo.goodsName}}{{goodsInfo.goodsType == 6?'(预约商品)':''}}</span></div>
+			<div class="goods-name"  v-if="goodsInfo.goodsType == 3"><span>【{{ goodsInfo.rentPayTypeName }}租赁】{{goodsInfo.goodsName}}</span></div>
 			<div class="goods-prop">
 				<div>
 					<span>￥</span>
@@ -213,7 +214,8 @@
 				goodsSkuList: [],
 				goodsId: 0,
 				activeNames: ['1'],
-				cartCount: 0
+				cartCount: 0,
+				timeGoodsId:0
 			};
 		},
 		filters: {
@@ -251,13 +253,15 @@
 		methods: {
 			findGoodsInfo() {
 				let {
-					goodsId
+					goodsId,
+					timeGoodsId
 				} = this.$route.query;
 				if (!goodsId) {
 					return;
 				}
 				let vm = this;
 				vm.goodsId = goodsId;
+				vm.timeGoodsId = timeGoodsId;
 				let params = {
 					req_type: 'query_goods_detail',
 					data: {
@@ -269,6 +273,15 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						vm.goodsInfo = res.data;
+						//
+						let isSingle = vm.goodsInfo.isSingle;
+						let goodsId = vm.goodsInfo.goodsId;
+						if(isSingle == 1){
+							// 单品
+							let url = '/goodsSingle?goodsId=' + goodsId;
+							vm.$router.push(url);
+						}
+						
 						vm.goodsBannelList = vm.goodsInfo.bannerImgList;
 						vm.goodsInfoList = vm.goodsInfo.goodsImgList;
 						vm.skuImg = vm.goodsInfo.goodsImg;
@@ -456,7 +469,7 @@
 		position: absolute;
 		bottom: 15px;
 		right: 5px;
-		z-index: 9999999;
+		z-index: 99;
 		background-color: white;
 		padding: 2px 3px;
 		

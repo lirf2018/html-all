@@ -55,6 +55,11 @@
 							<van-field label="手机号" placeholder="请输入手机号" v-model="phone" />
 						</van-cell-group>
 					</div>
+					<div style="clear: both;" v-if="commonGoodsType==3">
+						<van-cell-group>
+							<van-cell title="取货日期" :value="getDate" is-link />
+						</van-cell-group>
+					</div>
 				</div>
 			</van-tab>
 			<van-tab title="网点自提">
@@ -90,7 +95,8 @@
 								<van-field label="提货人" placeholder="请输入姓名" v-model="userName" />
 							</van-cell-group>
 						</div>
-						<div style="float: left;width: 45%;text-align: left;padding: 10px 0px;border-top: 1px solid #f0f0f0;">
+						<div
+							style="float: left;width: 45%;text-align: left;padding: 10px 0px;border-top: 1px solid #f0f0f0;">
 							<van-radio-group direction="horizontal" v-model="formData.sex">
 								<van-radio name="1" checked-color="#008000">先生</van-radio>
 								<van-radio name="0" checked-color="#008000">女士</van-radio>
@@ -100,6 +106,11 @@
 					<div style="clear: both;">
 						<van-cell-group>
 							<van-field label="手机号" placeholder="请输入手机号" v-model="phone" />
+						</van-cell-group>
+					</div>
+					<div style="clear: both;" v-if="commonGoodsType==3">
+						<van-cell-group>
+							<van-cell title="取货日期" :value="getDate" is-link />
 						</van-cell-group>
 					</div>
 				</div>
@@ -112,7 +123,9 @@
 					<div class="goods-img"><img :src="goods.goodsImg" /></div>
 					<div class="goods-info">
 						<div>
-							<div class="goods-name"><span>{{goods.goodsName}}</span></div>
+							<div class="goods-name" v-if="goods.goodsType != 3"><span>{{goods.goodsName}}</span></div>
+							<div class="goods-name" v-if="goods.goodsType == 3">
+								【{{ goods.rentPayTypeName }}租赁】{{ goods.goodsName }}</span></div>
 							<div class="space-name" v-if="goods.propCodeName != ''">规格：{{goods.propCodeName}}</div>
 							<div class="goods-price">
 								<div><span>X{{goods.buyCount}}</span></div>
@@ -120,7 +133,9 @@
 									<span class="currency-sale-price">￥</span>
 									<span class="money-sale-price">{{goods.nowMoney}}</span>
 									<!-- <span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span>{{goods.trueMoney}}</span></span> -->
-									<span style="font-size: 10px;color: gray;" v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span style="text-decoration:line-through;">{{goods.trueMoney}}</span></span>
+									<span style="font-size: 10px;color: gray;"
+										v-if="goods.trueMoney > goods.nowMoney">&nbsp;￥<span
+											style="text-decoration:line-through;">{{goods.trueMoney}}</span></span>
 								</div>
 							</div>
 						</div>
@@ -189,8 +204,8 @@
 			<div @click="createOrder"><span class="to-pay">去下单</span></div>
 		</div>
 		<van-popup v-model="showAddrListPannelFlag" position="bottom" :style="{ height: '100%' }">
-			<PlatformListPannel :closeSowAddrListPannelFlag="closeSowAddrListPannelFlag" :indexListP="indexList" :dataListP="dataList"
-			 :choseAddrP="choseAddr"></PlatformListPannel>
+			<PlatformListPannel :closeSowAddrListPannelFlag="closeSowAddrListPannelFlag" :indexListP="indexList"
+				:dataListP="dataList" :choseAddrP="choseAddr"></PlatformListPannel>
 		</van-popup>
 	</div>
 </template>
@@ -232,8 +247,8 @@
 	export default {
 		components: {
 			Head: Head,
-			OrderRead:OrderRead,
-			PriceMsg:PriceMsg,
+			OrderRead: OrderRead,
+			PriceMsg: PriceMsg,
 			PlatformListPannel: PlatformListPannel
 		},
 		data() {
@@ -268,12 +283,12 @@
 				orderPrice: 0,
 				realPrice: 0,
 				goodsPriceAll: 0,
-				goodsTruePriceAll:0,
+				goodsTruePriceAll: 0,
 				depositMoneyAll: 0,
 				advancePriceAll: 0,
 				discountsPriceAll: 0,
 				discountsPrice: 0,
-				goodsDiscountsPrice:0,// 商品优惠价格
+				goodsDiscountsPrice: 0, // 商品优惠价格
 				// 收据地址属性
 				postPrice: 0,
 				userAddrId: null,
@@ -287,7 +302,10 @@
 				indexList: [],
 				dataList: [],
 				//
-				order:null
+				order: null,
+				// 商品类型
+				commonGoodsType: -1,
+				getDate: '' // 取货日期
 			};
 		},
 		mounted: function() {
@@ -301,7 +319,7 @@
 			toDetailPage(orderId) {
 				let vm = this;
 				setTimeout(() => {
-					vm.$router.push("orderDetail?orderId="+orderId);
+					vm.$router.push("orderDetail?orderId=" + orderId);
 				}, 2000);
 			},
 			findPlatformList(type) {
@@ -363,7 +381,7 @@
 						buy_count: buyCount,
 						cart_ids: cartIds,
 						user_id: 0,
-						time_goods_id:timeGoodsId
+						time_goods_id: timeGoodsId
 					}
 				}; // 参数
 				axios.post('', params).then(function(res) {
@@ -378,6 +396,8 @@
 						vm.advancePriceAll = res.data.advance_price_all;
 						//商品优惠总额
 						vm.goodsDiscountsPrice = res.data.goods_discounts_price;
+						//
+						vm.commonGoodsType = res.data.common_goods_type;
 						//
 						vm.orderPrice = res.data.order_price;
 						vm.initPayPrice();
@@ -409,7 +429,7 @@
 					postPrice = vm.postPrice2;
 				}
 				vm.discountsPriceAll = vm.order.goods_discounts_price + vm.discountsPrice;
-				vm.orderPrice = Number(vm.order.order_price) +  Number(vm.postPrice) ;
+				vm.orderPrice = Number(vm.order.order_price) + Number(vm.postPrice);
 				vm.orderPrice = vm.orderPrice.toFixed(2);
 				vm.realPrice = Number(vm.orderPrice) - Number(vm.discountsPriceAll);
 				vm.realPrice = vm.realPrice.toFixed(2);
@@ -529,20 +549,20 @@
 					addrDetail_ = vm.addrDetail2 + "【" + vm.serviceName + "】";
 					postWay_ = 4;
 				}
-				if(userAddrId_ == '' || userAddrId_ == null){
+				if (userAddrId_ == '' || userAddrId_ == null) {
 					Toast('收货地址不能为空');
 					return false;
 				}
-				if(vm.userName == '' || vm.userName == null){
+				if (vm.userName == '' || vm.userName == null) {
 					Toast('收货人不能为空');
 					return false;
 				}
-				if(vm.phone == '' || vm.phone == null){
+				if (vm.phone == '' || vm.phone == null) {
 					Toast('手机号不能为空');
 					return false;
 				}
-				
-				if(vm.formData.sex == '' || vm.formData.sex == null){
+
+				if (vm.formData.sex == '' || vm.formData.sex == null) {
 					Toast('请选择先生/女士');
 					return false;
 				}
@@ -815,6 +835,7 @@
 		margin-bottom: 30px;
 		font-weight: normal;
 	}
+
 	.advice2 {
 		color: #9ea7b4;
 		font-size: 12px;
@@ -823,7 +844,8 @@
 		margin-bottom: 30px;
 		font-weight: normal;
 	}
-	.advice2>span{
+
+	.advice2>span {
 		display: block;
 	}
 
@@ -953,5 +975,9 @@
 
 	>>>.van-field__label {
 		width: 3rem;
+	}
+
+	.user-info>>>.van-cell {
+		color: #646566;
 	}
 </style>

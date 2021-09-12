@@ -14,7 +14,10 @@
 		</div>
 		<div class="goods-info" v-if="goodsInfo != null">
 			<div class="goods-name">
-				<span>{{ goodsInfo.goodsName }}{{goodsInfo.goodsType == 6?'(预约商品)':''}}</span>
+				<span
+					v-if="goodsInfo.goodsType != 3">{{ goodsInfo.goodsName }}{{goodsInfo.goodsType == 6?'(预约商品)':''}}</span>
+				<span
+					v-if="goodsInfo.goodsType == 3">【{{ goodsInfo.rentPayTypeName }}租赁】{{ goodsInfo.goodsName }}</span>
 			</div>
 			<div class="goods-prop">
 				<div>
@@ -120,7 +123,7 @@
 				<div class="goods-show">
 					<div class="goods-show-info">
 						<div class="img-top">
-							
+
 						</div>
 						<div class="goods-show-img"><img :src="goodsInfo.goodsImg" @click="showImg" /></div>
 						<div class="goods-show-goods">
@@ -236,6 +239,14 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						vm.goodsInfo = res.data;
+
+						let isSingle = vm.goodsInfo.isSingle;
+						let goodsId = vm.goodsInfo.goodsId;
+						if (isSingle == 0) {
+							// 单品
+							let url = '/goodsSku?goodsId=' + goodsId;
+							vm.$router.push(url);
+						}
 						if (vm.timeGoodsId != vm.goodsInfo.timeGoodsId) {
 							vm.timeGoodsId = 0;
 						}
@@ -364,20 +375,20 @@
 	.van-grid-item__icon {
 		font-size: 3.5rem !important;
 	}
-	
+
 	.banner-list {
 		position: relative;
 	}
-	
+
 	.model {
 		font-size: 13px;
 		position: absolute;
 		bottom: 15px;
 		right: 5px;
-		z-index: 9999999;
+		z-index: 99;
 		background-color: white;
 		padding: 2px 3px;
-		
+
 	}
 
 	.banner-list img {
@@ -473,7 +484,7 @@
 	.goods-show-info {
 		overflow: visible;
 	}
-	
+
 	.beforeBuy {
 		margin-bottom: 10px;
 	}
@@ -486,20 +497,20 @@
 	.van-popup {
 		overflow-y: visible !important;
 	}
-	
+
 	.img-top {
 		height: 20px;
 		/* position: absolute; */
 		/* top: 0px; */
 		width: 80%;
-		background:transparent;
+		background: transparent;
 	}
-	
-	>>>.van-popup{
-		background:transparent;
+
+	>>>.van-popup {
+		background: transparent;
 	}
-	
-	.goods-show{
+
+	.goods-show {
 		/* border: 1px solid black; */
 		overflow: hidden;
 		position: relative;
@@ -539,12 +550,12 @@
 		word-break: break-all;
 		background-color: white;
 	}
-	
-	.goods-show-goods-name{
+
+	.goods-show-goods-name {
 		height: 60px;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 3; 
+		-webkit-line-clamp: 3;
 		overflow: hidden;
 	}
 
@@ -663,8 +674,8 @@
 	>>>.van-tabs__line {
 		z-index: 0;
 	}
-	
-	>>>.van-popup__close-icon--top-right{
+
+	>>>.van-popup__close-icon--top-right {
 		right: 8px;
 		top: 25px;
 	}

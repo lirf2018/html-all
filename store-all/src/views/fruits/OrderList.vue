@@ -112,7 +112,7 @@
 			},
 			onChange(index) {
 				this.onClickOrderStatus = this.tabList[index].orderStatus;
-				// console.log('----选中的标签-----' + index + " this.onClickOrderStatus=" + this.onClickOrderStatus);
+				console.log('----选中的标签-----' + index + " this.onClickOrderStatus=" + this.onClickOrderStatus);
 				this.orderList.length = 0;
 				this.loading = false;
 				this.finished = false;

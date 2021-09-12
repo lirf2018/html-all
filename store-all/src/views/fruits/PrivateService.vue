@@ -129,7 +129,7 @@
 			</van-tabs>
 		</div>
 		<van-popup v-model="showPicker" round position="bottom">
-			<ChoseDate :onConfirm="onConfirm" :onCancel="onCancel" />
+			<ChoseDate :onConfirm="onConfirm" :onCancel="onCancel" dateListFlag="1"/>
 		</van-popup>
 
 	</div>

@@ -27,7 +27,9 @@
 									</div>
 									<div class="goods-contents">
 										<div class="goods-name-div" @click="toGoodsDetailPage(g.goodsId,1,g)">
-											<span class="goods-name">{{ g.goodsName }}</span>
+											<span class="goods-name"
+												v-if="g.goodsType == 3">【{{ g.rentPayTypeName }}租赁】{{ g.goodsName }}</span>
+											<span class="goods-name" v-if="g.goodsType != 3">{{ g.goodsName }}</span>
 										</div>
 										<!-- <span class="goods-desc">{{ g.goodsName }}</span> -->
 										<div class="price-div">

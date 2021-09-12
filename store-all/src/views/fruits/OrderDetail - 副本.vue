@@ -11,7 +11,7 @@
 					<span class="close-time">08:59</span>
 				</span>
 			</div>
-			<div class="status-remark"><span>15分钟后内未支付，订单将自动消失</span></div>
+			<div class="status-remark"><span>15分钟后内未支付，订单将自动取消</span></div>
 		</div>
 		<div class="user-addr-div">
 			<div>

@@ -6,7 +6,7 @@
 		<div v-if="null!=order">
 			<div class="order-status" v-if="null!=order && order.order_status == 0">
 				<div class="status"><span>待付款</span></div>
-				<div class="status-remark"><span>{{closeTime}}分钟后内未支付，订单将自动消失</span></div>
+				<div class="status-remark"><span>{{closeTime}}分钟后内未支付，订单将自动取消</span></div>
 			</div>
 			<div class="yuyue" v-if="null!=order && order.order_status != 0 && order.order_status != 7 && order.is_yuding_flag" @click="toPage('privateService')">
 				<span>当前订单含预约商品,请点击查看和预约具体取货时间</span>

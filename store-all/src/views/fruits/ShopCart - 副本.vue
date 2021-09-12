@@ -6,151 +6,134 @@
 			</div>
 		</div>
 		<div style="height: 46px;"></div>
-		<div class="tabs">
-			<van-tabs @change="onChange" v-model="cartActive" title-inactive-color="#657180" animated color="#008000"
-				title-active-color="#008000">
-				<van-tab :title="tabTitle0" key="0" name="0"></van-tab>
-				<van-tab :title="tabTitle1" key="1" name="1"></van-tab>
-			</van-tabs>
+		<div @click="toGoodsList" v-if="showCartEmptyFlag">
+			<van-empty class="custom-image" :image="cartNullImg" description="去逛逛" />
 		</div>
-		<div style="height: 46px;"></div>
-		<div class="tabs-data">
-			<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId"
-				v-if="shopCart.cartList.length == 0">
-				<div @click="toGoodsList">
-					<van-empty class="custom-image" :image="cartNullImg" description="去逛逛" />
-				</div>
-			</div>
-			<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId"
-				v-if="shopCart.isValid && shopCart.cartList.length > 0">
-				<div class="shop">
-					<div class="shop-div">
-						<div>
-							<van-checkbox v-model="shopCart.isChecked" checked-color="#008000"
-								@click="checkedShopGoodsAll(shopCart.shopId, shopCart.isChecked)">
-							</van-checkbox>
-						</div>
-						<div class="shop-o">
-							<van-icon name="shop-o" />
-						</div>
-						<div>
-							<span>{{ shopCart.shopName }}</span>
-						</div>
-						<div @click="onEditer(shopCart.shopId)">
-							<span>{{ shopCart.editerText }}</span>
-						</div>
+		<div class="shop-item" v-for="(shopCart, index) in cartItems" :key="shopCart.shopId"
+			v-if="shopCart.isValid && shopCart.cartList.length > 0">
+			<div class="shop">
+				<div class="shop-div">
+					<div>
+						<van-checkbox v-model="shopCart.isChecked" checked-color="#008000"
+							@click="checkedShopGoodsAll(shopCart.shopId, shopCart.isChecked)"></van-checkbox>
 					</div>
-				</div>
-				<div style="clear: both;"></div>
-				<div class="items" v-for="(goodsInfo, index) in shopCart.cartList" :key="goodsInfo.cartId"
-					v-if="goodsInfo.isValid">
-					<div class="goods-list">
-						<div class="select-btn">
-							<div class="checkbox-goods">
-								<van-checkbox checked-color="#008000" ref="checkboxes" v-model="goodsInfo.isChecked"
-									@click="checkedShopGoods(shopCart.shopId, goodsInfo.cartId, goodsInfo.isChecked)">
-								</van-checkbox>
-							</div>
-						</div>
-						<div class="goods-img" @click="toGoodsDetailPage(goodsInfo)">
-							<div>
-								<span><img :src="goodsInfo.goodsImg" /></span>
-							</div>
-						</div>
-						<div :class="goodsInfo.goodsInfoCss">
-							<div class="goods">
-								<div v-show="shopCart.isEditer" class="editer-goods">
-									<van-stepper v-model="goodsInfo.goodsCount" disable-input integer
-										:key="goodsInfo.cartId"
-										@change="updateCartGoodsCount(shopCart.shopId, goodsInfo.cartId, goodsInfo.goodsCount)" />
-								</div>
-								<div v-show="!shopCart.isEditer" class="goods-name"
-									@click="toGoodsDetailPage(goodsInfo)">
-									<span
-										v-if="goodsInfo.goodsType == 3">【{{ goodsInfo.rentPayTypeName }}租赁】{{ goodsInfo.goodsName }}</span>
-									<span v-if="goodsInfo.goodsType != 3">{{ goodsInfo.goodsName }}</span>
-								</div>
-							</div>
-							<div class="goods-sku" @click="toGoodsDetailPage(goodsInfo)">
-								<span v-if="goodsInfo.goodsSpecName != ''">规格:{{ goodsInfo.goodsSpecName }}</span>
-							</div>
-							<div class="goods-price" @click="toGoodsDetailPage(goodsInfo)">
-								<div>
-									<span>￥</span>
-									<span>{{ goodsInfo.goodsPrice }}</span>
-								</div>
-							</div>
-						</div>
-						<div :class="goodsInfo.buyCountCss">
-							<div v-show="!shopCart.isEditer" class="bc">
-								<span>x{{ goodsInfo.goodsCount }}</span>
-							</div>
-							<div v-show="shopCart.isEditer" class="delete-goods"
-								@click="deleteCartGoods(goodsInfo.cartId)">
-								<span>删除</span>
-							</div>
-						</div>
+					<div class="shop-o">
+						<van-icon name="shop-o" />
+					</div>
+					<div>
+						<span>{{ shopCart.shopName }}</span>
+					</div>
+					<div @click="onEditer(shopCart.shopId)">
+						<span>{{ shopCart.editerText }}</span>
 					</div>
 				</div>
 			</div>
-			<!-- 失效 -->
-			<div style="height: 10px"></div>
-			<div class="shop-item" v-if=" outTimeGoods.length > 0">
-				<div class="shop">
-					<div class="shop-div">
-						<div>
-							<van-checkbox v-model="deleteAll" checked-color="#008000" @click="checkedDeleteGoodsAll()">
+			<div style="clear: both;"></div>
+			<div class="items" v-for="(goodsInfo, index) in shopCart.cartList" :key="goodsInfo.cartId"
+				v-if="goodsInfo.isValid">
+				<div class="goods-list">
+					<div class="select-btn">
+						<div class="checkbox-goods">
+							<van-checkbox checked-color="#008000" ref="checkboxes" v-model="goodsInfo.isChecked"
+								@click="checkedShopGoods(shopCart.shopId, goodsInfo.cartId, goodsInfo.isChecked)">
 							</van-checkbox>
 						</div>
-						<div class="shop-o">
-						</div>
+					</div>
+					<div class="goods-img" @click="toGoodsDetailPage(goodsInfo)">
 						<div>
-							<span>&nbsp;&nbsp;失效商品</span>
-						</div>
-						<div>
-							<span @click="deleteShopCart">删除</span>
+							<span><img :src="goodsInfo.goodsImg" /></span>
 						</div>
 					</div>
-				</div>
-				<div style="clear: both;"></div>
-				<div class="items" v-for="(goodsInfo, index) in outTimeGoods" :key="goodsInfo.cartId">
-					<div class="goods-list">
-						<div class="select-btn">
-							<div class="checkbox-goods">
-								<van-checkbox ref="checkboxes" v-model="goodsInfo.isChecked" checked-color="#008000"
-									@click="deleteSun"></van-checkbox>
+					<div :class="goodsInfo.goodsInfoCss">
+						<div class="goods">
+							<div v-show="shopCart.isEditer" class="editer-goods">
+								<van-stepper v-model="goodsInfo.goodsCount" disable-input integer
+									:key="goodsInfo.cartId"
+									@change="updateCartGoodsCount(shopCart.shopId, goodsInfo.cartId, goodsInfo.goodsCount)" />
+							</div>
+							<div v-show="!shopCart.isEditer" class="goods-name" @click="toGoodsDetailPage(goodsInfo)">
+								{{ goodsInfo.goodsName }}
 							</div>
 						</div>
-						<div class="goods-img">
+						<div class="goods-sku" @click="toGoodsDetailPage(goodsInfo)">
+							<span  v-if="goodsInfo.goodsSpecName != ''">{{ goodsInfo.goodsSpecName }}</span>
+						</div>
+						<div class="goods-price" @click="toGoodsDetailPage(goodsInfo)">
 							<div>
-								<span><img :src="goodsInfo.goodsImg" /></span>
+								<span>￥</span>
+								<span>{{ goodsInfo.goodsPrice }}</span>
 							</div>
 						</div>
-						<div class="goods-info">
-							<div class="goods">
-								<div class="goods-name">{{ goodsInfo.goodsName }}</div>
-							</div>
-							<div class="goods-sku">
-								<span>{{ goodsInfo.goodsSpecName }}</span>
-							</div>
-							<div class="goods-price goods-price-del">
-								<div>
-									<span style="font-weight: normal;color: grey;">￥</span>
-									<span style="font-weight: normal;color: grey;">{{ goodsInfo.goodsPrice }}</span>
-								</div>
-							</div>
+					</div>
+					<div :class="goodsInfo.buyCountCss">
+						<div v-show="!shopCart.isEditer" class="bc">
+							<span>x{{ goodsInfo.goodsCount }}</span>
 						</div>
-						<div class="buy-count">
-							<div class="bc">
-								<span style="font-weight: normal;color: grey;">x{{ goodsInfo.goodsCount }}</span>
-							</div>
+						<div v-show="shopCart.isEditer" class="delete-goods" @click="deleteCartGoods(goodsInfo.cartId)">
+							<span>删除</span>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<!-- 失效 -->
+		<div style="height: 10px"></div>
+		<div class="shop-item" v-if=" outTimeGoods.length > 0">
+			<div class="shop">
+				<div class="shop-div">
+					<div>
+						<van-checkbox v-model="deleteAll" checked-color="#008000" @click="checkedDeleteGoodsAll()">
+						</van-checkbox>
+					</div>
+					<div class="shop-o">
+					</div>
+					<div>
+						<span>&nbsp;&nbsp;失效商品</span>
+					</div>
+					<div>
+						<span @click="deleteShopCart">删除</span>
+					</div>
+				</div>
+			</div>
+			<div style="clear: both;"></div>
+			<div class="items" v-for="(goodsInfo, index) in outTimeGoods" :key="goodsInfo.cartId">
+				<div class="goods-list">
+					<div class="select-btn">
+						<div class="checkbox-goods">
+							<van-checkbox ref="checkboxes" v-model="goodsInfo.isChecked" checked-color="#008000"
+								@click="deleteSun"></van-checkbox>
+						</div>
+					</div>
+					<div class="goods-img">
+						<div>
+							<span><img :src="goodsInfo.goodsImg" /></span>
+						</div>
+					</div>
+					<div class="goods-info">
+						<div class="goods">
+							<div class="goods-name">{{ goodsInfo.goodsName }}</div>
+						</div>
+						<div class="goods-sku">
+							<span>{{ goodsInfo.goodsSpecName }}</span>
+						</div>
+						<div class="goods-price goods-price-del">
+							<div>
+								<span style="font-weight: normal;color: grey;">￥</span>
+								<span style="font-weight: normal;color: grey;">{{ goodsInfo.goodsPrice }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="buy-count">
+						<div class="bc">
+							<span style="font-weight: normal;color: grey;">x{{ goodsInfo.goodsCount }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div>
-			<div style="height: 60px; width: 100%;clear: both;"></div>
+			<div style="height: 52px; width: 100%;clear: both;"></div>
 			<div class="van-submit-bar">
 				<div class="all-price-div">
 					<div class="all-price">
@@ -167,9 +150,9 @@
 				</div>
 			</div>
 		</div>
-		<!-- <div>
+		<div>
 			<Tbar tbActiveParent="2" />
-		</div> -->
+		</div>
 	</div>
 </template>
 <script>
@@ -187,8 +170,6 @@
 		data() {
 			return {
 				title: '购物车',
-				cartActive: 0,
-				clickTab: 0,
 				isEditer: false,
 				buttonText: '结算',
 				checkedAll: false,
@@ -197,18 +178,15 @@
 				priceAll: 0.0,
 				goodsCount: 1,
 				showCartEmptyFlag: false,
-				outTimeGoods: [], // 过期购物车商品
+				outTimeGoods: [],
 				deleteAll: "",
-				cartNullImg: null,
-				tabCount: 0,
-				// 
-				tabTitle0: '普通商品【0】',
-				tabTitle1: '租赁商品【0】',
+				cartNullImg: null
 			};
 		},
 		mounted: function() {
 			this.$nextTick(() => {
-				this.onChange(0);
+				this.findOrderCart();
+				// this.testData();
 			});
 		},
 		computed: {
@@ -247,31 +225,6 @@
 				//const page  = this.$router.resolve({path: url})
 				//window.open(page.href,'_blank')
 			},
-			onChange(index) {
-				let vm = this;
-				vm.initData();
-				vm.clickTab = index;
-				// this.onClickOrderStatus = this.tabList[index].orderStatus;
-				// console.log('----选中的标签-----' + index);
-				vm.findOrderCart();
-				// 初始化参数
-			},
-			initData() {
-				let vm = this;
-				vm.cartActive = 0;
-				vm.clickTab = 0;
-				vm.isEditer = false;
-				vm.buttonText = '结算';
-				vm.checkedAll = false;
-				vm.cartItems = [];
-				vm.priceAll = 0.0;
-				vm.goodsCount = 1;
-				vm.showCartEmptyFlag = false;
-				vm.outTimeGoods = []; // 过期购物车商品
-				vm.deleteAll = "";
-				vm.cartNullImg = null;
-				vm.tabCount = 0;
-			},
 			findOrderCart() {
 				let vm = this;
 				let params = {
@@ -288,56 +241,26 @@
 						vm.showCartEmptyFlag = res.data.showCartEmptyFlag;
 						vm.cartNullImg = res.data.cartNullImg;
 						var myData = [];
-						//
-						var tabCount0 = [];
-						var tabCount1 = [];
 						datas.forEach(function(e) {
 							var dateSun = [];
 							e.cartDetailList.forEach(function(e) {
-								// var shopCartData = {
-								// 	cartId: e.cartId,
-								// 	goodsId: e.goodsId,
-								// 	goodsName: e.goodsName,
-								// 	goodsCount: e.goodsCount,
-								// 	goodsImg: e.goodsImg,
-								// 	goodsPrice: e.goodsPrice,
-								// 	goodsSpecName: e.goodsSpecName,
-								// 	timeGoodsId: e.timeGoodsId,
-								// 	isSingle: e.isSingle,
-								// 	isChecked: false,
-								// 	isValid: true,
-								// 	goodsInfoCss: 'goods-info',
-								// 	buyCountCss: 'buy-count'
-								// };
-								e.isChecked = false;
-								e.isValid = true;
-								e.goodsInfoCss = 'goods-info';
-								e.buyCountCss = 'buy-count';
-								if (vm.clickTab == 1) {
-									// 租赁商品
-									if (e.goodsType == 3) {
-										dateSun.push(e);
-										tabCount1.push(e);
-									} else {
-										tabCount0.push(e);
-									}
-								} else {
-									// 普通商品
-									if (e.goodsType != 3) {
-										dateSun.push(e);
-										tabCount0.push(e);
-									} else {
-										tabCount1.push(e);
-									}
-								}
-
+								var shopCartData = {
+									cartId: e.cartId,
+									goodsId: e.goodsId,
+									goodsName: e.goodsName,
+									goodsCount: e.goodsCount,
+									goodsImg: e.goodsImg,
+									goodsPrice: e.goodsPrice,
+									goodsSpecName: e.goodsSpecName,
+									timeGoodsId: e.timeGoodsId,
+									isSingle: e.isSingle,
+									isChecked: false,
+									isValid: true,
+									goodsInfoCss: 'goods-info',
+									buyCountCss: 'buy-count'
+								};
+								dateSun.push(shopCartData);
 							});
-							// 
-							// console.log("=================================")
-							vm.tabCount = dateSun.length;
-							vm.tabTitle0 = "普通商品【" + tabCount0.length + "】";
-							vm.tabTitle1 = "租赁商品【" + tabCount1.length + "】";
-							// 
 							var shopCart = {
 								shopName: e.shopName,
 								shopId: e.shopId,
@@ -357,39 +280,24 @@
 				});
 			},
 			initOutTimeGoods() {
-				// 过期购物车商品
 				let vm = this;
 				let items = [];
 				vm.outTimeGoods.forEach(function(e) {
-					// var shopCartData = {
-					// 	cartId: e.cartId,
-					// 	goodsId: e.goodsId,
-					// 	goodsName: e.goodsName,
-					// 	goodsCount: e.goodsCount,
-					// 	goodsImg: e.goodsImg,
-					// 	goodsPrice: e.goodsPrice,
-					// 	goodsSpecName: e.goodsSpecName,
-					// 	isSingle: e.isSingle,
-					// 	isChecked: false,
-					// 	isValid: true,
-					// 	goodsInfoCss: 'goods-info',
-					// 	buyCountCss: 'buy-count'
-					// };
-					e.isChecked = false;
-					e.isValid = true;
-					e.goodsInfoCss = 'goods-info';
-					e.buyCountCss = 'buy-count';
-					if (vm.clickTab == 1) {
-						// 租赁商品
-						if (e.goodsType == 3) {
-							items.push(e);
-						}
-					} else {
-						// 普通商品
-						if (e.goodsType != 3) {
-							items.push(e);
-						}
-					}
+					var shopCartData = {
+						cartId: e.cartId,
+						goodsId: e.goodsId,
+						goodsName: e.goodsName,
+						goodsCount: e.goodsCount,
+						goodsImg: e.goodsImg,
+						goodsPrice: e.goodsPrice,
+						goodsSpecName: e.goodsSpecName,
+						isSingle: e.isSingle,
+						isChecked: false,
+						isValid: true,
+						goodsInfoCss: 'goods-info',
+						buyCountCss: 'buy-count'
+					};
+					items.push(shopCartData);
 				});
 				vm.outTimeGoods = items;
 			},
@@ -592,7 +500,6 @@
 			},
 			updateGoodsCartStatus(cartIds) {
 				//
-				let vm = this;
 				let params = {
 					req_type: 'delete_order_cart',
 					data: {
@@ -603,7 +510,6 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						Toast('删除成功');
-						vm.onChange(vm.clickTab);
 					} else {}
 				});
 			},
@@ -634,7 +540,7 @@
 					return
 				}
 				// console.log(cartIds)
-				this.checkBeforeOrder(cartIds);
+				this.$router.push('orderSubmit2?cartIds=' + cartIds);
 			},
 			initPageCss() {
 				let vm = this;
@@ -706,26 +612,86 @@
 				axios.post('', params).then(function(res) {
 					if (res.resp_code == 1) {
 						Toast('删除成功');
-						vm.onChange(vm.clickTab);
+						vm.findOrderCart();
 					} else {}
 				});
 			},
-			checkBeforeOrder(cartIds) {
-				let vm = this;
-				let params = {
-					req_type: 'before_submit_order',
-					data: {
-						cart_ids: cartIds
+			testData() {
+				const cartItems = [{
+						shopName: '水果2号店',
+						shopId: 2,
+						cartList: [{
+								cartId: 10,
+								goodsName: '测试店铺22商品10',
+								goodsCount: 1,
+								goodsImg: 'https://img.yzcdn.cn/vant/apple-1.jpg',
+								goodsPrice: 1.0,
+								goodsSpecName: ''
+							},
+							{
+								cartId: 11,
+								goodsName: '测试店铺22商品11',
+								goodsCount: 1,
+								goodsImg: 'https://img.yzcdn.cn/vant/apple-8.jpg',
+								goodsPrice: 1.01,
+								goodsSpecName: ''
+							}
+						]
+					},
+					{
+						shopName: '水果1号店',
+						shopId: 1,
+						cartList: [
+							// {
+							// 	cartId: 1,
+							// 	goodsName: '测试店铺商品1',
+							// 	goodsCount: 1,
+							// 	goodsImg: 'https://img.yzcdn.cn/vant/apple-2.jpg',
+							// 	goodsPrice: 1.0,
+							// 	goodsSpecName: ''
+							// },
+							// {
+							// 	cartId: 2,
+							// 	goodsName: '测试店铺商品2',
+							// 	goodsCount: 1,
+							// 	goodsImg: 'https://img.yzcdn.cn/vant/apple-5.jpg',
+							// 	goodsPrice: 1.01,
+							// 	goodsSpecName: ''
+							// }
+						]
 					}
-				}; // 参数
-				axios.post('', params).then(function(res) {
-					if (res.resp_code == 1) {
-						vm.$router.push('orderSubmit2?cartIds=' + cartIds);
-					} else {
-						Toast(res.resp_desc);
-					}
+				];
+
+				var myData = [];
+				cartItems.forEach(function(e) {
+					var dateSun = [];
+					e.cartList.forEach(function(e) {
+						var shopCartData = {
+							cartId: e.cartId,
+							goodsName: e.goodsName,
+							goodsCount: e.goodsCount,
+							goodsImg: e.goodsImg,
+							goodsPrice: e.goodsPrice,
+							goodsSpecName: e.goodsSpecName,
+							isChecked: false,
+							isValid: true
+						};
+						dateSun.push(shopCartData);
+					});
+					var shopCart = {
+						shopName: e.shopName,
+						shopId: e.shopId,
+						cartList: dateSun,
+						isChecked: false,
+						editerText: '编辑',
+						isEditer: false,
+						isValid: true
+					};
+					myData.push(shopCart);
+					// console.info(shopCart)
 				});
-			},
+				this.cartItems = myData;
+			}
 		}
 	};
 </script>
@@ -934,10 +900,8 @@
 		background-color: #008000;
 	}
 
-	>>>.van-submit-bar {
-		bottom: 0px !important;
-		padding: 0px 0px !important;
-
+	.van-submit-bar {
+		bottom: 50px !important;
 	}
 
 	.van-submit-bar__price {
@@ -975,7 +939,6 @@
 	}
 
 	.all-price-div {
-		margin-top: 5px;
 		float: left;
 		width: 50%;
 		text-align: right;
@@ -1011,15 +974,4 @@
 		background: #008000;
 		color: #ffffff;
 	}
-
-	/* tabs */
-	.tabs {
-		position: fixed;
-		top: 45px;
-		width: 100%;
-		background-color: #ffffff;
-		z-index: 99;
-	}
-
-	.tabs-data {}
 </style>
